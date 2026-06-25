@@ -13,7 +13,7 @@ import lombok.experimental.SuperBuilder;
 @MappedSuperclass
 @SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class SoftDeletableEntity extends UpdatableEntity {
+public abstract class SoftDeletableEntity extends UpdatableEntity {
 
 	// soft delete
 	@Column(name = "deleted_at")

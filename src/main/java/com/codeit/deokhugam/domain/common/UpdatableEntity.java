@@ -15,7 +15,7 @@ import lombok.experimental.SuperBuilder;
 @MappedSuperclass
 @SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class UpdatableEntity extends BaseEntity {
+public abstract class UpdatableEntity extends BaseEntity {
 
 	@LastModifiedDate
 	@Column(name = "updated_at", nullable = false)

@@ -82,8 +82,7 @@ CREATE TABLE review_like (
     id              BINARY(16) NOT NULL,
     review_id       BINARY(16) NOT NULL,
     user_id         BINARY(16) NOT NULL,
-    created_at      DATETIME(6) NOT NULL,
-    updated_at      DATETIME(6) NOT NULL
+    created_at      DATETIME(6) NOT NULL
 );
 ALTER TABLE review_like ADD CONSTRAINT pk_review_like_id PRIMARY KEY (id);
 ALTER TABLE review_like ADD CONSTRAINT fk_review_like_review FOREIGN KEY (review_id) REFERENCES review (id);

@@ -69,7 +69,6 @@ public class Review extends SoftDeletableEntity {
 		this.rating = rating;
 	}
 
-
 	/// 동시성 이슈 발생지점! -> Repository Layer에서 @OptimisticLock으로 처리
 	public void increaseLikeCount() {
 		this.likeCount++;
