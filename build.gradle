@@ -1,0 +1,57 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.5.15'
+    id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.sb12.team4'
+version = '0.0.1-SNAPSHOT'
+description = 'deokhugam'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Web & REST API
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    // 데이터 유효성 검사 (Bean Validation)
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // Database (JPA)
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+    // Elasticsearch
+    implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
+
+    // DB Drivers
+    runtimeOnly 'com.h2database:h2' // Dev 환경용
+    runtimeOnly 'com.mysql:mysql-connector-j' // Prod(Aurora) 환경용
+
+    // Lombok, Devtools
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+    // Test
+    testImplementation 'org.springframework.boot:spring-boot-starter-test' // 모든 스프링 테스트 기능 포함
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // Test 환경용 Lombok 설정
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
+
+    // .env 파일 로드
+    implementation 'me.paulschwarz:spring-dotenv:4.0.0'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
