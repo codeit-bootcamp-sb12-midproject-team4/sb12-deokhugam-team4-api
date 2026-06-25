@@ -8,6 +8,11 @@ DROP TABLE IF EXISTS `book_recommendation`;
 DROP TABLE IF EXISTS `notification`;
 DROP TABLE IF EXISTS `user`;
 DROP TABLE IF EXISTS `book_category`;
+DROP TABLE IF EXISTS `popular_book`;
+DROP TABLE IF EXISTS `popular_review`;
+DROP TABLE IF EXISTS `power_user`;
+DROP TABLE IF EXISTS `trending_keyword_snapshot`;
+DROP TABLE IF EXISTS `trending_keyword`;
 SET FOREIGN_KEY_CHECKS = 1;
 
 CREATE TABLE `user` (
@@ -126,14 +131,98 @@ ALTER TABLE book_recommendation ADD CONSTRAINT fk_book_recommendation_book FOREI
 
 CREATE TABLE notification
 (
-    id              BINARY(16)    NOT NULL,
-    user_id         BINARY(16)    NOT NULL,
-    review_id       BINARY(16)    NOT NULL,
-    message         VARCHAR(1000) NULL,
-    confirmed       BOOLEAN       NOT NULL DEFAULT FALSE,
-    created_at      DATETIME(6)   NOT NULL,
-    updated_at      DATETIME(6)   NOT NULL
+    id              BINARY(16)      NOT NULL,
+    user_id         BINARY(16)      NOT NULL,
+    review_id       BINARY(16)      NOT NULL,
+    message         VARCHAR(1000)   NULL,
+    confirmed       BOOLEAN         NOT NULL DEFAULT FALSE,
+    created_at      DATETIME(6)     NOT NULL,
+    updated_at      DATETIME(6)     NOT NULL
 );
 ALTER TABLE notification ADD CONSTRAINT pk_notification_id PRIMARY KEY (id);
 ALTER TABLE notification ADD CONSTRAINT fk_notification_user FOREIGN KEY (user_id) REFERENCES `user`(id);
 ALTER TABLE notification ADD CONSTRAINT fk_notifications_review FOREIGN KEY (review_id) REFERENCES review(id);
+
+CREATE TABLE popular_book (
+id                  BINARY(16)      NOT NULL,
+    book_id         BINARY(16)      NOT NULL,
+    period          ENUM('DAILY', 'WEEKLY', 'MONTHLY', 'ALL_TIME') NOT NULL,
+    ranking         INT UNSIGNED NOT NULL,
+    book_title      VARCHAR(255)    NOT NULL,
+    author          VARCHAR(50)     NOT NULL,
+    thumbnail_url   VARCHAR(300)    NULL,
+    score           DECIMAL(10,2)   NOT NULL,
+    review_count    INT UNSIGNED    NOT NULL,
+    like_count      INT UNSIGNED    NOT NULL,
+    comment_count   INT UNSIGNED    NOT NULL,
+    average_rating  DECIMAL(3,2)    NOT NULL,
+    batch_date      DATE            NOT NULL,
+    created_at      DATETIME(6)     NOT NULL DEFAULT CURRENT_TIMESTAMP(6)
+);
+ALTER TABLE popular_book ADD CONSTRAINT pk_popular_book_id PRIMARY KEY (id);
+ALTER TABLE popular_book ADD CONSTRAINT uq_popular_book_date UNIQUE (period, book_id, batch_date);
+ALTER TABLE popular_book ADD CONSTRAINT uq_popular_book_ranking UNIQUE (period, batch_date, ranking);
+ALTER TABLE popular_book ADD CONSTRAINT chk_popular_book_ranking CHECK (ranking BETWEEN 1 AND 50);
+ALTER TABLE popular_book ADD CONSTRAINT chk_popular_book_avg_rating CHECK (average_rating BETWEEN 0.00 AND 5.00);
+ALTER TABLE popular_book ADD CONSTRAINT chk_popular_book_score CHECK (score >= 0);
+
+CREATE TABLE popular_review (
+    id              BINARY(16)      NOT NULL,
+    review_id       BINARY(16)      NOT NULL,
+    `period`        ENUM('DAILY', 'WEEKLY', 'MONTHLY', 'ALL_TIME') NOT NULL,
+    ranking         INT UNSIGNED NOT NULL,
+    book_title      VARCHAR(255)    NOT NULL,
+    book_author     VARCHAR(50)     NOT NULL,
+    thumbnail_url   VARCHAR(300)    NULL,
+    user_nickname   VARCHAR(20)     NOT NULL,
+    review_content  VARCHAR(1000)   NOT NULL,
+    review_rating   INT UNSIGNED NOT NULL,
+    score           DECIMAL(10,2)   NOT NULL,
+    like_count      INT UNSIGNED    NOT NULL,
+    comment_count   INT UNSIGNED    NOT NULL,
+    batch_date      DATE            NOT NULL,
+    created_at      DATETIME(6)     NOT NULL DEFAULT CURRENT_TIMESTAMP(6)
+);
+ALTER TABLE popular_review ADD CONSTRAINT pk_popular_review_id PRIMARY KEY (id);
+ALTER TABLE popular_review ADD CONSTRAINT uq_popular_review_date UNIQUE (period, review_id, batch_date);
+ALTER TABLE popular_review ADD CONSTRAINT uq_popular_review_ranking UNIQUE (period, batch_date, ranking);
+ALTER TABLE popular_review ADD CONSTRAINT chk_popular_review_ranking CHECK (ranking BETWEEN 1 AND 50);
+ALTER TABLE popular_review ADD CONSTRAINT chk_popular_review_rating CHECK (review_rating BETWEEN 0 AND 5);
+ALTER TABLE popular_review ADD CONSTRAINT chk_popular_review_score CHECK (score >= 0);
+
+CREATE TABLE power_user (
+    id              BINARY(16)      NOT NULL,
+    user_id         BINARY(16)      NOT NULL,
+    `period`        ENUM('DAILY', 'WEEKLY', 'MONTHLY', 'ALL_TIME') NOT NULL,
+    ranking         INT UNSIGNED NOT NULL,
+    nickname        VARCHAR(20)     NOT NULL,
+    score           DECIMAL(10,2)   NOT NULL,
+    like_count      INT UNSIGNED    NOT NULL,
+    comment_count   INT UNSIGNED    NOT NULL,
+    batch_date      DATE            NOT NULL,
+    created_at      DATETIME(6)     NOT NULL DEFAULT CURRENT_TIMESTAMP(6)
+);
+ALTER TABLE power_user ADD CONSTRAINT pk_power_user_id PRIMARY KEY (id);
+ALTER TABLE power_user ADD CONSTRAINT uq_power_user_date UNIQUE (period, user_id, batch_date);
+ALTER TABLE power_user ADD CONSTRAINT uq_power_user_ranking UNIQUE (period, batch_date, ranking);
+ALTER TABLE power_user ADD CONSTRAINT chk_power_user_ranking CHECK (ranking BETWEEN 1 AND 10);
+ALTER TABLE power_user ADD CONSTRAINT chk_power_user_score CHECK (score >= 0);
+
+CREATE TABLE trending_keyword_snapshot (
+    snapshot_id     BIGINT          NOT NULL AUTO_INCREMENT,
+    calculated_at   DATETIME        NOT NULL -- (6) 정밀도를 제거하여 5바이트로 최적화
+);
+ALTER TABLE trending_keyword_snapshot ADD CONSTRAINT pk_trending_keyword_snapshot_id PRIMARY KEY (snapshot_id);
+ALTER TABLE trending_keyword_snapshot ADD CONSTRAINT uq_trending_keyword_snapshot_time UNIQUE (calculated_at);
+
+CREATE TABLE trending_keyword (
+    snapshot_id     BIGINT          NOT NULL,
+    ranking         INT UNSIGNED NOT NULL,
+    keyword         VARCHAR(50)     NOT NULL,
+    score           DECIMAL(8,2)    NOT NULL,
+    -- 대리키 id 제거 후 복합 PK 지정 (snapshot_id 별로 데이터가 물리적으로 뭉쳐서 저장됨)
+    PRIMARY KEY (snapshot_id, ranking)
+);
+ALTER TABLE trending_keyword ADD CONSTRAINT fk_trending_keyword_snapshot_id FOREIGN KEY (snapshot_id) REFERENCES trending_keyword_snapshot (snapshot_id) ON DELETE CASCADE;
+ALTER TABLE trending_keyword ADD CONSTRAINT chk_trending_keyword_ranking CHECK (ranking BETWEEN 1 AND 10);
+ALTER TABLE trending_keyword ADD CONSTRAINT chk_trending_keyword_score CHECK (score >= 0);
