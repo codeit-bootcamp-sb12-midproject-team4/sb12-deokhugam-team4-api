@@ -8,7 +8,7 @@ import org.hibernate.annotations.SQLRestriction;
 import com.codeit.deokhugam.domain.common.SoftDeletableEntity;
 
 @Entity
-@Table(name = "user")
+@Table(name = "users")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
