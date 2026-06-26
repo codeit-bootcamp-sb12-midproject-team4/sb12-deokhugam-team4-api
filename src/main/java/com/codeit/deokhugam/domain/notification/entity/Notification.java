@@ -1,12 +1,8 @@
-package com.codeit.deokhugam.domain.notification;
+package com.codeit.deokhugam.domain.notification.entity;
 
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import com.codeit.deokhugam.domain.common.BaseEntity;
 import com.codeit.deokhugam.domain.common.UpdatableEntity;
 import com.codeit.deokhugam.domain.review.Review;
 import com.codeit.deokhugam.domain.user.User;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -18,6 +14,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @Table(name = "notification")
@@ -27,21 +24,21 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Notification extends UpdatableEntity {
 
-	@ManyToOne(fetch = FetchType.LAZY, optional = false)
-	@JoinColumn(name = "user_id", nullable = false)
-	private User user;
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "user_id", nullable = false)
+  private User user;
 
-	@ManyToOne(fetch = FetchType.LAZY, optional = false)
-	@JoinColumn(name = "review_id", nullable = false)
-	private Review review;
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "review_id", nullable = false)
+  private Review review;
 
-	@Column(name = "message", length = 1000)
-	private String message;
+  @Column(name = "message", length = 1000)
+  private String message;
 
-	@Column(name = "confirmed", nullable = false)
-	private boolean confirmed = false;
+  @Column(name = "confirmed", nullable = false)
+  private boolean confirmed = false;
 
-	public void confirm() {
-		this.confirmed = true;
-	}
+  public void confirm() {
+    this.confirmed = true;
+  }
 }
