@@ -1,0 +1,30 @@
+spring:
+  config:
+    activate:
+      on-profile: dev-batch
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/deokhugam-db?useSSL=false&serverTimezone=UTC&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
+    username: user
+    password: 1234
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate # 정합성 검증 (엔티티 vs 테이블)
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
+
+  elasticsearch:
+    uris: http://localhost:9200
+
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.hibernate.orm.jdbc.bind: trace
+    org.hibernate.type.descriptor.sql: trace
+    org.springframework.web: trace
+    com.deokhugam.team4.sb12: trace
