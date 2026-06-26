@@ -208,11 +208,12 @@ ALTER TABLE power_user ADD CONSTRAINT chk_power_user_ranking CHECK (ranking BETW
 ALTER TABLE power_user ADD CONSTRAINT chk_power_user_score CHECK (score >= 0);
 
 CREATE TABLE trending_keyword_snapshot (
-    snapshot_id     BIGINT          NOT NULL AUTO_INCREMENT,
-    calculated_at   DATETIME        NOT NULL -- (6) 정밀도를 제거하여 5바이트로 최적화
+    snapshot_id     BIGINT          NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    calculated_at   DATETIME        NOT NULL, -- (6) 정밀도를 제거하여 5바이트로 최적화
+    UNIQUE KEY uq_trending_keyword_snapshot_time(calculated_at)
 );
-ALTER TABLE trending_keyword_snapshot ADD CONSTRAINT pk_trending_keyword_snapshot_id PRIMARY KEY (snapshot_id);
-ALTER TABLE trending_keyword_snapshot ADD CONSTRAINT uq_trending_keyword_snapshot_time UNIQUE (calculated_at);
+-- ALTER TABLE trending_keyword_snapshot ADD CONSTRAINT pk_trending_keyword_snapshot_id PRIMARY KEY (snapshot_id);
+-- ALTER TABLE trending_keyword_snapshot ADD CONSTRAINT uq_trending_keyword_snapshot_time UNIQUE (calculated_at);
 
 CREATE TABLE trending_keyword (
     snapshot_id     BIGINT          NOT NULL,

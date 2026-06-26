@@ -7,7 +7,7 @@ spring:
       max-file-size: 100MB
       max-request-size: 300MB
   profiles:
-    active: dev   # dev, prod 선택 가능
+    active: dev   # dev, dev-batch, prod 선택 가능
 
   jpa:
     open-in-view: false
