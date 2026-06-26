@@ -1,4 +1,4 @@
-package com.codeit.deokhugam.domain.dashboard;
+package com.codeit.deokhugam.domain.dashboard.entity;
 
 import java.io.Serializable;
 import java.util.Objects;

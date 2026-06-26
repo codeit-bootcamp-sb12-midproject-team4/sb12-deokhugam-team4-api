@@ -1,4 +1,4 @@
-package com.codeit.deokhugam.domain.dashboard;
+package com.codeit.deokhugam.domain.dashboard.entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -27,19 +27,19 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Table(
-	name = "popular_review",
+	name = "power_user",
 	uniqueConstraints = {
-		@UniqueConstraint(name = "uq_popular_review_date", columnNames = {"period", "review_id", "batch_date"}),
-		@UniqueConstraint(name = "uq_popular_review_ranking", columnNames = {"period", "batch_date", "ranking"})
+		@UniqueConstraint(name = "uq_power_user_date", columnNames = {"period", "user_id", "batch_date"}),
+		@UniqueConstraint(name = "uq_power_user_ranking", columnNames = {"period", "batch_date", "ranking"})
 	}
 )
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PopularReview extends BaseEntity {
+public class PowerUser extends BaseEntity {
 
 	@JdbcTypeCode(SqlTypes.BINARY)
-	@Column(name = "review_id", nullable = false)
-	private UUID reviewId;
+	@Column(name = "user_id", nullable = false)
+	private UUID userId;
 
 	@NotNull
 	@Enumerated(EnumType.STRING)
@@ -47,33 +47,13 @@ public class PopularReview extends BaseEntity {
 	private PeriodType period;
 
 	@Min(1)
-	@Max(50)
+	@Max(10)
 	@Column(name = "ranking", nullable = false)
 	private Integer ranking;
 
 	@NotBlank
-	@Column(name = "book_title", nullable = false, length = 255)
-	private String bookTitle;
-
-	@NotBlank
-	@Column(name = "book_author", nullable = false, length = 50)
-	private String bookAuthor;
-
-	@Column(name = "thumbnail_url", length = 300)
-	private String thumbnailUrl;
-
-	@NotBlank
-	@Column(name = "user_nickname", nullable = false, length = 20)
-	private String userNickname;
-
-	@NotBlank
-	@Column(name = "review_content", nullable = false, length = 1000)
-	private String reviewContent;
-
-	@Min(0)
-	@Max(5)
-	@Column(name = "review_rating", nullable = false)
-	private Integer reviewRating;
+	@Column(name = "nickname", nullable = false, length = 20)
+	private String nickname;
 
 	@DecimalMin("0.00")
 	@Column(name = "score", nullable = false, precision = 10, scale = 2)
@@ -90,4 +70,5 @@ public class PopularReview extends BaseEntity {
 	@NotNull
 	@Column(name = "batch_date", nullable = false)
 	private LocalDate batchDate;
+
 }

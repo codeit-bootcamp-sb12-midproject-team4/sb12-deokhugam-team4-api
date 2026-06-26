@@ -1,4 +1,4 @@
-package com.codeit.deokhugam.domain.dashboard;
+package com.codeit.deokhugam.domain.dashboard.entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -27,19 +27,19 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Table(
-	name = "power_user",
+	name = "popular_review",
 	uniqueConstraints = {
-		@UniqueConstraint(name = "uq_power_user_date", columnNames = {"period", "user_id", "batch_date"}),
-		@UniqueConstraint(name = "uq_power_user_ranking", columnNames = {"period", "batch_date", "ranking"})
+		@UniqueConstraint(name = "uq_popular_review_date", columnNames = {"period", "review_id", "batch_date"}),
+		@UniqueConstraint(name = "uq_popular_review_ranking", columnNames = {"period", "batch_date", "ranking"})
 	}
 )
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PowerUser extends BaseEntity {
+public class PopularReview extends BaseEntity {
 
 	@JdbcTypeCode(SqlTypes.BINARY)
-	@Column(name = "user_id", nullable = false)
-	private UUID userId;
+	@Column(name = "review_id", nullable = false)
+	private UUID reviewId;
 
 	@NotNull
 	@Enumerated(EnumType.STRING)
@@ -47,13 +47,33 @@ public class PowerUser extends BaseEntity {
 	private PeriodType period;
 
 	@Min(1)
-	@Max(10)
+	@Max(50)
 	@Column(name = "ranking", nullable = false)
 	private Integer ranking;
 
 	@NotBlank
-	@Column(name = "nickname", nullable = false, length = 20)
-	private String nickname;
+	@Column(name = "book_title", nullable = false, length = 255)
+	private String bookTitle;
+
+	@NotBlank
+	@Column(name = "book_author", nullable = false, length = 50)
+	private String bookAuthor;
+
+	@Column(name = "thumbnail_url", length = 300)
+	private String thumbnailUrl;
+
+	@NotBlank
+	@Column(name = "user_nickname", nullable = false, length = 20)
+	private String userNickname;
+
+	@NotBlank
+	@Column(name = "review_content", nullable = false, length = 1000)
+	private String reviewContent;
+
+	@Min(0)
+	@Max(5)
+	@Column(name = "review_rating", nullable = false)
+	private Integer reviewRating;
 
 	@DecimalMin("0.00")
 	@Column(name = "score", nullable = false, precision = 10, scale = 2)
@@ -70,5 +90,4 @@ public class PowerUser extends BaseEntity {
 	@NotNull
 	@Column(name = "batch_date", nullable = false)
 	private LocalDate batchDate;
-
 }

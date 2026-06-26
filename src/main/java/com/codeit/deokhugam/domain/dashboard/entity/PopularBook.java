@@ -1,4 +1,4 @@
-package com.codeit.deokhugam.domain.dashboard;
+package com.codeit.deokhugam.domain.dashboard.entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
