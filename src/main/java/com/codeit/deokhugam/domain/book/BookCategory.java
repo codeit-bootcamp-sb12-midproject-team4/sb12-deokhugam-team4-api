@@ -30,7 +30,7 @@ import lombok.NoArgsConstructor;
 @EntityListeners(AuditingEntityListener.class)
 public class BookCategory extends UpdatableEntity {
 
-	@Column(name = "name", length = 100, nullable = false)
+	@Column(name = "name", nullable = false, length = 100)
 	private String name;
 
 	@Column(name = "depth", nullable = false)

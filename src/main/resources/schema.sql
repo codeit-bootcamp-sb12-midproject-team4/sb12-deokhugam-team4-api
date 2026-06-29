@@ -30,26 +30,27 @@ ALTER TABLE `users` ADD CONSTRAINT uk_user_email UNIQUE (email);
 CREATE TABLE book_category (
     id              BINARY(16)      NOT NULL,
     name            VARCHAR(100)    NOT NULL,
-    parent_id       BINARY(16)      NULL,
     depth           INTEGER         NOT NULL,
     path            VARCHAR(255)    NOT NULL,
+    parent_id       BINARY(16)      NULL,
     created_at      DATETIME(6)     NOT NULL,
     updated_at      DATETIME(6)     NOT NULL
 );
 ALTER TABLE book_category ADD CONSTRAINT pk_book_category_id PRIMARY KEY (id);
 ALTER TABLE book_category ADD CONSTRAINT fk_book_category_parent_id FOREIGN KEY (parent_id) REFERENCES book_category(id);
+ALTER TABLE book_category ADD CONSTRAINT uk_book_category_parent_id_name UNIQUE (name, parent_id);
 
 CREATE TABLE book (
     id              BINARY(16)      NOT NULL,
     title           VARCHAR(255)    NOT NULL,
     author          VARCHAR(50)     NOT NULL,
-    description     VARCHAR(1000)   NULL,
+    description     TEXT            NULL,
     publisher       VARCHAR(50)     NOT NULL,
     published_date  DATE            NULL,
     isbn            VARCHAR(20)     NOT NULL UNIQUE,
-    thumbnail_url   VARCHAR(100)    NULL,
-    review_count    BIGINT          NULL DEFAULT 0,
-    rating          DOUBLE          NULL DEFAULT 0,
+    thumbnail_url   VARCHAR(255)    NULL,
+    review_count    BIGINT          NOT NULL DEFAULT 0,
+    rating          DOUBLE          NOT NULL DEFAULT 0,
     book_category_id
                     BINARY(16)      NOT NULL,
     created_at      DATETIME(6)     NOT NULL,

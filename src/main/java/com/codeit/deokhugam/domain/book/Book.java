@@ -15,29 +15,35 @@ import com.codeit.deokhugam.domain.common.SoftDeletableEntity;
 @AllArgsConstructor
 public class Book extends SoftDeletableEntity {
 
-	@Column(nullable = false)
+	@Column(name = "title", nullable = false, length = 255)
 	private String title;
 
-	@Column(nullable = false, length = 50)
+	@Column(name = "author", nullable = false, length = 50)
 	private String author;
 
-	@Column(length = 1000)
+	@Column(name = "description", columnDefinition = "TEXT")
 	private String description;
 
-	@Column(nullable = false, length = 50)
+	@Column(name = "publisher", nullable = false, length = 50)
 	private String publisher;
 
+	@Column(name = "published_date")
 	private LocalDate publishedDate;
 
-	@Column(nullable = false, length = 20)
+	@Column(name = "isbn", nullable = false, unique = true, length = 20)
 	private String isbn;
 
-	@Column(length = 100)
+	@Column(name = "thumbnail_url", length = 255)
 	private String thumbnailUrl;
 
-	@Column(columnDefinition = "BIGINT DEFAULT 0")
+	@Column(name = "review_count", nullable = false, columnDefinition = "BIGINT DEFAULT 0")
 	private Long reviewCount = 0L;
 
-	@Column(columnDefinition = "DOUBLE DEFAULT 0")
+	@Column(name = "rating", nullable = false, columnDefinition = "DOUBLE DEFAULT 0")
 	private Double rating = 0.0;
+
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "book_category_id")
+	private BookCategory bookCategory;
 }
