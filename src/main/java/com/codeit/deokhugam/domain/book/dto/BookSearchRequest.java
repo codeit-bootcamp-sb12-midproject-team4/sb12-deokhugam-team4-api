@@ -2,6 +2,7 @@ package com.codeit.deokhugam.domain.book.dto;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -31,6 +32,7 @@ public class BookSearchRequest {
 	@Pattern(regexp = "ASC|DESC", message = "정렬 방향은 ASC 또는 DESC여야 합니다.")
 	private String direction = "DESC";
 
+	@Nullable
 	private String cursor;
 
 	@NotNull(message = "보조 커서(after)는 필수입니다.")
