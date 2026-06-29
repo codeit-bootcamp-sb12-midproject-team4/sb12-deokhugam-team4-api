@@ -1,4 +1,4 @@
-package com.codeit.deokhugam.domain.review;
+package com.codeit.deokhugam.domain.review.entity;
 
 import java.util.UUID;
 

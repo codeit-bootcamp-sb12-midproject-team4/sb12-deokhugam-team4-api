@@ -1,11 +1,11 @@
-package com.codeit.deokhugam.domain.reviewlike;
+package com.codeit.deokhugam.domain.reviewlike.entity;
 
 import java.util.UUID;
 
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.codeit.deokhugam.domain.common.BaseEntity;
-import com.codeit.deokhugam.domain.review.Review;
+import com.codeit.deokhugam.domain.review.entity.Review;
 import com.codeit.deokhugam.domain.user.User;
 
 import jakarta.persistence.Entity;

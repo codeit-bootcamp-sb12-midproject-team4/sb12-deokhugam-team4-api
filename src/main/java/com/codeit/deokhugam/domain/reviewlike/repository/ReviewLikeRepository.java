@@ -8,7 +8,7 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import com.codeit.deokhugam.domain.reviewlike.ReviewLike;
+import com.codeit.deokhugam.domain.reviewlike.entity.ReviewLike;
 
 public interface ReviewLikeRepository extends JpaRepository<ReviewLike, UUID> {
 

@@ -7,9 +7,9 @@ import org.springframework.stereotype.Repository;
 
 import com.codeit.deokhugam.domain.book.QBook;
 import com.codeit.deokhugam.domain.common.CursorPageResponse;
-import com.codeit.deokhugam.domain.review.QReview;
-import com.codeit.deokhugam.domain.review.Review;
 import com.codeit.deokhugam.domain.review.dto.ReviewSearchCondition;
+import com.codeit.deokhugam.domain.review.entity.QReview;
+import com.codeit.deokhugam.domain.review.entity.Review;
 import com.codeit.deokhugam.domain.review.repository.ReviewRepositoryCustom;
 import com.codeit.deokhugam.domain.user.QUser;
 import com.querydsl.core.BooleanBuilder;

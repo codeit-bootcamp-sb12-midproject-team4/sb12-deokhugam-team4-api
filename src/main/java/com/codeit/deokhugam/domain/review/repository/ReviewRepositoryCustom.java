@@ -1,8 +1,8 @@
 package com.codeit.deokhugam.domain.review.repository;
 
 import com.codeit.deokhugam.domain.common.CursorPageResponse;
-import com.codeit.deokhugam.domain.review.Review;
 import com.codeit.deokhugam.domain.review.dto.ReviewSearchCondition;
+import com.codeit.deokhugam.domain.review.entity.Review;
 
 public interface ReviewRepositoryCustom {
 

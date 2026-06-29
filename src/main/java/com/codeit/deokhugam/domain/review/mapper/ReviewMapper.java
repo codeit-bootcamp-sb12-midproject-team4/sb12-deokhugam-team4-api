@@ -5,9 +5,9 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import com.codeit.deokhugam.domain.book.Book;
-import com.codeit.deokhugam.domain.review.Review;
 import com.codeit.deokhugam.domain.review.dto.ReviewCreateRequest;
 import com.codeit.deokhugam.domain.review.dto.ReviewResponse;
+import com.codeit.deokhugam.domain.review.entity.Review;
 import com.codeit.deokhugam.domain.user.User;
 
 @Mapper(componentModel = "spring")
