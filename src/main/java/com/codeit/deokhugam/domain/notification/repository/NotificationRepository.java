@@ -65,4 +65,6 @@ public interface NotificationRepository extends JpaRepository<Notification, UUID
         and n.updatedAt < :threshold
       """)
   int deleteConfirmedAfter(Instant threshold);
+
+  long countByUserId(UUID userId);
 }

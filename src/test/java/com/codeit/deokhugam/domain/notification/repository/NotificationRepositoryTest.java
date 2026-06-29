@@ -164,7 +164,6 @@ public class NotificationRepositoryTest {
     List<Notification> notificationList = notificationRepository.findAllByUserIdWithCursorDESC(
         user.getId(),
         null,
-        null,
         pageable
     );
 
@@ -188,7 +187,6 @@ public class NotificationRepositoryTest {
 
     List<Notification> notificationList = notificationRepository.findAllByUserIdWithCursorASC(
         user.getId(),
-        null,
         null,
         pageable
     );
