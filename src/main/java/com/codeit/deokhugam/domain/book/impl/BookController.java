@@ -1,4 +1,4 @@
-package com.codeit.deokhugam.domain.book;
+package com.codeit.deokhugam.domain.book.impl;
 
 import java.util.UUID;
 
@@ -17,11 +17,15 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.codeit.deokhugam.domain.book.BookFacade;
+import com.codeit.deokhugam.domain.book.BookService;
 import com.codeit.deokhugam.domain.book.dto.BookIsbnResponse;
 import com.codeit.deokhugam.domain.book.dto.BookPatchRequest;
 import com.codeit.deokhugam.domain.book.dto.BookPostRequest;
 import com.codeit.deokhugam.domain.book.dto.BookResponse;
 import com.codeit.deokhugam.domain.book.dto.BookSearchRequest;
+import com.codeit.deokhugam.domain.client.isbn.IsbnClient;
+import com.codeit.deokhugam.domain.client.ocr.OcrClient;
 import com.codeit.deokhugam.domain.common.CursorPageResponse;
 
 import jakarta.validation.Valid;
@@ -33,20 +37,26 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @RequestMapping("/api/books")
 public class BookController {
+	private final BookFacade bookFacade;
+	private final BookService bookService;
+	private final OcrClient ocrClient;
+	private final IsbnClient isbnClient;
 
 	@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<BookResponse> postBook(
 			@RequestPart(value = "bookData") @Valid BookPostRequest req,
 			@RequestPart(value = "thumbnailImage", required = false)MultipartFile img
 	) {
-		return ResponseEntity.status(HttpStatus.CREATED).body(null);
+		BookResponse res = bookFacade.post(req, img);
+		return ResponseEntity.status(HttpStatus.CREATED).body(res);
 	}
 
 	@PostMapping(value = "/isbn/ocr", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<String> postIsbn(
 			@RequestPart(value = "image") MultipartFile img
 	) {
-		return ResponseEntity.status(HttpStatus.OK).body(null);
+		String res = ocrClient.getIsbnFromImage(img);
+		return ResponseEntity.status(HttpStatus.OK).body(res);
 	}
 
 	@GetMapping(value = "/info")
@@ -55,24 +65,28 @@ public class BookController {
 			@Pattern(regexp = "^(978|979)-?[0-9]{1,7}-?[0-9]{1,7}-?[0-9]{1,7}-?[0-9X0-9]$", message = "올바른 ISBN 형식이 아닙니다.")
 			String isbn
 	) {
-		return ResponseEntity.status(HttpStatus.OK).body(null);
+		BookIsbnResponse res = isbnClient.getInfoFromIsbn(isbn);
+		return ResponseEntity.status(HttpStatus.OK).body(res);
 	}
 
 	@GetMapping
 	public ResponseEntity<CursorPageResponse<BookResponse>> getBooks(
 			@ModelAttribute @Valid BookSearchRequest req
 	) {
-		return ResponseEntity.status(HttpStatus.OK).body(null);
+		CursorPageResponse<BookResponse> res = bookService.findAllByKeyword(req);
+		return ResponseEntity.status(HttpStatus.OK).body(res);
 	}
 
 	@GetMapping("/{userId}")
 	public ResponseEntity<CursorPageResponse<BookResponse>> getUserBooks(@PathVariable UUID userId) {
-		return ResponseEntity.status(HttpStatus.OK).body(null);
+		CursorPageResponse<BookResponse> res = bookService.findAllByUserId(userId);
+		return ResponseEntity.status(HttpStatus.OK).body(res);
 	}
 
 	@GetMapping("/{bookId}")
 	public ResponseEntity<BookResponse> getBookDetails(@PathVariable UUID bookId) {
-		return ResponseEntity.status(HttpStatus.OK).body(null);
+		BookResponse res = bookService.findById(bookId);
+		return ResponseEntity.status(HttpStatus.OK).body(res);
 	}
 
 	@PatchMapping("/{bookId}")
@@ -81,16 +95,19 @@ public class BookController {
 			@RequestPart(value = "bookData") @Valid BookPatchRequest req,
 			@RequestPart(value = "thumbnailImage", required = false) MultipartFile img
 	) {
-		return ResponseEntity.status(HttpStatus.OK).body(null);
+		BookResponse res = bookFacade.patch(bookId, req, img);
+		return ResponseEntity.status(HttpStatus.OK).body(res);
 	}
 
 	@DeleteMapping("/{bookId}")
 	public ResponseEntity<Void> logicalDeleteBook(@PathVariable UUID bookId) {
+		bookService.deleteSoft(bookId);
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
 	}
 
 	@DeleteMapping("/{bookId}")
 	public ResponseEntity<Void> physicalDeleteBook(@PathVariable UUID bookId) {
+		bookService.delete(bookId);
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
 	}
 

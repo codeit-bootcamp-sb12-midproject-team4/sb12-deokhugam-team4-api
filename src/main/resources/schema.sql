@@ -47,7 +47,7 @@ CREATE TABLE book (
     description     TEXT            NULL,
     publisher       VARCHAR(50)     NOT NULL,
     published_date  DATE            NULL,
-    isbn            VARCHAR(20)     NOT NULL UNIQUE,
+    isbn            VARCHAR(20)     NULL, UNIQUE,
     thumbnail_url   VARCHAR(255)    NULL,
     review_count    BIGINT          NOT NULL DEFAULT 0,
     rating          DOUBLE          NOT NULL DEFAULT 0,

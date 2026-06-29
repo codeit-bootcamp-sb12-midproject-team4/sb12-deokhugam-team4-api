@@ -1,4 +1,4 @@
-package com.codeit.deokhugam.domain.bookstatus;
+package com.codeit.deokhugam.domain.bookstatus.impl;
 
 import java.util.UUID;
 
@@ -11,7 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import jakarta.validation.constraints.Pattern;
+import com.codeit.deokhugam.domain.bookstatus.BookStatusType;
+
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -22,13 +23,17 @@ public class BookStatusController {
 	@PutMapping("/{bookId}")
 	public ResponseEntity<Void> putBookStatus(
 			@PathVariable UUID bookId,
-			@RequestParam @Pattern(regexp = "WANT|READING|DONE") String status
+			@RequestParam BookStatusType status
+			// 요청 사용자정보 수집필요
 	) {
 		return ResponseEntity.status(HttpStatus.OK).body(null);
 	}
 
 	@DeleteMapping("/{bookId}")
-	public ResponseEntity<Void> deleteBookStatus(@PathVariable UUID bookId) {
+	public ResponseEntity<Void> deleteBookStatus(
+			@PathVariable UUID bookId
+			// 요청 사용자정보 수집필요
+	) {
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
 	}
 

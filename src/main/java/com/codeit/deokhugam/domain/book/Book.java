@@ -30,7 +30,7 @@ public class Book extends SoftDeletableEntity {
 	@Column(name = "published_date")
 	private LocalDate publishedDate;
 
-	@Column(name = "isbn", nullable = false, unique = true, length = 20)
+	@Column(name = "isbn", unique = true, length = 20)
 	private String isbn;
 
 	@Column(name = "thumbnail_url", length = 255)
