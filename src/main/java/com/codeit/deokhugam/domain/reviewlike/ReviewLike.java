@@ -18,6 +18,7 @@ import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Getter
@@ -29,6 +30,7 @@ import lombok.NoArgsConstructor;
 			columnNames = {"review_id", "user_id"}
 		)
 	})
+@SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
 public class ReviewLike extends BaseEntity {

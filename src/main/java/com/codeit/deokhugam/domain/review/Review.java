@@ -22,6 +22,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Getter
@@ -34,6 +35,7 @@ import lombok.NoArgsConstructor;
 		)
 	})
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SuperBuilder
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 @SQLDelete(sql = "UPDATE review SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
@@ -63,9 +65,8 @@ public class Review extends SoftDeletableEntity {
 	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
 
-	public void update(String content, String attachmentUrl, Integer rating) {
+	public void update(String content, Integer rating) {
 		this.content = content;
-		this.attachmentUrl = attachmentUrl;
 		this.rating = rating;
 	}
 
