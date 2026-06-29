@@ -35,7 +35,7 @@ public interface NotificationRepository extends JpaRepository<Notification, UUID
       join fetch n.user
       join fetch n.review r
       where n.user.id = :userId
-        and :cursor is null or n.createdAt < :cursor
+        and (:cursor is null or n.createdAt < :cursor)
       """)
   List<Notification> findAllByUserIdWithCursorDESC(
       UUID userId,
@@ -49,7 +49,7 @@ public interface NotificationRepository extends JpaRepository<Notification, UUID
       join fetch n.user
       join fetch n.review r
       where n.user.id = :userId
-        and :cursor is null or n.createdAt > :cursor
+        and (:cursor is null or n.createdAt > :cursor)
       """)
   List<Notification> findAllByUserIdWithCursorASC(
       UUID userId,
