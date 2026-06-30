@@ -1,4 +1,4 @@
-package com.codeit.deokhugam.domain.review;
+package com.codeit.deokhugam.domain.review.entity;
 
 import java.util.UUID;
 
@@ -20,8 +20,10 @@ import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Getter
@@ -34,6 +36,7 @@ import lombok.NoArgsConstructor;
 		)
 	})
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SuperBuilder
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 @SQLDelete(sql = "UPDATE review SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
@@ -49,9 +52,11 @@ public class Review extends SoftDeletableEntity {
 	@Column(name = "rating", nullable = false)
 	private Integer rating;
 
+	@Builder.Default
 	@Column(name = "like_count", nullable = false)
 	private Long likeCount = 0L;
 
+	@Builder.Default
 	@Column(name = "comment_count", nullable = false)
 	private Long commentCount = 0L;
 
@@ -63,13 +68,12 @@ public class Review extends SoftDeletableEntity {
 	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
 
-	public void update(String content, String attachmentUrl, Integer rating) {
+	public void update(String content, Integer rating) {
 		this.content = content;
-		this.attachmentUrl = attachmentUrl;
 		this.rating = rating;
 	}
 
-	/// 동시성 이슈 발생지점! -> Repository Layer에서 @OptimisticLock으로 처리
+	/// TODO: 동시성 이슈 발생지점! -> Repository Layer에서 @OptimisticLock으로 처리
 	public void increaseLikeCount() {
 		this.likeCount++;
 	}
