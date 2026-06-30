@@ -4,8 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.codeit.deokhugam.domain.book.Book;
 import com.codeit.deokhugam.domain.notification.entity.Notification;
+import com.codeit.deokhugam.domain.notification.mapper.NotificationMapperImpl;
+import com.codeit.deokhugam.domain.notification.service.impl.NotificationServiceImpl;
 import com.codeit.deokhugam.domain.review.Review;
 import com.codeit.deokhugam.domain.user.User;
+import com.codeit.deokhugam.global.config.QueryDslConfig;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -17,6 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -25,6 +29,11 @@ import org.springframework.data.domain.Sort.Direction;
 @DataJpaTest(properties = {
     "spring.sql.init.mode=never",
     "spring.jpa.hibernate.ddl-auto=create-drop"
+})
+@Import({
+    NotificationServiceImpl.class,
+    NotificationMapperImpl.class,
+    QueryDslConfig.class
 })
 public class NotificationRepositoryTest {
 
