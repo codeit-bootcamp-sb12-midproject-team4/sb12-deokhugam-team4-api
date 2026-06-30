@@ -1,8 +1,10 @@
 package com.codeit.deokhugam.domain.book.dto;
 
+import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.UUID;
+
+import com.codeit.deokhugam.domain.bookstatus.BookStatusType;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -28,6 +30,7 @@ public class BookResponse {
 	private Long reviewCount;
 	private Double rating;
 	private String categoryPath;
-	private LocalDateTime createdAt;
-	private LocalDateTime updatedAt;
+	private BookStatusType status;
+	private Instant createdAt;
+	private Instant updatedAt;
 }

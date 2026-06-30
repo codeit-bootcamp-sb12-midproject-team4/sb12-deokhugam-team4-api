@@ -5,6 +5,7 @@ import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -24,15 +25,18 @@ import com.codeit.deokhugam.domain.book.dto.BookPatchRequest;
 import com.codeit.deokhugam.domain.book.dto.BookPostRequest;
 import com.codeit.deokhugam.domain.book.dto.BookResponse;
 import com.codeit.deokhugam.domain.book.dto.BookSearchRequest;
+import com.codeit.deokhugam.domain.book.dto.BookSearchUserRequest;
 import com.codeit.deokhugam.domain.client.isbn.IsbnClient;
 import com.codeit.deokhugam.domain.client.ocr.OcrClient;
 import com.codeit.deokhugam.domain.common.CursorPageResponse;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 
+@Validated
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/books")
@@ -73,25 +77,31 @@ public class BookController {
 	public ResponseEntity<CursorPageResponse<BookResponse>> getBooks(
 			@ModelAttribute @Valid BookSearchRequest req
 	) {
-		CursorPageResponse<BookResponse> res = bookService.findAllByKeyword(req);
+		CursorPageResponse<BookResponse> res = bookService.findAllByKeyword(req);	// -> userId 필요
 		return ResponseEntity.status(HttpStatus.OK).body(res);
 	}
 
 	@GetMapping("/{userId}")
-	public ResponseEntity<CursorPageResponse<BookResponse>> getUserBooks(@PathVariable UUID userId) {
-		CursorPageResponse<BookResponse> res = bookService.findAllByUserId(userId);
+	public ResponseEntity<CursorPageResponse<BookResponse>> getUserBooks(
+			@PathVariable UUID userId,
+			@ModelAttribute @Valid BookSearchUserRequest req
+	) {
+		CursorPageResponse<BookResponse> res = bookService.findAllByUserId(req, userId);
 		return ResponseEntity.status(HttpStatus.OK).body(res);
 	}
 
 	@GetMapping("/{bookId}")
-	public ResponseEntity<BookResponse> getBookDetails(@PathVariable UUID bookId) {
-		BookResponse res = bookService.findById(bookId);
+	public ResponseEntity<BookResponse> getBookDetails(
+			@PathVariable UUID bookId,
+			@RequestParam @NotNull UUID userId
+	) {
+		BookResponse res = bookService.findByIdWithStatus(bookId, userId);
 		return ResponseEntity.status(HttpStatus.OK).body(res);
 	}
 
 	@PatchMapping("/{bookId}")
 	public ResponseEntity<BookResponse> patchBook(
-			@PathVariable UUID bookId,
+			@PathVariable @NotBlank(message = "ID는 공백일 수 없습니다.") UUID bookId,
 			@RequestPart(value = "bookData") @Valid BookPatchRequest req,
 			@RequestPart(value = "thumbnailImage", required = false) MultipartFile img
 	) {
@@ -105,12 +115,10 @@ public class BookController {
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
 	}
 
-	@DeleteMapping("/{bookId}")
+	@DeleteMapping("/{bookId}/hard")
 	public ResponseEntity<Void> physicalDeleteBook(@PathVariable UUID bookId) {
 		bookService.delete(bookId);
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
 	}
-
-
 
 }

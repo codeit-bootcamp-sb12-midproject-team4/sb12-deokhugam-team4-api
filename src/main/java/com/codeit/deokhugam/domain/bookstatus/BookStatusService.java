@@ -4,8 +4,8 @@ import java.util.UUID;
 
 public interface BookStatusService {
 
-	void save(UUID bookId, BookStatusType type);
+	void putStatus(UUID bookId, UUID userId, BookStatusType type);
 
-	void delete(UUID bookId);
+	void deleteStatus(UUID bookId, UUID userId);
 
 }

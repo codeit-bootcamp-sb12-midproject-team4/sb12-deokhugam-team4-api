@@ -8,7 +8,6 @@ import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -22,13 +21,7 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class BookSearchRequest {
-
-	@NotNull(message = "사용자 정보는 필수입니다.")
-	private UUID userId;
-
-	@NotBlank(message = "검색어는 필수입니다.")
-	private String keyword;
+public class BookSearchUserRequest {
 
 	@NotBlank(message = "정렬 기준은 필수입니다.")
 	@Pattern(regexp = "title|publishedDate|rating|reviewCount", message = "정렬 기준은 title, publishedDate, rating, reviewCount 중 하나여야 합니다.")

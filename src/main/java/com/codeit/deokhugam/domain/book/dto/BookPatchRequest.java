@@ -1,11 +1,13 @@
 package com.codeit.deokhugam.domain.book.dto;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
@@ -21,6 +23,9 @@ import lombok.Setter;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class BookPatchRequest {
+
+	@NotNull(message = "사용자 정보는 필수입니다.")
+	private UUID userId;
 
 	@NotBlank(message = "도서 제목은 필수입니다.")
 	@Size(max = 255, message = "도서 제목은 255자 이하입니다.")
