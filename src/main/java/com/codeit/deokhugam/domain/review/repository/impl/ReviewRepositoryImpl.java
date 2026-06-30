@@ -1,6 +1,7 @@
 package com.codeit.deokhugam.domain.review.repository.impl;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Repository;
@@ -93,9 +94,18 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 		}
 
 		// 정렬 기준
-		OrderSpecifier<?> orderSpecifier = getOrderSpecifier(
-			request.getOrderBy(), request.getDirection()
-		);
+		boolean isRating = "rating".equals(request.getOrderBy());
+		boolean isAsc = "ASC".equals(request.getDirection());
+
+		OrderSpecifier<?> orderSpecifier = isRating
+			? (isAsc ? review.rating.asc() : review.rating.desc())
+			: (isAsc ? review.createdAt.asc() : review.createdAt.desc());
+
+		List<OrderSpecifier<?>> orderSpecifiers = new ArrayList<>();
+		orderSpecifiers.add(orderSpecifier);
+		if (isRating) {
+			orderSpecifiers.add(isAsc ? review.createdAt.asc() : review.createdAt.desc());
+		}
 
 		// 조회
 		List<Review> reviews = queryFactory
@@ -103,7 +113,7 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 			.join(review.book, book).fetchJoin()
 			.join(review.user, user).fetchJoin()
 			.where(where)
-			.orderBy(orderSpecifier, review.createdAt.desc())
+			.orderBy(orderSpecifiers.toArray(new OrderSpecifier[0]))
 			.limit(limit + 1)
 			.fetch();
 
@@ -198,14 +208,5 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 			.totalElements(totalElements != null ? totalElements : 0L)
 			.hasNext(hasNext)
 			.build();
-	}
-
-	private OrderSpecifier<?> getOrderSpecifier(String orderBy, String direction) {
-		boolean isAsc = "ASC".equals(direction);
-
-		if ("rating".equals(orderBy)) {
-			return isAsc ? review.rating.asc() : review.rating.desc();
-		}
-		return isAsc ? review.createdAt.asc() : review.createdAt.desc();
 	}
 }
