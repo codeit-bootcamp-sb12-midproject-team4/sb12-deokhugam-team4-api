@@ -1,4 +1,4 @@
-package com.codeit.deokhugam.domain.dashboard;
+package com.codeit.deokhugam.domain.dashboard.entity;
 
 import java.time.LocalDateTime;
 
@@ -9,21 +9,26 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-import jakarta.validation.constraints.NotNull;
+
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
+import lombok.AllArgsConstructor;
 
 @Entity
 @Table(
-	name = "trending_keyword_snapshot",
-	uniqueConstraints = {
-		@UniqueConstraint(name = "uq_trending_keyword_snapshot_time", columnNames = {"calculated_at"})
-	}
+		name = "trending_keyword_snapshot",
+		uniqueConstraints = {
+				@UniqueConstraint(name = "uq_trending_keyword_snapshot_time", columnNames = {"calculated_at"})
+		}
 )
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@ToString
+@Builder
+@AllArgsConstructor(access = AccessLevel.PRIVATE) // 빌더 패턴의 컴파일 안정성을 위해 추가
 public class TrendingKeywordSnapshot {
 
 	@Id
@@ -31,12 +36,6 @@ public class TrendingKeywordSnapshot {
 	@Column(name = "snapshot_id", nullable = false)
 	private Long snapshotId;
 
-	@NotNull
 	@Column(name = "calculated_at", nullable = false)
 	private LocalDateTime calculatedAt;
-
-	@Builder
-	public TrendingKeywordSnapshot(LocalDateTime calculatedAt) {
-		this.calculatedAt = calculatedAt;
-	}
 }
