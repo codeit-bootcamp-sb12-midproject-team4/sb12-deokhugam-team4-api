@@ -15,12 +15,6 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PositiveOrZero;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -46,37 +40,25 @@ public class PowerUser extends BaseEntity {
 	@Column(name = "user_id", nullable = false)
 	private UUID userId;
 
-	@NotNull
 	@Enumerated(EnumType.STRING)
 	@Column(name = "period", nullable = false, columnDefinition = "ENUM('DAILY', 'WEEKLY', 'MONTHLY', 'ALL_TIME')")
 	private PeriodType period;
 
-	@NotNull
-	@Min(1)
-	@Max(10)
 	@Column(name = "ranking", nullable = false)
 	private Integer ranking;
 
-	@NotBlank
 	@Column(name = "nickname", nullable = false, length = 20)
 	private String nickname;
 
-	@NotNull
-	@DecimalMin("0.00")
 	@Column(name = "score", nullable = false, precision = 10, scale = 2)
 	private BigDecimal score;
 
-	@NotNull
-	@PositiveOrZero
 	@Column(name = "like_count", nullable = false)
 	private Integer likeCount;
 
-	@NotNull
-	@PositiveOrZero
 	@Column(name = "comment_count", nullable = false)
 	private Integer commentCount;
 
-	@NotNull
 	@Column(name = "batch_date", nullable = false)
 	private LocalDate batchDate;
 }
