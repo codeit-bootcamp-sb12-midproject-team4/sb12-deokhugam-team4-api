@@ -1,7 +1,7 @@
 package com.codeit.deokhugam.domain.comment;
 
 import com.codeit.deokhugam.domain.common.SoftDeletableEntity;
-import com.codeit.deokhugam.domain.review.Review;
+import com.codeit.deokhugam.domain.review.entity.Review;
 import com.codeit.deokhugam.domain.user.User;
 
 import jakarta.persistence.Column;
