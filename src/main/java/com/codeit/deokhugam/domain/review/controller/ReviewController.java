@@ -17,9 +17,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.codeit.deokhugam.domain.common.CursorPageResponse;
+import com.codeit.deokhugam.domain.review.dto.LikedReviewSearchRequest;
 import com.codeit.deokhugam.domain.review.dto.ReviewCreateRequest;
 import com.codeit.deokhugam.domain.review.dto.ReviewResponse;
-import com.codeit.deokhugam.domain.review.dto.ReviewSearchCondition;
+import com.codeit.deokhugam.domain.review.dto.ReviewSearchRequest;
 import com.codeit.deokhugam.domain.review.dto.ReviewUpdateRequest;
 import com.codeit.deokhugam.domain.review.service.ReviewService;
 import com.codeit.deokhugam.domain.reviewlike.dto.ReviewLikeResponse;
@@ -42,12 +43,12 @@ public class ReviewController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 
-	@GetMapping("/{reviewid}")
+	@GetMapping("/{reviewId}")
 	public ResponseEntity<ReviewResponse> getReview(
-		@PathVariable UUID reviewid,
+		@PathVariable UUID reviewId,
 		@RequestHeader("Deokhugam-Request-User-ID") UUID requestUserId
 	) {
-		ReviewResponse response = reviewService.findByReviewId(reviewid, requestUserId);
+		ReviewResponse response = reviewService.findByReviewId(reviewId, requestUserId);
 		return ResponseEntity.ok(response);
 	}
 
@@ -63,7 +64,7 @@ public class ReviewController {
 		@RequestParam(defaultValue = "50") int limit,
 		@RequestHeader("Deokhugam-Request-User-ID") UUID requestUserId
 	) {
-		ReviewSearchCondition condition = ReviewSearchCondition.builder()
+		ReviewSearchRequest request = ReviewSearchRequest.builder()
 			.userId(userId)
 			.bookId(bookId)
 			.keyword(keyword)
@@ -75,7 +76,7 @@ public class ReviewController {
 			.requestUserId(requestUserId)
 			.build();
 
-		return ResponseEntity.ok(reviewService.findByCondition(condition));
+		return ResponseEntity.ok(reviewService.findByRequest(request));
 	}
 
 	@PatchMapping("/{reviewId}")
@@ -89,7 +90,7 @@ public class ReviewController {
 	}
 
 	@DeleteMapping("/{reviewId}")
-	public ResponseEntity<Void> deleteReview(
+	public ResponseEntity<Void> softDeleteReview(
 		@PathVariable UUID reviewId,
 		@RequestHeader("Deokhugam-Request-User-ID") UUID requestUserId
 	) {
@@ -113,5 +114,23 @@ public class ReviewController {
 	) {
 		ReviewLikeResponse response = reviewService.toggleLike(reviewId, requestUserId);
 		return ResponseEntity.ok(response);
+	}
+
+	@GetMapping("/like/{userId}")
+	public ResponseEntity<CursorPageResponse<ReviewResponse>> getLikedReviews(
+		@PathVariable UUID userId,
+		@RequestParam(required = false) String cursor,
+		@RequestParam(required = false) Instant after,
+		@RequestParam(defaultValue = "50") int limit,
+		@RequestHeader("Deokhugam-Request-User-ID") UUID requestUserId
+	) {
+		LikedReviewSearchRequest request = LikedReviewSearchRequest.builder()
+			.userId(userId)
+			.cursor(cursor)
+			.after(after)
+			.limit(limit)
+			.build();
+
+		return ResponseEntity.ok(reviewService.findLikedReviews(request, requestUserId));
 	}
 }

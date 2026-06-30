@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReviewSearchCondition {
+public class ReviewSearchRequest {
 	private UUID userId;
 	private UUID bookId;
 	private String keyword;

@@ -23,9 +23,6 @@ public interface ReviewLikeRepository extends JpaRepository<ReviewLike, UUID> {
 	// 좋아요 존재 여부
 	Optional<ReviewLike> findByReviewIdAndUserId(UUID reviewId, UUID userId);
 
-	// likedByMe 체크 (리뷰 조회 시)
-	boolean existsByReviewIdAndUserId(UUID reviewId, UUID userId);
-
 	// 물리 삭제 시 연관 좋아요 삭제
 	void deleteAllByReviewId(UUID reviewId);
 }

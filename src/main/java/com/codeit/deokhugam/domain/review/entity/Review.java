@@ -20,6 +20,7 @@ import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -51,9 +52,11 @@ public class Review extends SoftDeletableEntity {
 	@Column(name = "rating", nullable = false)
 	private Integer rating;
 
+	@Builder.Default
 	@Column(name = "like_count", nullable = false)
 	private Long likeCount = 0L;
 
+	@Builder.Default
 	@Column(name = "comment_count", nullable = false)
 	private Long commentCount = 0L;
 

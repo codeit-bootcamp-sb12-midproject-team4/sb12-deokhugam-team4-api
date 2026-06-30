@@ -13,9 +13,10 @@ import org.springframework.transaction.annotation.Transactional;
 import com.codeit.deokhugam.domain.book.Book;
 import com.codeit.deokhugam.domain.book.repository.BookRepository;
 import com.codeit.deokhugam.domain.common.CursorPageResponse;
+import com.codeit.deokhugam.domain.review.dto.LikedReviewSearchRequest;
 import com.codeit.deokhugam.domain.review.dto.ReviewCreateRequest;
 import com.codeit.deokhugam.domain.review.dto.ReviewResponse;
-import com.codeit.deokhugam.domain.review.dto.ReviewSearchCondition;
+import com.codeit.deokhugam.domain.review.dto.ReviewSearchRequest;
 import com.codeit.deokhugam.domain.review.dto.ReviewUpdateRequest;
 import com.codeit.deokhugam.domain.review.entity.Review;
 import com.codeit.deokhugam.domain.review.mapper.ReviewMapper;
@@ -60,6 +61,7 @@ public class ReviewServiceImpl implements ReviewService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public ReviewResponse findByReviewId(UUID reviewId, UUID userId) {
 		Review review = reviewRepository.findById(reviewId)
 			.orElseThrow(() -> new NoSuchElementException("리뷰를 찾을 수 없습니다."));
@@ -70,17 +72,18 @@ public class ReviewServiceImpl implements ReviewService {
 	}
 
 	@Override
-	public CursorPageResponse<ReviewResponse> findByCondition(ReviewSearchCondition condition) {
-		CursorPageResponse<Review> reviewPage = reviewRepository.findReviewsByCondition(condition);
+	@Transactional(readOnly = true)
+	public CursorPageResponse<ReviewResponse> findByRequest(ReviewSearchRequest request) {
+		CursorPageResponse<Review> reviewPage = reviewRepository.findReviewsByRequest(request);
 
 		List<UUID> reviewIds = reviewPage.getContent().stream()
 			.map(Review::getId)
 			.toList();
 
 		Set<UUID> likedReviewIds = new HashSet<>();
-		if (condition.getRequestUserId() != null && !reviewIds.isEmpty()) {
+		if (request.getRequestUserId() != null && !reviewIds.isEmpty()) {
 			likedReviewIds = reviewLikeRepository
-				.findReviewIdsByReviewIdInAndUserId(reviewIds, condition.getRequestUserId());
+				.findReviewIdsByReviewIdInAndUserId(reviewIds, request.getRequestUserId());
 		}
 
 		Set<UUID> finalLikedReviewIds = likedReviewIds;
@@ -99,6 +102,7 @@ public class ReviewServiceImpl implements ReviewService {
 	}
 
 	@Override
+	@Transactional
 	public ReviewResponse update(UUID reviewId, UUID userId, ReviewUpdateRequest request) {
 		Review review = reviewRepository.findById(reviewId)
 			.orElseThrow(() -> new NoSuchElementException("리뷰를 찾을 수 없습니다."));
@@ -118,6 +122,7 @@ public class ReviewServiceImpl implements ReviewService {
 	}
 
 	@Override
+	@Transactional
 	public void deleteReview(UUID reviewId, UUID userId) {
 		Review review = reviewRepository.findById(reviewId)
 			.orElseThrow(() -> new NoSuchElementException("리뷰를 찾을 수 없습니다."));
@@ -130,8 +135,9 @@ public class ReviewServiceImpl implements ReviewService {
 	}
 
 	@Override
+	@Transactional
 	public void hardDeleteReview(UUID reviewId, UUID userId) {
-		Review review = reviewRepository.findById(reviewId)
+		Review review = reviewRepository.findByIdIncludingDeleted(reviewId)
 			.orElseThrow(() -> new NoSuchElementException("리뷰를 찾을 수 없습니다."));
 
 		if (!review.isOwnedBy(userId)) {
@@ -139,10 +145,11 @@ public class ReviewServiceImpl implements ReviewService {
 		}
 
 		reviewLikeRepository.deleteAllByReviewId(reviewId);
-		reviewRepository.delete(review);
+		reviewRepository.hardDeleteById(reviewId);
 	}
 
 	@Override
+	@Transactional
 	public ReviewLikeResponse toggleLike(UUID reviewId, UUID userId) {
 		Review review = reviewRepository.findById(reviewId)
 			.orElseThrow(() -> new NoSuchElementException("리뷰를 찾을 수 없습니다."));
@@ -171,6 +178,29 @@ public class ReviewServiceImpl implements ReviewService {
 			.reviewId(reviewId)
 			.userId(userId)
 			.liked(liked)
+			.build();
+	}
+
+	@Override
+	public CursorPageResponse<ReviewResponse> findLikedReviews(LikedReviewSearchRequest request, UUID userId) {
+		if (!request.getUserId().equals(userId)) {
+			throw new IllegalStateException("본인의 좋아요 목록만 조회할 수 있습니다.");
+		}
+
+		CursorPageResponse<Review> reviewPage =
+			reviewRepository.findLikedReviewsByRequest(request);
+
+		List<ReviewResponse> content = reviewPage.getContent().stream()
+			.map(r -> reviewMapper.toResponse(r, true))
+			.toList();
+
+		return CursorPageResponse.<ReviewResponse>builder()
+			.content(content)
+			.nextCursor(reviewPage.getNextCursor())
+			.nextAfter(reviewPage.getNextAfter())
+			.size(reviewPage.getSize())
+			.totalElements(reviewPage.getTotalElements())
+			.hasNext(reviewPage.isHasNext())
 			.build();
 	}
 }
