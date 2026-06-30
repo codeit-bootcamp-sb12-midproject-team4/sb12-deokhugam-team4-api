@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import com.codeit.deokhugam.domain.common.BaseEntity;
 import com.codeit.deokhugam.domain.common.UpdatableEntity;
 
 import jakarta.persistence.CascadeType;
@@ -19,18 +18,21 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Table(name = "book_category")
 @Getter
+@SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @EntityListeners(AuditingEntityListener.class)
 public class BookCategory extends UpdatableEntity {
 
-	@Column(name = "name", length = 100, nullable = false)
+	@Column(name = "name", nullable = false, length = 100)
 	private String name;
 
 	@Column(name = "depth", nullable = false)
@@ -43,6 +45,8 @@ public class BookCategory extends UpdatableEntity {
 	@JoinColumn(name = "parent_id")
 	private BookCategory parent;
 
+
+	@Builder.Default
 	@OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<BookCategory> children = new ArrayList<>();
 
