@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.codeit.deokhugam.domain.book.Book;
-import com.codeit.deokhugam.domain.book.repository.BookRepository;
+import com.codeit.deokhugam.domain.book.BookRepository;
 import com.codeit.deokhugam.domain.common.CursorPageResponse;
 import com.codeit.deokhugam.domain.review.dto.LikedReviewSearchRequest;
 import com.codeit.deokhugam.domain.review.dto.ReviewCreateRequest;
@@ -182,7 +182,8 @@ public class ReviewServiceImpl implements ReviewService {
 	}
 
 	@Override
-	public CursorPageResponse<ReviewResponse> findLikedReviews(LikedReviewSearchRequest request, UUID userId) {
+	public CursorPageResponse<ReviewResponse> findLikedReviews(LikedReviewSearchRequest request,
+		UUID userId) {
 		if (!request.getUserId().equals(userId)) {
 			throw new IllegalStateException("본인의 좋아요 목록만 조회할 수 있습니다.");
 		}
