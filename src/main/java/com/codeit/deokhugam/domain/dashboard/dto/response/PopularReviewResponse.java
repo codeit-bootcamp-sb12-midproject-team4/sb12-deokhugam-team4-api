@@ -1,13 +1,19 @@
 package com.codeit.deokhugam.domain.dashboard.dto.response;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 public record PopularReviewResponse(
         UUID reviewId,
-        UUID bookId,
-        String bookTitle,
-        String memberNickname,
-        String contentSummary,
         Integer ranking,
-        Long likeCount
+        String bookTitle,
+        String bookAuthor,
+        String thumbnailUrl,
+        String userNickname,
+        String reviewSummary,
+        Integer reviewRating,
+        BigDecimal score,
+        Integer likeCount,
+        Integer commentCount
+
 ) {}

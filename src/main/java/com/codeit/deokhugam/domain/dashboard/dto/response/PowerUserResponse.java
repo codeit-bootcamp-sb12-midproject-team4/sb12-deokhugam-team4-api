@@ -1,11 +1,13 @@
 package com.codeit.deokhugam.domain.dashboard.dto.response;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 public record PowerUserResponse(
-        UUID memberId,
-        String nickname,
-        String profileImageUrl,
         Integer ranking,
-        Long activityCount
+        UUID userId,
+        String nickname,
+        BigDecimal score,
+        Integer likeCount,
+        Integer commentCount
 ) {}

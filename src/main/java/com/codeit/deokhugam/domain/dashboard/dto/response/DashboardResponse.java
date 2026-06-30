@@ -7,9 +7,9 @@ import com.codeit.deokhugam.domain.dashboard.entity.PeriodType;
 public record DashboardResponse(
         PeriodType period,
         LocalDate batchDate,
-        List<PopularBookResponse> popularBook,
-        List<PopularReviewResponse> popularReview,
-        List<PowerUserResponse> powerUser,
+        List<PopularBookResponse> popularBooks,
+        List<PopularReviewResponse> popularReviews,
+        List<PowerUserResponse> powerUsers,
         TrendingKeywordResponse trendingKeyword,
         DashboardInsightResponse insight
 ) {}
