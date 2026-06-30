@@ -15,7 +15,6 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,11 +23,11 @@ import lombok.experimental.SuperBuilder;
 
 @Entity
 @Table(
-		name = "power_user",
-		uniqueConstraints = {
-				@UniqueConstraint(name = "uq_power_user_date", columnNames = {"period", "user_id", "batch_date"}),
-				@UniqueConstraint(name = "uq_power_user_ranking", columnNames = {"period", "batch_date", "ranking"})
-		}
+	name = "power_user",
+	uniqueConstraints = {
+		@UniqueConstraint(name = "uq_power_user_date", columnNames = {"period", "user_id", "batch_date"}),
+		@UniqueConstraint(name = "uq_power_user_ranking", columnNames = {"period", "batch_date", "ranking"})
+	}
 )
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

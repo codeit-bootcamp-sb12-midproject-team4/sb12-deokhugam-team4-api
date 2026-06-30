@@ -1,8 +1,8 @@
 package com.codeit.deokhugam.domain.bookstatus;
+
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.codeit.deokhugam.domain.book.Book;
-import com.codeit.deokhugam.domain.common.BaseEntity;
 import com.codeit.deokhugam.domain.common.UpdatableEntity;
 import com.codeit.deokhugam.domain.user.User;
 

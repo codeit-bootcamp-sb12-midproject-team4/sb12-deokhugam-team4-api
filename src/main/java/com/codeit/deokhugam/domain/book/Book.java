@@ -1,12 +1,23 @@
 package com.codeit.deokhugam.domain.book;
 
-import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.SuperBuilder;
-
 import java.time.LocalDate;
 
 import com.codeit.deokhugam.domain.common.SoftDeletableEntity;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Table(name = "book", uniqueConstraints = {
@@ -52,12 +63,14 @@ public class Book extends SoftDeletableEntity {
 	@JoinColumn(name = "book_category_id")
 	private BookCategory bookCategory;
 
-
 	public void update(String title, String author, String description, String publisher, LocalDate publishedDate) {
-		if (title != null) this.title = title;
-		if (author != null) this.author = author;
+		if (title != null)
+			this.title = title;
+		if (author != null)
+			this.author = author;
 		this.description = description;
-		if (publisher != null) this.publisher = publisher;
+		if (publisher != null)
+			this.publisher = publisher;
 		this.publishedDate = publishedDate;
 	}
 

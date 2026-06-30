@@ -9,12 +9,12 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Repository;
 
+import com.codeit.deokhugam.domain.book.BookQueryRepository;
 import com.codeit.deokhugam.domain.book.QBook;
 import com.codeit.deokhugam.domain.book.QBookCategory;
 import com.codeit.deokhugam.domain.book.dto.BookResponse;
 import com.codeit.deokhugam.domain.book.dto.BookSearchRequest;
 import com.codeit.deokhugam.domain.book.dto.BookSearchUserRequest;
-import com.codeit.deokhugam.domain.book.BookQueryRepository;
 import com.codeit.deokhugam.domain.bookstatus.QBookStatus;
 import com.codeit.deokhugam.domain.common.CursorPageResponse;
 import com.querydsl.core.BooleanBuilder;
@@ -63,16 +63,15 @@ public class BookQueryRepositoryImpl implements BookQueryRepository {
 				.build();
 		}
 
-
 		BooleanBuilder where = new BooleanBuilder(searchCondition);
 		Order order = "DESC".equalsIgnoreCase(req.getDirection()) ? Order.DESC : Order.ASC;
 		OrderSpecifier<?> orderSpecifier;
 		switch (req.getOrderBy()) {
-			case "title"         -> orderSpecifier = new OrderSpecifier<>(order, b.title);
+			case "title" -> orderSpecifier = new OrderSpecifier<>(order, b.title);
 			case "publishedDate" -> orderSpecifier = new OrderSpecifier<>(order, b.publishedDate);
-			case "rating"        -> orderSpecifier = new OrderSpecifier<>(order, b.rating);
-			case "reviewCount"   -> orderSpecifier = new OrderSpecifier<>(order, b.reviewCount);
-			default              -> orderSpecifier = new OrderSpecifier<>(order, b.createdAt);
+			case "rating" -> orderSpecifier = new OrderSpecifier<>(order, b.rating);
+			case "reviewCount" -> orderSpecifier = new OrderSpecifier<>(order, b.reviewCount);
+			default -> orderSpecifier = new OrderSpecifier<>(order, b.createdAt);
 		}
 
 		if (req.getCursor() != null && req.getAfter() != null) {
@@ -131,7 +130,8 @@ public class BookQueryRepositoryImpl implements BookQueryRepository {
 					}
 				}
 				where.and(cursorCondition);
-			} catch (Exception ignored) {}
+			} catch (Exception ignored) {
+			}
 		}
 
 		int limit = req.getLimit();
@@ -174,11 +174,11 @@ public class BookQueryRepositoryImpl implements BookQueryRepository {
 			BookResponse lastItem = content.get(content.size() - 1);
 			nextAfter = lastItem.getCreatedAt();
 			nextCursor = switch (req.getOrderBy()) {
-				case "title"         -> lastItem.getTitle();
+				case "title" -> lastItem.getTitle();
 				case "publishedDate" -> lastItem.getPublishedDate().toString();
-				case "rating"        -> String.valueOf(lastItem.getRating());
-				case "reviewCount"   -> String.valueOf(lastItem.getReviewCount());
-				default              -> lastItem.getCreatedAt().toString();
+				case "rating" -> String.valueOf(lastItem.getRating());
+				case "reviewCount" -> String.valueOf(lastItem.getReviewCount());
+				default -> lastItem.getCreatedAt().toString();
 			};
 		}
 
@@ -219,11 +219,11 @@ public class BookQueryRepositoryImpl implements BookQueryRepository {
 		BooleanBuilder where = new BooleanBuilder(baseCondition);
 		Order order = "DESC".equalsIgnoreCase(req.getDirection()) ? Order.DESC : Order.ASC;
 		OrderSpecifier<?> orderSpecifier = switch (req.getOrderBy()) {
-			case "title"         -> new OrderSpecifier<>(order, b.title);
+			case "title" -> new OrderSpecifier<>(order, b.title);
 			case "publishedDate" -> new OrderSpecifier<>(order, b.publishedDate);
-			case "rating"        -> new OrderSpecifier<>(order, b.rating);
-			case "reviewCount"   -> new OrderSpecifier<>(order, b.reviewCount);
-			default              -> new OrderSpecifier<>(order, b.createdAt);
+			case "rating" -> new OrderSpecifier<>(order, b.rating);
+			case "reviewCount" -> new OrderSpecifier<>(order, b.reviewCount);
+			default -> new OrderSpecifier<>(order, b.createdAt);
 		};
 
 		if (req.getCursor() != null && req.getAfter() != null) {
@@ -282,7 +282,8 @@ public class BookQueryRepositoryImpl implements BookQueryRepository {
 					}
 				}
 				where.and(cursorCondition);
-			} catch (Exception ignored) {}
+			} catch (Exception ignored) {
+			}
 		}
 
 		int limit = req.getLimit();
@@ -328,11 +329,11 @@ public class BookQueryRepositoryImpl implements BookQueryRepository {
 			nextAfter = lastItem.getCreatedAt();
 
 			nextCursor = switch (req.getOrderBy()) {
-				case "title"         -> lastItem.getTitle();
+				case "title" -> lastItem.getTitle();
 				case "publishedDate" -> lastItem.getPublishedDate().toString();
-				case "rating"        -> String.valueOf(lastItem.getRating());
-				case "reviewCount"   -> String.valueOf(lastItem.getReviewCount());
-				default              -> lastItem.getCreatedAt().toString();
+				case "rating" -> String.valueOf(lastItem.getRating());
+				case "reviewCount" -> String.valueOf(lastItem.getReviewCount());
+				default -> lastItem.getCreatedAt().toString();
 			};
 		}
 

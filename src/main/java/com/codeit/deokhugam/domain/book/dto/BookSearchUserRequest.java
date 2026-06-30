@@ -1,7 +1,5 @@
 package com.codeit.deokhugam.domain.book.dto;
 
-import java.util.UUID;
-
 import org.springframework.format.annotation.DateTimeFormat;
 
 import jakarta.annotation.Nullable;
