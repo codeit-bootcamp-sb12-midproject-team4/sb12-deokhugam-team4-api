@@ -10,6 +10,7 @@ import com.codeit.deokhugam.domain.book.QBook;
 import com.codeit.deokhugam.domain.common.CursorPageResponse;
 import com.codeit.deokhugam.domain.review.dto.LikedReviewSearchRequest;
 import com.codeit.deokhugam.domain.review.dto.ReviewSearchRequest;
+import com.codeit.deokhugam.domain.review.dto.ReviewSearchCondition;
 import com.codeit.deokhugam.domain.review.entity.QReview;
 import com.codeit.deokhugam.domain.review.entity.Review;
 import com.codeit.deokhugam.domain.review.repository.ReviewRepositoryCustom;
