@@ -6,7 +6,6 @@ import java.util.UUID;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.fasterxml.uuid.Generators;
@@ -30,21 +29,21 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public abstract class BaseEntity {
 
-    @Id
-    @Column(updatable = false, nullable = false, columnDefinition = "BINARY(16)")
-    @JdbcTypeCode(SqlTypes.BINARY)
-    private UUID id;
+	@Id
+	@Column(updatable = false, nullable = false, columnDefinition = "BINARY(16)")
+	@JdbcTypeCode(SqlTypes.BINARY)
+	private UUID id;
 
-    @PrePersist
-    protected void onCreate() {
-        if (id == null) {
-            id = Generators.timeBasedEpochGenerator().generate();
-        }
-    }
+	@PrePersist
+	protected void onCreate() {
+		if (id == null) {
+			id = Generators.timeBasedEpochGenerator().generate();
+		}
+	}
 
-    @CreatedDate
-    @Column(name = "created_at",
-            updatable = false, nullable = false)
-    private Instant createdAt;
+	@CreatedDate
+	@Column(name = "created_at",
+		updatable = false, nullable = false)
+	private Instant createdAt;
 
 }

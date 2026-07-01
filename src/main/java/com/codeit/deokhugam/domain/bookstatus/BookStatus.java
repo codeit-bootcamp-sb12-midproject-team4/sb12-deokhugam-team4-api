@@ -1,8 +1,8 @@
 package com.codeit.deokhugam.domain.bookstatus;
+
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.codeit.deokhugam.domain.book.Book;
-import com.codeit.deokhugam.domain.common.BaseEntity;
 import com.codeit.deokhugam.domain.common.UpdatableEntity;
 import com.codeit.deokhugam.domain.user.User;
 
@@ -20,6 +20,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Getter
@@ -31,8 +32,9 @@ import lombok.NoArgsConstructor;
 			columnNames = {"user_id", "book_id"}
 		)
 	})
+@SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @EntityListeners(AuditingEntityListener.class)
 public class BookStatus extends UpdatableEntity {
 
