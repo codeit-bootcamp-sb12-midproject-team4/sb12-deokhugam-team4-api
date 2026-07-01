@@ -30,9 +30,9 @@ import com.codeit.deokhugam.domain.client.isbn.IsbnClient;
 import com.codeit.deokhugam.domain.client.ocr.OcrClient;
 import com.codeit.deokhugam.domain.common.CursorPageResponse;
 
+import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 
@@ -81,7 +81,7 @@ public class BookController {
 		return ResponseEntity.status(HttpStatus.OK).body(res);
 	}
 
-	@GetMapping("/{userId}")
+	@GetMapping("/users/{userId}")
 	public ResponseEntity<CursorPageResponse<BookResponse>> getUserBooks(
 			@PathVariable UUID userId,
 			@ModelAttribute @Valid BookSearchUserRequest req
@@ -93,15 +93,15 @@ public class BookController {
 	@GetMapping("/{bookId}")
 	public ResponseEntity<BookResponse> getBookDetails(
 			@PathVariable UUID bookId,
-			@RequestParam @NotNull UUID userId
+			@RequestParam @Nullable UUID userId
 	) {
-		BookResponse res = bookService.findByIdWithStatus(bookId, userId);
+		BookResponse res = bookService.findById(bookId, userId);
 		return ResponseEntity.status(HttpStatus.OK).body(res);
 	}
 
 	@PatchMapping("/{bookId}")
 	public ResponseEntity<BookResponse> patchBook(
-			@PathVariable @NotBlank(message = "ID는 공백일 수 없습니다.") UUID bookId,
+			@PathVariable UUID bookId,
 			@RequestPart(value = "bookData") @Valid BookPatchRequest req,
 			@RequestPart(value = "thumbnailImage", required = false) MultipartFile img
 	) {

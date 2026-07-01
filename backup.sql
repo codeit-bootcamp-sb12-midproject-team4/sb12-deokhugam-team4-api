@@ -1,0 +1,230 @@
+-- H2 2.3.232;
+;             
+CREATE USER IF NOT EXISTS "SA" SALT 'ec8c5f0fd8141430' HASH 'c9394967153974be61f51eab50c9071aaa0da39da69598120ed2be446e4e2d07' ADMIN;         
+CREATE MEMORY TABLE "public"."users"(
+    "id" BINARY(16) NOT NULL,
+    "email" CHARACTER VARYING(320) NOT NULL,
+    "nickname" CHARACTER VARYING(20) NOT NULL,
+    "password" CHARACTER VARYING(255) NOT NULL,
+    "deleted_at" TIMESTAMP(6),
+    "created_at" TIMESTAMP(6) NOT NULL,
+    "updated_at" TIMESTAMP(6) NOT NULL
+);      
+ALTER TABLE "public"."users" ADD CONSTRAINT "public"."pk_user_id" PRIMARY KEY("id");          
+-- 1 +/- SELECT COUNT(*) FROM public.users;   
+INSERT INTO "public"."users"("id", "email", "nickname", "password", "deleted_at", "created_at", "updated_at") VALUES(X'019f1d106a947854bbac94a27748b18a', 'woody@email.com', 'woody', '$2a$10$XzviuaZ6IqCWUZN1/zWYku0b2wiLCP2wgefbtRjGzYtSkxayQRVAK', NULL, TIMESTAMP '2026-07-01 18:44:02.962398', TIMESTAMP '2026-07-01 18:44:02.962398');  
+CREATE MEMORY TABLE "public"."book_category"(
+    "id" BINARY(16) NOT NULL,
+    "name" CHARACTER VARYING(100) NOT NULL,
+    "depth" INTEGER NOT NULL,
+    "path" CHARACTER VARYING(255) NOT NULL,
+    "parent_id" BINARY(16),
+    "created_at" TIMESTAMP(6) NOT NULL,
+    "updated_at" TIMESTAMP(6) NOT NULL
+);       
+ALTER TABLE "public"."book_category" ADD CONSTRAINT "public"."pk_book_category_id" PRIMARY KEY("id");         
+-- 9 +/- SELECT COUNT(*) FROM public.book_category;           
+INSERT INTO "public"."book_category"("id", "name", "depth", "path", "parent_id", "created_at", "updated_at") VALUES(X'019f1d0ffc9b706086c7f48ba9688792', U&'\ad6d\b0b4\b3c4\c11c', 1, U&'\ad6d\b0b4\b3c4\c11c', NULL, TIMESTAMP '2026-07-01 18:43:34.809143', TIMESTAMP '2026-07-01 18:43:34.809143');        
+INSERT INTO "public"."book_category"("id", "name", "depth", "path", "parent_id", "created_at", "updated_at") VALUES(X'019f1d0ffcc87e4fbe04fdba20a4008f', U&'\c778\bb38\d559', 2, U&'\ad6d\b0b4\b3c4\c11c>\c778\bb38\d559', X'019f1d0ffc9b706086c7f48ba9688792', TIMESTAMP '2026-07-01 18:43:34.856143', TIMESTAMP '2026-07-01 18:43:34.856143');              
+INSERT INTO "public"."book_category"("id", "name", "depth", "path", "parent_id", "created_at", "updated_at") VALUES(X'019f1d0ffccc7763a6effcec60fd39aa', U&'\ad50\c591 \c778\bb38\d559', 3, U&'\ad6d\b0b4\b3c4\c11c>\c778\bb38\d559>\ad50\c591 \c778\bb38\d559', X'019f1d0ffcc87e4fbe04fdba20a4008f', TIMESTAMP '2026-07-01 18:43:34.860146', TIMESTAMP '2026-07-01 18:43:34.860146');        
+INSERT INTO "public"."book_category"("id", "name", "depth", "path", "parent_id", "created_at", "updated_at") VALUES(X'019f1d1010f07ef18170170dffabd125', U&'\c18c\c124/\c2dc/\d76c\ace1', 2, U&'\ad6d\b0b4\b3c4\c11c>\c18c\c124/\c2dc/\d76c\ace1', X'019f1d0ffc9b706086c7f48ba9688792', TIMESTAMP '2026-07-01 18:43:40.016568', TIMESTAMP '2026-07-01 18:43:40.016568');      
+INSERT INTO "public"."book_category"("id", "name", "depth", "path", "parent_id", "created_at", "updated_at") VALUES(X'019f1d1010f378648f1e14d11bec56d0', U&'\acfc\d559\c18c\c124(SF)', 3, U&'\ad6d\b0b4\b3c4\c11c>\c18c\c124/\c2dc/\d76c\ace1>\acfc\d559\c18c\c124(SF)', X'019f1d1010f07ef18170170dffabd125', TIMESTAMP '2026-07-01 18:43:40.019569', TIMESTAMP '2026-07-01 18:43:40.019569');
+INSERT INTO "public"."book_category"("id", "name", "depth", "path", "parent_id", "created_at", "updated_at") VALUES(X'019f1d1010f57f59b952c06c1564a3cb', U&'\c678\ad6d \acfc\d559\c18c\c124', 4, U&'\ad6d\b0b4\b3c4\c11c>\c18c\c124/\c2dc/\d76c\ace1>\acfc\d559\c18c\c124(SF)>\c678\ad6d \acfc\d559\c18c\c124', X'019f1d1010f378648f1e14d11bec56d0', TIMESTAMP '2026-07-01 18:43:40.021569', TIMESTAMP '2026-07-01 18:43:40.021569');         
+INSERT INTO "public"."book_category"("id", "name", "depth", "path", "parent_id", "created_at", "updated_at") VALUES(X'019f1d101ee87a76b02134e2aa49cb3b', U&'\c790\ae30\acc4\bc1c', 2, U&'\ad6d\b0b4\b3c4\c11c>\c790\ae30\acc4\bc1c', X'019f1d0ffc9b706086c7f48ba9688792', TIMESTAMP '2026-07-01 18:43:43.59202', TIMESTAMP '2026-07-01 18:43:43.59202');      
+INSERT INTO "public"."book_category"("id", "name", "depth", "path", "parent_id", "created_at", "updated_at") VALUES(X'019f1d101eec714ab4c894afbb1d11a7', U&'\c131\acf5', 3, U&'\ad6d\b0b4\b3c4\c11c>\c790\ae30\acc4\bc1c>\c131\acf5', X'019f1d101ee87a76b02134e2aa49cb3b', TIMESTAMP '2026-07-01 18:43:43.596018', TIMESTAMP '2026-07-01 18:43:43.596018');   
+INSERT INTO "public"."book_category"("id", "name", "depth", "path", "parent_id", "created_at", "updated_at") VALUES(X'019f1d101eef71e297a1fa7ec2df8f26', U&'\c131\acf5\d559', 4, U&'\ad6d\b0b4\b3c4\c11c>\c790\ae30\acc4\bc1c>\c131\acf5>\c131\acf5\d559', X'019f1d101eec714ab4c894afbb1d11a7', TIMESTAMP '2026-07-01 18:43:43.599018', TIMESTAMP '2026-07-01 18:43:43.599018');              
+CREATE MEMORY TABLE "public"."book"(
+    "id" BINARY(16) NOT NULL,
+    "title" CHARACTER VARYING(255) NOT NULL,
+    "author" CHARACTER VARYING(50) NOT NULL,
+    "description" CHARACTER VARYING,
+    "publisher" CHARACTER VARYING(50) NOT NULL,
+    "published_date" DATE,
+    "isbn" CHARACTER VARYING(20),
+    "thumbnail_url" CHARACTER VARYING(255),
+    "review_count" BIGINT DEFAULT 0 NOT NULL,
+    "rating" DOUBLE PRECISION DEFAULT 0 NOT NULL,
+    "book_category_id" BINARY(16),
+    "created_at" TIMESTAMP(6) NOT NULL,
+    "updated_at" TIMESTAMP(6) NOT NULL,
+    "deleted_at" TIMESTAMP(6)
+); 
+ALTER TABLE "public"."book" ADD CONSTRAINT "public"."pk_book_id" PRIMARY KEY("id");           
+-- 3 +/- SELECT COUNT(*) FROM public.book;    
+INSERT INTO "public"."book"("id", "title", "author", "description", "publisher", "published_date", "isbn", "thumbnail_url", "review_count", "rating", "book_category_id", "created_at", "updated_at", "deleted_at") VALUES(X'019f1d0ffccf73ecbf292a391d47880d', U&'\c65c\c758 \c4f8\baa8 (\ad00\acc4\c640 \d798\c758 \ad6c\c870\b97c \d30c\c545\d558\b294 \b124 \ac00\c9c0 \d504\b808\c784)', U&'\cc30\c2a4 \d2f8\b9ac', U&'\c77c\c0c1\c801 \b300\d654\bd80\d130 \bcf5\c7a1\d55c \c815\ce58\c801 \b17c\c7c1\ae4c\c9c0, \c6b0\b9ac\b294 \b9e4\c77c\b9e4\c77c \b204\ad70\ac00\c758 \b9d0\c744 \b4e3\ace0 \b610 \c804\d558\ba70 \c0b4\c544\ac04\b2e4. 21\c138\ae30 \c0ac\d68c\d559\c758 \cc3d\c2dc\c790\b85c \bd88\b9ac\b294 \c0ac\d68c\d559\c790 \cc30\c2a4 \d2f8\b9ac\b294 \c774 \cc45\c744 \d1b5\d574 \c6b0\b9ac \b300\d654\c5d0 \ac00\b4dd\d55c \2018\c774\c720\2019\c5d0 \c8fc\baa9\d588\b2e4. \b2e8\c21c\d788 \d2b9\c815\d55c \c77c\c758 \c6d0\c778\c744 \c81c\c2dc\d558\b294 \ac83\c744 \b118\c5b4, \c0ac\b78c\b4e4\c740 \c11c\b85c \b2e4\c591\d55c \c720\d615\c758 \c774\c720\b97c \c8fc\ace0\bc1b\c73c\ba70 \acf5\b3d9\c758 \c774\d574\c640 \c0ac\d68c\c801 \ad00\acc4\c758 \d1a0\b300\b97c \c774\b8ec\b2e4\b294 \ac83\c774 \d575\c2ec\c774\b2e4. \201c\ace4\acbd\c5d0\c11c \bc97\c5b4\b098\b824 \d560 \b54c, \c11c\b85c\b97c \d310\b2e8\d560 \b54c, \c751\ae09 \c0c1\d669\c5d0 \c9c1\ba74\d588\c744 \b54c\201d \b9d0\c744 \b098\b204\b294 \c0ac\b78c\b4e4\c758 \ad00\acc4\c640 \c0c1\d669\c5d0 \b530\b77c \bcc0\d654\d558\b294 \c774\c720 \c81c\c2dc \c720\d615\c744 \c0b4\d3b4\bcf4\ba74 \b2e4\c591\d55c \ad00\acc4\c758 \c0ac\d68c\c801 \b2e8\ba74\c774 \ace0\c2a4\b780\d788 \b4dc\b7ec\b09c\b2e4.\000a\c800\c790\b294 \c77c\c0c1\c801\c778 \c0ac\b840\bd80\d130 9\00b711 \d14c\b7ec\c640 \ac19\c740 \c704\ae30 \c0c1\d669\c5d0\c11c \c774\b8e8\c5b4\c9c4 \c2e4\c81c \b300\d654\b97c \c0dd\c0dd\d788 \c778\c6a9\d574 \c774\c720 \c81c\c2dc\c758 \c720\d615\c744 \b098\b208\b2e4. \ad00\c2b5, \c774\c57c\ae30, \cf54\b4dc, \d559\c220\c801 \b17c\ace0 \b124 \ac00\c9c0\b85c \bd84\b958\b418\b294 \c720\d615\b4e4\c740 \c0ac\d68c\c801 \ad00\acc4\b97c \bc18\c601\d558\ace0, \c218\b9bd\d558\ace0, \bcf5\ad6c\d558\ba70, \d611\c0c1\d558\b294 \b3c4\ad6c\ac00 \b41c\b2e4. \adf8\b7f0 \c758\bbf8\c5d0\c11c \ad00\acc4\c5d0 \b9de\cd94\c5b4 \b9d0\d574\c9c0\b294 \ac01\ac01\c758 \c774\c720\b97c \bd84\c11d\d558\ba74 \ad00\acc4\c640 \ad8c\b825\c758 \b9e5\b77d\c774 \bcf4\c774\b294 \ac83. \2018\c65c\2019\b77c\b294 \c9c8\bb38\acfc \adf8 \b300\b2f5\c5d0 \c8fc\baa9\d558\ba74 \adf8 \b4a4\d3b8\c5d0 \c228\aca8\c9c4 \c0ac\d68c\c801 \b9e5\b77d\c774 \c644\c804\d788 \c0c8\b86d\ac8c \c77d\d78c\b2e4.', U&'\c720\c720', DATE '2025-08-04', '9791167701312', NULL, 0, 0.0, X'019f1d0ffccc7763a6effcec60fd39aa', TIMESTAMP '2026-07-01 18:43:34.861147', TIMESTAMP '2026-07-01 18:43:34.861147', NULL); 
+INSERT INTO "public"."book"("id", "title", "author", "description", "publisher", "published_date", "isbn", "thumbnail_url", "review_count", "rating", "book_category_id", "created_at", "updated_at", "deleted_at") VALUES(X'019f1d1010f574fdbbc22b0038e6c4e8', U&'\d504\b85c\c81d\d2b8 \d5e4\c77c\ba54\b9ac (\c601\d654 ''\d504\b85c\c81d\d2b8 \d5e4\c77c\ba54\b9ac'' \c6d0\c791)', U&'\c564\b514 \c704\c5b4', U&'2026\b144 3\c6d4, \c601\d654 \3008\d504\b85c\c81d\d2b8 \d5e4\c77c\ba54\b9ac\3009 \ac1c\bd09!\000a\201c\b2e4\c74c \c138\ae30\ae4c\c9c0 SF \ace0\c804\c73c\b85c \b0a8\c744 \b300\c791\201d\000a\000a\c804 \c138\acc4 SF \d32c\b4e4\c744 \c0ac\b85c\c7a1\c740 \d654\c81c\c758 \c18c\c124 \300a\d504\b85c\c81d\d2b8 \d5e4\c77c\ba54\b9ac\300b\ac00 \b9c8\ce68\b0b4 \c2a4\d06c\b9b0\c73c\b85c \d5a5\d55c\b2e4. \d55c\ad6d\c5d0\c11c\b3c4 \cd08\d310 \cd9c\ac04 \c774\d6c4 \afb8\c900\d788 \c0ac\b791\bc1b\c73c\ba70 \201c\acfc\d559\acfc \c6b0\c8fc\b97c \c0ac\b791\d558\b294 \c0ac\b78c\b4e4\c5d0\ac8c \c9dc\b9bf\d55c\201d \c21c\ac04\c744 \c120\c0ac\d574\c628 \c774 \c18c\c124\c758 \c601\d654 \d310\ad8c\c740 \ce58\c5f4\d55c \acbd\c7c1 \b05d\c5d0 \c544\b9c8\c874 MGM\c774 \b530\b0b8 \c9c0 5\b144 \b9cc\c5d0 \b9c9\bc14\c9c0 \c791\c5c5\b9cc\c744 \b0a8\aca8\b450\ace0 \c788\b2e4. \c608\ace0\d3b8 \acf5\ac1c\b9cc\c73c\b85c 7\c5b5 \d68c\ac00 \b118\b294 \c870\d68c \c218\ac00 \c785\c99d\d558\b4ef, \c601\d654 \c560\d638\ac00\bfd0\b9cc \c544\b2c8\b77c \c774 \cc45\c758 \c601\c0c1\d654\b97c \ac04\c808\d788 \bc14\b77c\c628 \b3c5\c790\b4e4\b3c4 \d55c\aecf \ae30\b300\ac10\c744 \c548\ace0 \ac1c\bd09\c77c\c744 \ae30\b2e4\b9ac\ace0 \c788\b2e4.\000a\c564\b514 \c704\c5b4\b294 \b370\bdd4\c791 \300a\b9c8\c158\300b\acfc \d6c4\c18d\c791 \300a\c544\b974\d14c\bbf8\c2a4\300b \adf8\b9ac\ace0 \c774 \cc45\ae4c\c9c0 \b2e8 \c138 \ad8c\c744 \bc1c\d45c\d574 \c787\b2ec\c544 \c131\acf5\c744 \ac70\b450\ba70 \b274\c695 \d0c0\c784\c2a4\c640 \c544\b9c8\c874 \bca0\c2a4\d2b8\c140\b7ec\c5d0 \c774\b984\c744 \c62c\b9b0 \ba85\c2e4\c0c1\bd80 \cd5c\ace0\c758 SF \c791\ac00\c774\b2e4. \ae00\c744 \c4f8 \b54c \acfc\d559\c801 \c0ac\c2e4\c744 \c870\c0ac\d558\ace0 \ac80\c99d\d558\b294 \ac83\c73c\b85c \c815\d3c9\c774 \b09c \c791\ac00\c758 \c791\d488\c778 \b9cc\d07c, \d760\c7a1\c744 \b370 \c5c6\b294 \acfc\d559\c801 \c9c0\c2dd\c774 \c791\ac00\c758 \c7a5\ae30\c778 \b099\ad00\c801 \ac10\c218\c131\acfc \c5b4\c6b0\b7ec\c838 \c720\ac10\c5c6\c774 \adf8\b824\c84c\b2e4. \d2b9\d788 \c791\ac00\ac00 \ce58\bc00\d558\ac8c \ad6c\c0c1\d55c \2018\d2b9\bcc4\d55c \ce90\b9ad\d130\2019\c758 \b4f1\c7a5\c740 \b2e8\c5f0 \c18c\c124\c758 \bc31\bbf8\b2e4.\000a\c9c0\ad6c\b97c \ad6c\d558\ae30 \c704\d574 \c6b0\c8fc\b85c \b5a0\b09c \d55c \c0ac\b78c \adf8\b9ac\ace0 \adf8 \c5ec\c815\c5d0\c11c \b9cc\b098\b294 \2018\c808\b300 \c78a\d788\c9c0 \c54a\b294 \c874\c7ac\2019. \c774 \c18c\c124\c740 \acfc\d559\c18c\c124\c758 \c678\d53c\b97c \c4f4 \cc44 \acf5\c0dd\acfc \c5f0\b300, \c885\c744 \b118\c5b4\c11c\b294 \c6b0\c815\c5d0 \ad00\d574 \201c\cf78\cf78 \c19f\b294 \c774\c57c\ae30 \c0d8\bb3c\201d\c744 \d37c \b098\b978\b2e4. \c778\b958\b97c \c0b4\b9ac\ae30 \c704\d574 \c790\c2e0\c758 \adc0\d658\c744 \d3ec\ae30\d55c \2018\c88b\c740 \c0ac\b78c\2019\c758 \c120\d0dd\c740 \c5b4\b5a4 \acb0\b9d0\c744 \b9de\c744 \ac83\c778\ac00. \d55c\ce35 \ae4a\c5b4\c9c0\ace0 \b113\c5b4\c9c4 \c564\b514 \c704\c5b4\c758 \c138\acc4 \c18d\c5d0 \adf8 \b2f5\c774 \c788\b2e4. \c774 \c774\c57c\ae30\b294 \bd84\ba85, \cc45\c73c\b85c\b3c4 \c601\d654\b85c\b3c4 \c624\b798 \ae30\c5b5\b420 \ac83\c774\b2e4.', U&'\c54c\c5d0\c774\ce58\cf54\b9ac\c544', DATE '2026-02-19', '9788925588735', NULL, 0, 0.0, X'019f1d1010f57f59b952c06c1564a3cb', TIMESTAMP '2026-07-01 18:43:40.021569', TIMESTAMP '2026-07-01 18:43:40.021569', NULL);     
+INSERT INTO "public"."book"("id", "title", "author", "description", "publisher", "published_date", "isbn", "thumbnail_url", "review_count", "rating", "book_category_id", "created_at", "updated_at", "deleted_at") VALUES(X'019f1d101ef07715a9a0e3676e7f7fca', U&'\bbf8\b77c\d074 \c5d0\b514\d305 (\b2f9\c2e0\b9cc\c758 \cde8\d5a5\c744 \b3c8\c774 \b418\b294 \cf58\d150\ce20\b85c)', U&'\b514\c5d0\b514\d2b8', U&'\c720\d29c\be0c, \c778\c2a4\d0c0\adf8\b7a8, \b274\c2a4\b808\d130\ae4c\c9c0 \000a130\b9cc \ad6c\b3c5 \b9e4\ac70\c9c4 \2018\b514\c5d0\b514\d2b8\2019\b97c \b9cc\b4e0 \cf58\d150\ce20 \ae30\d68d\c758 \baa8\b4e0 \ac83\000a\000a500\b9cc \c6d0, \b178\d2b8\bd81 \d55c \b300, \c0ac\bb34\c2e4\b3c4 \c5c6\c774 \ce74\d398\b97c \c804\c804\d558\ba70 \c2dc\c791\d55c \b450 \ba85\c758 \c5d0\b514\d130\ac00 \c788\c5c8\b2e4. 10\b144\c774 \c9c0\b09c \c9c0\ae08, \adf8\b4e4\c774 \b9cc\b4e0 \2018\b514\c5d0\b514\d2b8\2019\b294 \c6f9\c0ac\c774\d2b8, \c720\d29c\be0c, \c778\c2a4\d0c0\adf8\b7a8, \b274\c2a4\b808\d130\b97c \c544\c6b0\b974\b294 130\b9cc \ad6c\b3c5 \b77c\c774\d504\c2a4\d0c0\c77c \b9e4\ac70\c9c4\c774 \b410\b2e4. \b871\d3fc\c5d0\c11c \c20f\d3fc\c73c\b85c, \c6f9 \b9e4\ac70\c9c4\c5d0\c11c \c778\c2a4\d0c0\adf8\b7a8 \b9e4\ac70\c9c4\c73c\b85c, \c5d0\b514\d130\ac00 \b9cc\b4e0 \cf58\d150\ce20\c5d0\c11c AI \cf58\d150\ce20\b85c \bb34\c12d\ac8c \bc14\b00c\b294 \d2b8\b80c\b4dc \c18d\c5d0\c11c\b3c4 \adf8\b4e4\c740 \c0b4\c544\b0a8\c558\b2e4.\000a\000a\300a\bbf8\b77c\d074 \c5d0\b514\d305\300b\c740 \adf8 \c0dd\c874\c758 \ae30\b85d\c774\b2e4. \c798 \b9cc\b4e0 \ac83\c774 \c544\b2c8\b77c \c798 \d314\b9b0 \ac83\c758 \ae30\b85d\c774\ba70, \c131\acf5\b9cc\c774 \c544\b2c8\b77c \c2e4\d328\d558\ace0 \b2e4\c2dc \ace0\ce5c \c0ac\b840\b4e4\c758 \ae30\b85d\c774\b2e4. \c774 \cc45\c740 \cf58\d150\ce20\b97c \b2e8\c21c\d788 \2018\c798 \b9cc\b4dc\b294 \ae30\c220\2019\c774 \c544\b2c8\b77c, \c0ac\b78c\b4e4\c758 \c120\d0dd\c744 \c6c0\c9c1\c774\ace0 \cde8\d5a5\c744 \be44\c988\b2c8\c2a4\b85c \c5f0\acb0\d558\b294 \2018\c5d0\b514\d305 \ac10\ac01\2019\c73c\b85c \c815\c758\d55c\b2e4. \c720\d29c\be0c\00b7\c778\c2a4\d0c0\adf8\b7a8\00b7\b274\c2a4\b808\d130 \b4f1 \d50c\b7ab\d3fc\bcc4 \acf5\b7b5\bc95\bd80\d130 \c54c\ace0\b9ac\c998\c744 \d0c0\b294 \bc95, \d3c9\bc94\d55c \ac1c\c778\c744 \d314\b9ac\b294 \ce90\b9ad\d130\b85c \b9cc\b4dc\b294 \bc95, AI\b97c \b0b4 \d3b8\c73c\b85c \c4f0\b294 \bc95 \b4f1 \ba38\b9bf\c18d \c0dd\ac01\acfc \ad00\c810\c744 \d604\c2e4\c758 \b3c8\acfc \be44\c988\b2c8\c2a4\b85c \bc14\afd4\c8fc\b294 \c5d0\b514\d305\c758 \ae30\c220\c744 \b2f4\c558\b2e4.\000a\000a\c800\c790\b4e4\c740 \cf58\d150\ce20 \c2dc\c7a5\c774 \be60\b974\ac8c \bc14\b00c\b294 \c2dc\b300\c77c\c218\b85d \c911\c694\d55c \ac83\c740 \ac70\b300\d55c \c790\bcf8\c774\b098 \c644\bcbd\d55c \c900\be44\ac00 \c544\b2c8\b77c, \c9c0\ae08 \b2f9\c7a5 \c2dc\c791\d558\ace0 \b04a\c784\c5c6\c774 \c218\c815\d558\ba70 \c0b4\c544\b0a8\b294 \c2e4\d589\b825\c774\b77c\ace0 \b9d0\d55c\b2e4. \acb0\ad6d\300a\bbf8\b77c\d074 \c5d0\b514\d305\300b\c740 \d3c9\bc94\d55c \ac1c\c778\c774 \c790\c2e0\c758 \ac10\ac01\acfc \cde8\d5a5\c73c\b85c \c5b4\b5bb\ac8c \c790\ae30\b9cc\c758 \be0c\b79c\b4dc\c640 \c138\acc4\b97c \b9cc\b4e4\c5b4\ac08 \c218 \c788\b294\c9c0\b97c \bcf4\c5ec\c8fc\b294 \ac00\c7a5 \c2e4\c804\c801\c778 \c5d0\b514\d305 \c548\b0b4\c11c\b2e4. \cf58\d150\ce20\b97c \b9cc\b4dc\b294 \c0ac\b78c\bfd0 \c544\b2c8\b77c, \c790\ae30 \c774\b984\c73c\b85c \c77c\d558\ace0 \c2f6\c740 \c9c1\c7a5\c778, \b9c8\cf00\d130, \ae30\d68d\c790 \baa8\b450\c5d0\ac8c \c720\d6a8\d55c \c774\c57c\ae30\ac00 \b418\c5b4\c904 \ac83\c774\b2e4.', U&'\bd81\c2a4\d1a4', DATE '2026-06-17', '9791175230477', NULL, 0, 0.0, X'019f1d101eef71e297a1fa7ec2df8f26', TIMESTAMP '2026-07-01 18:43:43.60002', TIMESTAMP '2026-07-01 18:43:43.60002', NULL);         
+CREATE MEMORY TABLE "public"."review"(
+    "id" BINARY(16) NOT NULL,
+    "book_id" BINARY(16) NOT NULL,
+    "user_id" BINARY(16) NOT NULL,
+    "content" CHARACTER VARYING(1000) NOT NULL,
+    "attachment_url" CHARACTER VARYING(100),
+    "rating" INTEGER NOT NULL,
+    "like_count" BIGINT DEFAULT 0 NOT NULL,
+    "comment_count" BIGINT DEFAULT 0 NOT NULL,
+    "created_at" TIMESTAMP(6) NOT NULL,
+    "updated_at" TIMESTAMP(6) NOT NULL,
+    "deleted_at" TIMESTAMP(6)
+);
+ALTER TABLE "public"."review" ADD CONSTRAINT "public"."pk_review_id" PRIMARY KEY("id");       
+-- 0 +/- SELECT COUNT(*) FROM public.review;  
+CREATE MEMORY TABLE "public"."review_like"(
+    "id" BINARY(16) NOT NULL,
+    "review_id" BINARY(16) NOT NULL,
+    "user_id" BINARY(16) NOT NULL,
+    "created_at" TIMESTAMP(6) NOT NULL
+);              
+ALTER TABLE "public"."review_like" ADD CONSTRAINT "public"."pk_review_like_id" PRIMARY KEY("id");             
+-- 0 +/- SELECT COUNT(*) FROM public.review_like;             
+CREATE MEMORY TABLE "public"."comment"(
+    "id" BINARY(16) NOT NULL,
+    "user_id" BINARY(16) NOT NULL,
+    "review_id" BINARY(16) NOT NULL,
+    "content" CHARACTER VARYING(500) NOT NULL,
+    "deleted_at" TIMESTAMP(6),
+    "created_at" TIMESTAMP(6) NOT NULL,
+    "updated_at" TIMESTAMP(6) NOT NULL
+);         
+ALTER TABLE "public"."comment" ADD CONSTRAINT "public"."pk_comment_id" PRIMARY KEY("id");     
+-- 0 +/- SELECT COUNT(*) FROM public.comment; 
+CREATE MEMORY TABLE "public"."book_status"(
+    "id" BINARY(16) NOT NULL,
+    "user_id" BINARY(16) NOT NULL,
+    "book_id" BINARY(16) NOT NULL,
+    "status" CHARACTER VARYING(10) NOT NULL,
+    "created_at" TIMESTAMP(6) NOT NULL,
+    "updated_at" TIMESTAMP(6) NOT NULL
+);         
+ALTER TABLE "public"."book_status" ADD CONSTRAINT "public"."pk_book_status_id" PRIMARY KEY("id");             
+-- 1 +/- SELECT COUNT(*) FROM public.book_status;             
+INSERT INTO "public"."book_status"("id", "user_id", "book_id", "status", "created_at", "updated_at") VALUES(X'019f1d1835897638b6f5bb2f66eb6b5e', X'019f1d106a947854bbac94a27748b18a', X'019f1d101ef07715a9a0e3676e7f7fca', 'WANT', TIMESTAMP '2026-07-01 18:52:33.672907', TIMESTAMP '2026-07-01 18:52:33.672907');           
+CREATE MEMORY TABLE "public"."book_recommendation"(
+    "id" BINARY(16) NOT NULL,
+    "user_id" BINARY(16) NOT NULL,
+    "book_id" BINARY(16) NOT NULL,
+    "created_at" TIMESTAMP(6) NOT NULL,
+    "updated_at" TIMESTAMP(6) NOT NULL
+);               
+ALTER TABLE "public"."book_recommendation" ADD CONSTRAINT "public"."pk_book_recommendation_id" PRIMARY KEY("id");             
+-- 0 +/- SELECT COUNT(*) FROM public.book_recommendation;     
+CREATE MEMORY TABLE "public"."notification"(
+    "id" BINARY(16) NOT NULL,
+    "user_id" BINARY(16) NOT NULL,
+    "review_id" BINARY(16) NOT NULL,
+    "message" CHARACTER VARYING(1000),
+    "confirmed" BOOLEAN DEFAULT FALSE NOT NULL,
+    "created_at" TIMESTAMP(6) NOT NULL,
+    "updated_at" TIMESTAMP(6) NOT NULL
+);           
+ALTER TABLE "public"."notification" ADD CONSTRAINT "public"."pk_notification_id" PRIMARY KEY("id");           
+-- 0 +/- SELECT COUNT(*) FROM public.notification;            
+CREATE MEMORY TABLE "public"."popular_book"(
+    "id" BINARY(16) NOT NULL,
+    "book_id" BINARY(16) NOT NULL,
+    "period" ENUM('DAILY', 'WEEKLY', 'MONTHLY', 'ALL_TIME') NOT NULL,
+    "ranking" INTEGER NOT NULL,
+    "book_title" CHARACTER VARYING(255) NOT NULL,
+    "author" CHARACTER VARYING(50) NOT NULL,
+    "thumbnail_url" CHARACTER VARYING(300),
+    "score" DECIMAL(10, 2) NOT NULL,
+    "review_count" INTEGER NOT NULL,
+    "like_count" INTEGER NOT NULL,
+    "comment_count" INTEGER NOT NULL,
+    "average_rating" DECIMAL(3, 2) NOT NULL,
+    "batch_date" DATE NOT NULL,
+    "created_at" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP(6) NOT NULL
+);          
+ALTER TABLE "public"."popular_book" ADD CONSTRAINT "public"."pk_popular_book_id" PRIMARY KEY("id");           
+-- 0 +/- SELECT COUNT(*) FROM public.popular_book;            
+CREATE MEMORY TABLE "public"."popular_review"(
+    "id" BINARY(16) NOT NULL,
+    "review_id" BINARY(16) NOT NULL,
+    "period" ENUM('DAILY', 'WEEKLY', 'MONTHLY', 'ALL_TIME') NOT NULL,
+    "ranking" INTEGER NOT NULL,
+    "book_title" CHARACTER VARYING(255) NOT NULL,
+    "book_author" CHARACTER VARYING(50) NOT NULL,
+    "thumbnail_url" CHARACTER VARYING(300),
+    "user_nickname" CHARACTER VARYING(20) NOT NULL,
+    "review_content" CHARACTER VARYING(1000) NOT NULL,
+    "review_rating" INTEGER NOT NULL,
+    "score" DECIMAL(10, 2) NOT NULL,
+    "like_count" INTEGER NOT NULL,
+    "comment_count" INTEGER NOT NULL,
+    "batch_date" DATE NOT NULL,
+    "created_at" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP(6) NOT NULL
+); 
+ALTER TABLE "public"."popular_review" ADD CONSTRAINT "public"."pk_popular_review_id" PRIMARY KEY("id");       
+-- 0 +/- SELECT COUNT(*) FROM public.popular_review;          
+CREATE MEMORY TABLE "public"."power_user"(
+    "id" BINARY(16) NOT NULL,
+    "user_id" BINARY(16) NOT NULL,
+    "period" ENUM('DAILY', 'WEEKLY', 'MONTHLY', 'ALL_TIME') NOT NULL,
+    "ranking" INTEGER NOT NULL,
+    "nickname" CHARACTER VARYING(20) NOT NULL,
+    "score" DECIMAL(10, 2) NOT NULL,
+    "like_count" INTEGER NOT NULL,
+    "comment_count" INTEGER NOT NULL,
+    "batch_date" DATE NOT NULL,
+    "created_at" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP(6) NOT NULL
+);              
+ALTER TABLE "public"."power_user" ADD CONSTRAINT "public"."pk_power_user_id" PRIMARY KEY("id");               
+-- 0 +/- SELECT COUNT(*) FROM public.power_user;              
+CREATE MEMORY TABLE "public"."trending_keyword_snapshot"(
+    "snapshot_id" BIGINT GENERATED BY DEFAULT AS IDENTITY(START WITH 1) DEFAULT ON NULL NOT NULL,
+    "calculated_at" TIMESTAMP NOT NULL
+);      
+ALTER TABLE "public"."trending_keyword_snapshot" ADD CONSTRAINT "public"."CONSTRAINT_6" PRIMARY KEY("snapshot_id");           
+-- 0 +/- SELECT COUNT(*) FROM public.trending_keyword_snapshot;               
+CREATE MEMORY TABLE "public"."trending_keyword"(
+    "snapshot_id" BIGINT NOT NULL,
+    "ranking" INTEGER NOT NULL,
+    "keyword" CHARACTER VARYING(50) NOT NULL,
+    "score" DECIMAL(8, 2) NOT NULL
+);  
+ALTER TABLE "public"."trending_keyword" ADD CONSTRAINT "public"."CONSTRAINT_E" PRIMARY KEY("snapshot_id", "ranking");         
+-- 0 +/- SELECT COUNT(*) FROM public.trending_keyword;        
+ALTER TABLE "public"."trending_keyword" ADD CONSTRAINT "public"."chk_trending_keyword_ranking" CHECK("ranking" BETWEEN 1 AND 10) NOCHECK;     
+ALTER TABLE "public"."popular_review" ADD CONSTRAINT "public"."chk_popular_review_rating" CHECK("review_rating" BETWEEN 0 AND 5) NOCHECK;     
+ALTER TABLE "public"."review" ADD CONSTRAINT "public"."CONSTRAINT_C" CHECK("rating" BETWEEN 1 AND 5) NOCHECK; 
+ALTER TABLE "public"."popular_book" ADD CONSTRAINT "public"."chk_popular_book_avg_rating" CHECK("average_rating" BETWEEN 0.00 AND 5.00) NOCHECK;              
+ALTER TABLE "public"."power_user" ADD CONSTRAINT "public"."chk_power_user_score" CHECK("score" >= CAST(0 AS NUMERIC(1))) NOCHECK;             
+ALTER TABLE "public"."power_user" ADD CONSTRAINT "public"."chk_power_user_ranking" CHECK("ranking" BETWEEN 1 AND 10) NOCHECK; 
+ALTER TABLE "public"."popular_review" ADD CONSTRAINT "public"."chk_popular_review_score" CHECK("score" >= CAST(0 AS NUMERIC(1))) NOCHECK;     
+ALTER TABLE "public"."popular_book" ADD CONSTRAINT "public"."chk_popular_book_score" CHECK("score" >= CAST(0 AS NUMERIC(1))) NOCHECK;         
+ALTER TABLE "public"."trending_keyword" ADD CONSTRAINT "public"."chk_trending_keyword_score" CHECK("score" >= CAST(0 AS NUMERIC(1))) NOCHECK; 
+ALTER TABLE "public"."popular_review" ADD CONSTRAINT "public"."chk_popular_review_ranking" CHECK("ranking" BETWEEN 1 AND 50) NOCHECK;         
+ALTER TABLE "public"."popular_book" ADD CONSTRAINT "public"."chk_popular_book_ranking" CHECK("ranking" BETWEEN 1 AND 50) NOCHECK;             
+ALTER TABLE "public"."book_category" ADD CONSTRAINT "public"."uk_book_category_path" UNIQUE NULLS DISTINCT ("path");          
+ALTER TABLE "public"."book" ADD CONSTRAINT "public"."CONSTRAINT_2" UNIQUE NULLS DISTINCT ("isbn");            
+ALTER TABLE "public"."book_category" ADD CONSTRAINT "public"."CONSTRAINT_5" UNIQUE NULLS DISTINCT ("path");   
+ALTER TABLE "public"."book" ADD CONSTRAINT "public"."uk_book_isbn" UNIQUE NULLS DISTINCT ("isbn");            
+ALTER TABLE "public"."book_status" ADD CONSTRAINT "public"."uk_book_status_user_book" UNIQUE NULLS DISTINCT ("user_id", "book_id");           
+ALTER TABLE "public"."comment" ADD CONSTRAINT "public"."uk_comment_user_review" UNIQUE NULLS DISTINCT ("user_id", "review_id");               
+ALTER TABLE "public"."power_user" ADD CONSTRAINT "public"."uq_power_user_ranking" UNIQUE NULLS DISTINCT ("period", "batch_date", "ranking");  
+ALTER TABLE "public"."popular_review" ADD CONSTRAINT "public"."uq_popular_review_ranking" UNIQUE NULLS DISTINCT ("period", "batch_date", "ranking");          
+ALTER TABLE "public"."review_like" ADD CONSTRAINT "public"."uk_review_like_review_user" UNIQUE NULLS DISTINCT ("review_id", "user_id");       
+ALTER TABLE "public"."popular_book" ADD CONSTRAINT "public"."uq_popular_book_date" UNIQUE NULLS DISTINCT ("period", "book_id", "batch_date"); 
+ALTER TABLE "public"."popular_book" ADD CONSTRAINT "public"."uq_popular_book_ranking" UNIQUE NULLS DISTINCT ("period", "batch_date", "ranking");              
+ALTER TABLE "public"."book_recommendation" ADD CONSTRAINT "public"."uk_book_recommendation_user_book" UNIQUE NULLS DISTINCT ("user_id", "book_id");           
+ALTER TABLE "public"."popular_review" ADD CONSTRAINT "public"."uq_popular_review_date" UNIQUE NULLS DISTINCT ("period", "review_id", "batch_date");           
+ALTER TABLE "public"."review" ADD CONSTRAINT "public"."uk_review_book_user" UNIQUE NULLS DISTINCT ("book_id", "user_id");     
+ALTER TABLE "public"."book_category" ADD CONSTRAINT "public"."uk_book_category_parent_id_name" UNIQUE NULLS DISTINCT ("name", "parent_id");   
+ALTER TABLE "public"."power_user" ADD CONSTRAINT "public"."uq_power_user_date" UNIQUE NULLS DISTINCT ("period", "user_id", "batch_date");     
+ALTER TABLE "public"."trending_keyword_snapshot" ADD CONSTRAINT "public"."uq_trending_keyword_snapshot_time" UNIQUE NULLS DISTINCT ("calculated_at");         
+ALTER TABLE "public"."users" ADD CONSTRAINT "public"."uk_user_email" UNIQUE NULLS DISTINCT ("email");         
+ALTER TABLE "public"."notification" ADD CONSTRAINT "public"."fk_notification_user" FOREIGN KEY("user_id") REFERENCES "public"."users"("id") NOCHECK;          
+ALTER TABLE "public"."book_recommendation" ADD CONSTRAINT "public"."fk_book_recommendation_user" FOREIGN KEY("user_id") REFERENCES "public"."users"("id") NOCHECK;            
+ALTER TABLE "public"."comment" ADD CONSTRAINT "public"."fk_comment_review" FOREIGN KEY("review_id") REFERENCES "public"."review"("id") NOCHECK;               
+ALTER TABLE "public"."book_category" ADD CONSTRAINT "public"."fk_book_category_parent_id" FOREIGN KEY("parent_id") REFERENCES "public"."book_category"("id") NOCHECK;         
+ALTER TABLE "public"."book_status" ADD CONSTRAINT "public"."fk_book_status_user" FOREIGN KEY("user_id") REFERENCES "public"."users"("id") NOCHECK;            
+ALTER TABLE "public"."review" ADD CONSTRAINT "public"."fk_review_user" FOREIGN KEY("user_id") REFERENCES "public"."users"("id") NOCHECK;      
+ALTER TABLE "public"."book_recommendation" ADD CONSTRAINT "public"."fk_book_recommendation_book" FOREIGN KEY("book_id") REFERENCES "public"."book"("id") NOCHECK;             
+ALTER TABLE "public"."review_like" ADD CONSTRAINT "public"."fk_review_like_user" FOREIGN KEY("user_id") REFERENCES "public"."users"("id") NOCHECK;            
+ALTER TABLE "public"."comment" ADD CONSTRAINT "public"."fk_comment_user" FOREIGN KEY("user_id") REFERENCES "public"."users"("id") NOCHECK;    
+ALTER TABLE "public"."notification" ADD CONSTRAINT "public"."fk_notifications_review" FOREIGN KEY("review_id") REFERENCES "public"."review"("id") NOCHECK;    
+ALTER TABLE "public"."review" ADD CONSTRAINT "public"."fk_review_book" FOREIGN KEY("book_id") REFERENCES "public"."book"("id") NOCHECK;       
+ALTER TABLE "public"."book_status" ADD CONSTRAINT "public"."fk_book_status_book" FOREIGN KEY("book_id") REFERENCES "public"."book"("id") NOCHECK;             
+ALTER TABLE "public"."review_like" ADD CONSTRAINT "public"."fk_review_like_review" FOREIGN KEY("review_id") REFERENCES "public"."review"("id") NOCHECK;       
+ALTER TABLE "public"."trending_keyword" ADD CONSTRAINT "public"."fk_trending_keyword_snapshot_id" FOREIGN KEY("snapshot_id") REFERENCES "public"."trending_keyword_snapshot"("snapshot_id") ON DELETE CASCADE NOCHECK;        
+ALTER TABLE "public"."book" ADD CONSTRAINT "public"."fk_book_book_category" FOREIGN KEY("book_category_id") REFERENCES "public"."book_category"("id") NOCHECK;

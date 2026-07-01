@@ -38,7 +38,7 @@ public class BookServiceImpl implements BookService {
 			throw new IllegalArgumentException("이미 등록된 도서입니다. (ISBN중복 : " + req.getIsbn() + ")");
 		}
 		BookCategory bookCategory = null;
-		if (!category.isBlank()) {
+		if (category != null && !category.isBlank()) {
 			bookCategory = findBookCategory(category);
 		}
 		Book book = bookRepository.save(bookMapper.toBook(req, url, bookCategory));
@@ -53,6 +53,7 @@ public class BookServiceImpl implements BookService {
 		BookCategory currentParent = null;
 		StringBuilder currentPathBuilder = new StringBuilder();
 
+		int depth = 1;
 		for (String name : categoryNames) {
 			if (name.isBlank()) continue;
 			if (!currentPathBuilder.isEmpty()) {
@@ -62,14 +63,17 @@ public class BookServiceImpl implements BookService {
 			String currentPath = currentPathBuilder.toString();
 
 			final BookCategory finalParent = currentParent;
+			final Integer finalDepth = depth;
 			currentParent = bookCategoryRepository.findByNameAndParent(name, currentParent)
 				.orElseGet(() -> bookCategoryRepository.save(
 					BookCategory.builder()
 						.name(name)
 						.path(currentPath)
 						.parent(finalParent)
+						.depth(finalDepth)
 						.build()
 				));
+			depth += 1;
 		}
 
 		return currentParent;
@@ -89,9 +93,22 @@ public class BookServiceImpl implements BookService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public BookResponse findByIdWithStatus(UUID bookId, UUID userId) {
-		return bookRepository.findByIdWithStatus(bookId, userId)
+	public BookResponse findById(UUID bookId, UUID userId) {
+		if (userId != null) {
+			return bookRepository.findByIdWithStatus(bookId, userId)
+				.orElseThrow(() -> new NoSuchElementException("해당하는 도서 정보가 없습니다. (bookId : " + bookId + ")"));
+		} else {
+			Book book = bookRepository.findById(bookId)
+				.orElseThrow(() -> new NoSuchElementException("해당하는 도서 정보가 없습니다. (bookId : " + bookId + ")"));
+			return bookMapper.toResponse(book, null);
+		}
+	}
+
+	@Transactional(readOnly = true)
+	public String getImageUrl(UUID bookId) {
+		Book book = bookRepository.findById(bookId)
 			.orElseThrow(() -> new NoSuchElementException("해당하는 도서 정보가 없습니다. (bookId : " + bookId + ")"));
+		return book.getThumbnailUrl();
 	}
 
 	@Override
@@ -100,8 +117,11 @@ public class BookServiceImpl implements BookService {
 		Book book = bookRepository.findById(bookId)
 			.orElseThrow(() -> new NoSuchElementException("해당하는 도서 정보가 없습니다. (bookId : " + bookId + ")"));
 		book.update(req.getTitle(), req.getAuthor(), req.getDescription(), req.getPublisher(), req.getPublishedDate());
-		BookStatus bookStatus = bookStatusRepository.findByBookIdAndUserId(bookId, req.getUserId())
-			.orElse(null);
+		BookStatus bookStatus = null;
+		if (req.getUserId() != null) {
+			bookStatus = bookStatusRepository.findByBookIdAndUserId(bookId, req.getUserId())
+				.orElse(null);
+		}
 		return bookMapper.toResponse(bookRepository.save(book), bookStatus);
 	}
 

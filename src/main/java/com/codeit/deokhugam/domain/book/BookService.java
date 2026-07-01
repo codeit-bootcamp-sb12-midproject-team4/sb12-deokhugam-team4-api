@@ -17,7 +17,9 @@ public interface BookService {
 
 	CursorPageResponse<BookResponse> findAllByUserId(BookSearchUserRequest req, UUID userId);
 
-	BookResponse findByIdWithStatus(UUID bookId, UUID userId);
+	BookResponse findById(UUID bookId, UUID userId);
+
+	String getImageUrl(UUID bookId);
 
 	BookResponse update(UUID bookId, BookPatchRequest req, String url);
 
