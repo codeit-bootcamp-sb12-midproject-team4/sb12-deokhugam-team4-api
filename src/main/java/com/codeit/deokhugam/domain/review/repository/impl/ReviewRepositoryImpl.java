@@ -10,7 +10,6 @@ import com.codeit.deokhugam.domain.book.QBook;
 import com.codeit.deokhugam.domain.common.CursorPageResponse;
 import com.codeit.deokhugam.domain.review.dto.LikedReviewSearchRequest;
 import com.codeit.deokhugam.domain.review.dto.ReviewSearchRequest;
-import com.codeit.deokhugam.domain.review.dto.ReviewSearchCondition;
 import com.codeit.deokhugam.domain.review.entity.QReview;
 import com.codeit.deokhugam.domain.review.entity.Review;
 import com.codeit.deokhugam.domain.review.repository.ReviewRepositoryCustom;
@@ -31,7 +30,6 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 	private static final QReview review = QReview.review;
 	private static final QBook book = QBook.book;
 	private static final QUser user = QUser.user;
-
 	private static final QReviewLike reviewLike = QReviewLike.reviewLike;
 
 	@Override
@@ -210,4 +208,5 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 			.hasNext(hasNext)
 			.build();
 	}
+
 }

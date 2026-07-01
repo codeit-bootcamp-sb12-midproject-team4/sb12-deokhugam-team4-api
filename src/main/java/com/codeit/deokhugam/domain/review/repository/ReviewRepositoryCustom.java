@@ -7,8 +7,6 @@ import com.codeit.deokhugam.domain.review.dto.ReviewSearchRequest;
 import com.codeit.deokhugam.domain.review.entity.Review;
 
 public interface ReviewRepositoryCustom {
-  
-  CursorPageResponse<Review> findReviewsByCondition(ReviewSearchCondition condition);
 
 	// 리뷰 목록 조회 (페이지네이션)
 	CursorPageResponse<Review> findReviewsByRequest(ReviewSearchRequest request);

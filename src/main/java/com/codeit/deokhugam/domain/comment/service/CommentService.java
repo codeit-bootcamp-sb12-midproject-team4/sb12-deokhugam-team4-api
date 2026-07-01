@@ -5,7 +5,7 @@ import com.codeit.deokhugam.domain.comment.dto.CommentCreateRequest;
 import com.codeit.deokhugam.domain.comment.dto.CommentResponse;
 import com.codeit.deokhugam.domain.comment.dto.CommentUpdateRequest;
 import com.codeit.deokhugam.domain.comment.repository.CommentRepository;
-import com.codeit.deokhugam.domain.review.Review;
+import com.codeit.deokhugam.domain.review.entity.Review;
 import com.codeit.deokhugam.domain.review.repository.ReviewRepository;
 import com.codeit.deokhugam.domain.user.User;
 import com.codeit.deokhugam.domain.user.repository.UserRepository;
