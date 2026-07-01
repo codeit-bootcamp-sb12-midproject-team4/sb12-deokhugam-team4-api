@@ -38,7 +38,7 @@ dependencies {
     // Lombok, Devtools
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    //developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
     // MapStruct
     implementation 'org.mapstruct:mapstruct:1.6.3'
@@ -66,6 +66,9 @@ dependencies {
     implementation 'com.fasterxml.uuid:java-uuid-generator:5.1.0'
 
     // BCrypt 암호화
+    implementation 'org.springframework.security:spring-security-crypto'
+
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
     implementation 'org.springframework.security:spring-security-crypto'
 
 }

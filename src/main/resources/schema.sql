@@ -228,3 +228,17 @@ CREATE TABLE trending_keyword (
 ALTER TABLE trending_keyword ADD CONSTRAINT fk_trending_keyword_snapshot_id FOREIGN KEY (snapshot_id) REFERENCES trending_keyword_snapshot (snapshot_id) ON DELETE CASCADE;
 ALTER TABLE trending_keyword ADD CONSTRAINT chk_trending_keyword_ranking CHECK (ranking BETWEEN 1 AND 10);
 ALTER TABLE trending_keyword ADD CONSTRAINT chk_trending_keyword_score CHECK (score >= 0);
+
+CREATE TABLE `oauth_kakao` (
+   id              BINARY(16)      NOT NULL,
+   user_id         BINARY(16)      NOT NULL,
+   kako_id         VARCHAR(50)     NOT NULL,
+   email           VARCHAR(320)    NOT NULL,
+   nickname        VARCHAR(20)     NOT NULL,
+   deleted_at      DATETIME(6)     NULL,
+   created_at      DATETIME(6)     NOT NULL,
+   updated_at      DATETIME(6)     NOT NULL
+);
+ALTER TABLE `oauth_kakao` ADD CONSTRAINT pk_oauth_kakao_id PRIMARY KEY (id);
+ALTER TABLE `oauth_kakao` ADD CONSTRAINT uk_oauth_kakao_email UNIQUE (email);
+ALTER TABLE `oauth_kakao` ADD CONSTRAINT fk_oauth_kakao_user FOREIGN KEY (user_id) REFERENCES `users`(id);
