@@ -23,7 +23,7 @@ import com.codeit.deokhugam.domain.notification.event.CommentCreatedEvent;
 import com.codeit.deokhugam.domain.notification.mapper.NotificationMapperImpl;
 import com.codeit.deokhugam.domain.notification.repository.NotificationRepository;
 import com.codeit.deokhugam.domain.notification.service.impl.NotificationServiceImpl;
-import com.codeit.deokhugam.domain.review.Review;
+import com.codeit.deokhugam.domain.review.entity.Review;
 import com.codeit.deokhugam.domain.user.User;
 import com.codeit.deokhugam.global.config.QueryDslConfig;
 
@@ -65,27 +65,26 @@ public class NotificationServiceTest {
 			"password"
 		));
 
-		Book book = entityManager.persist(new Book(
-			"title",
-			"author",
-			"description",
-			"publisher",
-			LocalDate.of(2024, 1, 1),
-			"9781234567890",
-			"thumbnail-url",
-			0L,
-			0.0
-		));
+		Book book = entityManager.persist(Book.builder()
+			.title("title")
+			.author("author")
+			.description("description")
+			.publisher("publisher")
+			.publishedDate(LocalDate.of(2024, 1, 1))
+			.isbn("9781234567890")
+			.thumbnailUrl("thumbnail-url")
+			.reviewCount(0L)
+			.rating(0.0)
+			.build());
 
-		review = entityManager.persist(new Review(
-			"review content",
-			null,
-			5,
-			0L,
-			0L,
-			book,
-			receiver
-		));
+		review = entityManager.persist(Review.builder()
+			.content("review content")
+			.rating(5)
+			.likeCount(0L)
+			.commentCount(0L)
+			.book(book)
+			.user(receiver)
+			.build());
 
 		entityManager.flush();
 		entityManager.clear();
@@ -121,12 +120,11 @@ public class NotificationServiceTest {
 	@Test
 	@DisplayName("알림을 읽음 처리하고 응답을 반환한다")
 	void markNotificationAsRead_success() {
-		Notification notification = entityManager.persist(new Notification(
-			receiver,
-			review,
-			"message",
-			false
-		));
+		Notification notification = entityManager.persist(Notification.builder()
+			.user(receiver)
+			.review(review)
+			.message("message")
+			.build());
 		entityManager.flush();
 		entityManager.clear();
 
@@ -150,24 +148,21 @@ public class NotificationServiceTest {
 	@Test
 	@DisplayName("알림 목록을 최신순 커서 페이지로 조회한다")
 	void findByUserId_success() {
-		Notification notification1 = entityManager.persist(new Notification(
-			receiver,
-			review,
-			"notification1",
-			false
-		));
-		Notification notification2 = entityManager.persist(new Notification(
-			receiver,
-			review,
-			"notification2",
-			false
-		));
-		Notification notification3 = entityManager.persist(new Notification(
-			receiver,
-			review,
-			"notification3",
-			false
-		));
+		Notification notification1 = entityManager.persist(Notification.builder()
+			.user(receiver)
+			.review(review)
+			.message("notification1")
+			.build());
+		Notification notification2 = entityManager.persist(Notification.builder()
+			.user(receiver)
+			.review(review)
+			.message("notification2")
+			.build());
+		Notification notification3 = entityManager.persist(Notification.builder()
+			.user(receiver)
+			.review(review)
+			.message("notification3")
+			.build());
 		entityManager.flush();
 
 		updateCreatedAt(notification1, "2024-01-01T00:00:00Z");

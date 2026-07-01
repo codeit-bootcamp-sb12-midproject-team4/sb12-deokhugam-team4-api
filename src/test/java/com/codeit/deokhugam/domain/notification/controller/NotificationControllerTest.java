@@ -21,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.codeit.deokhugam.domain.book.Book;
 import com.codeit.deokhugam.domain.notification.entity.Notification;
 import com.codeit.deokhugam.domain.notification.repository.NotificationRepository;
-import com.codeit.deokhugam.domain.review.Review;
+import com.codeit.deokhugam.domain.review.entity.Review;
 import com.codeit.deokhugam.domain.user.User;
 
 import jakarta.persistence.EntityManager;
@@ -61,46 +61,49 @@ class NotificationControllerTest {
 			"password"
 		));
 
-		Book book = persist(new Book(
-			"title",
-			"author",
-			"description",
-			"publisher",
-			LocalDate.of(2024, 1, 1),
-			"9781234567890",
-			"thumbnail-url",
-			0L,
-			0.0
-		));
+		Book book = persist(Book.builder()
+			.title("title")
+			.author("author")
+			.description("description")
+			.publisher("publisher")
+			.publishedDate(LocalDate.of(2024, 1, 1))
+			.isbn("9781234567890")
+			.thumbnailUrl("thumbnail-url")
+			.reviewCount(0L)
+			.rating(0.0)
+			.build()
+		);
 
-		Review review = persist(new Review(
-			"review content",
-			null,
-			5,
-			0L,
-			0L,
-			book,
-			user
-		));
+		Review review = persist(Review.builder()
+			.content("review content")
+			.rating(5)
+			.likeCount(0L)
+			.commentCount(0L)
+			.book(book)
+			.user(user)
+			.build()
+		);
 
-		notification1 = persist(new Notification(
-			user,
-			review,
-			"notification1",
-			false
-		));
-		notification2 = persist(new Notification(
-			user,
-			review,
-			"notification2",
-			false
-		));
-		notification3 = persist(new Notification(
-			user,
-			review,
-			"notification3",
-			false
-		));
+		notification1 = persist(Notification.builder()
+			.user(user)
+			.review(review)
+			.message("notification1")
+			.build()
+		);
+
+		notification2 = persist(Notification.builder()
+			.user(user)
+			.review(review)
+			.message("notification2")
+			.build()
+		);
+
+		notification3 = persist(Notification.builder()
+			.user(user)
+			.review(review)
+			.message("notification3")
+			.build()
+		);
 
 		entityManager.flush();
 

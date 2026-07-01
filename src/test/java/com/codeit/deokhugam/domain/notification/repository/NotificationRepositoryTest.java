@@ -24,7 +24,7 @@ import com.codeit.deokhugam.domain.book.Book;
 import com.codeit.deokhugam.domain.notification.entity.Notification;
 import com.codeit.deokhugam.domain.notification.mapper.NotificationMapperImpl;
 import com.codeit.deokhugam.domain.notification.service.impl.NotificationServiceImpl;
-import com.codeit.deokhugam.domain.review.Review;
+import com.codeit.deokhugam.domain.review.entity.Review;
 import com.codeit.deokhugam.domain.user.User;
 import com.codeit.deokhugam.global.config.QueryDslConfig;
 
@@ -60,48 +60,49 @@ public class NotificationRepositoryTest {
 			"password"
 		));
 
-		Book book = entityManager.persist(new Book(
-			"title",
-			"author",
-			"description",
-			"publisher",
-			LocalDate.of(2024, 1, 1),
-			"9781234567890",
-			"thumbnail-url",
-			0L,
-			0.0
-		));
+		Book book = entityManager.persist(Book.builder()
+			.title("title")
+			.author("author")
+			.description("description")
+			.publisher("publisher")
+			.publishedDate(LocalDate.of(2024, 1, 1))
+			.isbn("9781234567890")
+			.thumbnailUrl("thumbnail-url")
+			.reviewCount(0L)
+			.rating(0.0)
+			.build()
+		);
 
-		review = entityManager.persist(new Review(
-			"review content",
-			null,
-			5,
-			0L,
-			0L,
-			book,
-			user
-		));
+		review = entityManager.persist(Review.builder()
+			.content("review content")
+			.rating(5)
+			.likeCount(0L)
+			.commentCount(0L)
+			.book(book)
+			.user(user)
+			.build()
+		);
 
-		notification1 = entityManager.persist(new Notification(
-			user,
-			review,
-			"notification1",
-			false
-		));
+		notification1 = entityManager.persist(Notification.builder()
+			.user(user)
+			.review(review)
+			.message("notification1")
+			.build()
+		);
 
-		notification2 = entityManager.persist(new Notification(
-			user,
-			review,
-			"notification2",
-			false
-		));
+		notification2 = entityManager.persist(Notification.builder()
+			.user(user)
+			.review(review)
+			.message("notification2")
+			.build()
+		);
 
-		notification3 = entityManager.persist(new Notification(
-			user,
-			review,
-			"notification3",
-			false
-		));
+		notification3 = entityManager.persist(Notification.builder()
+			.user(user)
+			.review(review)
+			.message("notification3")
+			.build()
+		);
 
 		updateCreatedAt(notification1, "2024-01-01T00:00:00Z");
 		updateCreatedAt(notification2, "2024-01-02T00:00:00Z");
