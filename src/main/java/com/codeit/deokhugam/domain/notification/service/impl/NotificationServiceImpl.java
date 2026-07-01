@@ -99,12 +99,11 @@ public class NotificationServiceImpl implements NotificationService {
 	}
 
 	private void saveNotification(User receiver, Review review, String message) {
-		Notification notification = new Notification(
-			receiver,
-			review,
-			message,
-			false
-		);
+		Notification notification = Notification.builder()
+			.user(receiver)
+			.review(review)
+			.message(message)
+			.build();
 
 		notificationRepository.save(notification);
 	}
