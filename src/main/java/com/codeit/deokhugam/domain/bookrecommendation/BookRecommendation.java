@@ -1,7 +1,6 @@
 package com.codeit.deokhugam.domain.bookrecommendation;
 
 import com.codeit.deokhugam.domain.book.Book;
-import com.codeit.deokhugam.domain.common.BaseEntity;
 import com.codeit.deokhugam.domain.common.UpdatableEntity;
 import com.codeit.deokhugam.domain.user.User;
 
