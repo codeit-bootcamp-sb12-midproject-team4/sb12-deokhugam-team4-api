@@ -30,7 +30,6 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 	private static final QReview review = QReview.review;
 	private static final QBook book = QBook.book;
 	private static final QUser user = QUser.user;
-
 	private static final QReviewLike reviewLike = QReviewLike.reviewLike;
 
 	@Override
@@ -209,4 +208,5 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 			.hasNext(hasNext)
 			.build();
 	}
+
 }
