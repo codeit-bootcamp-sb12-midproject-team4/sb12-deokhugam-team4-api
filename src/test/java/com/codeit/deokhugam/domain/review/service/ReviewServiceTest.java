@@ -23,6 +23,9 @@ import com.codeit.deokhugam.domain.review.dto.ReviewResponse;
 import com.codeit.deokhugam.domain.review.dto.ReviewSearchRequest;
 import com.codeit.deokhugam.domain.review.dto.ReviewUpdateRequest;
 import com.codeit.deokhugam.domain.review.entity.Review;
+import com.codeit.deokhugam.domain.review.exception.ReviewAlreadyExistsException;
+import com.codeit.deokhugam.domain.review.exception.ReviewNotFoundException;
+import com.codeit.deokhugam.domain.review.exception.ReviewNotOwnedException;
 import com.codeit.deokhugam.domain.review.mapper.ReviewMapperImpl;
 import com.codeit.deokhugam.domain.review.repository.ReviewRepository;
 import com.codeit.deokhugam.domain.review.service.impl.ReviewServiceImpl;
@@ -158,7 +161,7 @@ class ReviewServiceTest {
 		org.springframework.test.util.ReflectionTestUtils.setField(request, "rating", 5);
 
 		assertThatThrownBy(() -> reviewService.save(request))
-			.isInstanceOf(NoSuchElementException.class);
+			.isInstanceOf(ReviewAlreadyExistsException.class);
 	}
 
 	@Test
@@ -183,7 +186,7 @@ class ReviewServiceTest {
 	@DisplayName("리뷰 단건 조회 실패 - 존재하지 않는 리뷰")
 	void findByReviewId_notFound_fail() {
 		assertThatThrownBy(() -> reviewService.findByReviewId(UUID.randomUUID(), user1.getId()))
-			.isInstanceOf(NoSuchElementException.class);
+			.isInstanceOf(ReviewNotFoundException.class);
 	}
 
 	@Test
@@ -252,7 +255,7 @@ class ReviewServiceTest {
 		ReflectionTestUtils.setField(updateRequest, "rating", 3);
 
 		assertThatThrownBy(() -> reviewService.update(review.getId(), user2.getId(), updateRequest))
-			.isInstanceOf(IllegalStateException.class);
+			.isInstanceOf(ReviewNotOwnedException.class);
 	}
 
 	@Test
@@ -263,7 +266,7 @@ class ReviewServiceTest {
 		org.springframework.test.util.ReflectionTestUtils.setField(updateRequest, "rating", 3);
 
 		assertThatThrownBy(() -> reviewService.update(UUID.randomUUID(), user1.getId(), updateRequest))
-			.isInstanceOf(NoSuchElementException.class);
+			.isInstanceOf(ReviewNotFoundException.class);
 	}
 
 	@Test
@@ -294,7 +297,7 @@ class ReviewServiceTest {
 		reviewRepository.save(review);
 
 		assertThatThrownBy(() -> reviewService.deleteReview(review.getId(), user2.getId()))
-			.isInstanceOf(IllegalStateException.class);
+			.isInstanceOf(ReviewNotOwnedException.class);
 	}
 
 	@Test
@@ -317,7 +320,7 @@ class ReviewServiceTest {
 	@DisplayName("리뷰 물리 삭제 실패 - 존재하지 않는 리뷰")
 	void hardDeleteReview_notFound_fail() {
 		assertThatThrownBy(() -> reviewService.hardDeleteReview(UUID.randomUUID(), user1.getId()))
-			.isInstanceOf(NoSuchElementException.class);
+			.isInstanceOf(ReviewNotFoundException.class);
 	}
 
 	@Test
@@ -361,7 +364,7 @@ class ReviewServiceTest {
 	@DisplayName("좋아요 실패 - 존재하지 않는 리뷰")
 	void toggleLike_reviewNotFound_fail() {
 		assertThatThrownBy(() -> reviewService.toggleLike(UUID.randomUUID(), user1.getId()))
-			.isInstanceOf(NoSuchElementException.class);
+			.isInstanceOf(ReviewNotFoundException.class);
 	}
 
 	@Test
@@ -395,6 +398,6 @@ class ReviewServiceTest {
 			.build();
 
 		assertThatThrownBy(() -> reviewService.findLikedReviews(request, user2.getId()))
-			.isInstanceOf(IllegalStateException.class);
+			.isInstanceOf(ReviewNotOwnedException.class);
 	}
 }
