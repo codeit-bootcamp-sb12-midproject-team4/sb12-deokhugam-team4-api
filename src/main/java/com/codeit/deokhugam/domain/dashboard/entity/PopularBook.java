@@ -24,11 +24,11 @@ import lombok.experimental.SuperBuilder;
 
 @Entity
 @Table(
-		name = "popular_book",
-		uniqueConstraints = {
-				@UniqueConstraint(name = "uq_popular_book_date", columnNames = {"period", "book_id", "batch_date"}),
-				@UniqueConstraint(name = "uq_popular_book_ranking", columnNames = {"period", "batch_date", "ranking"})
-		}
+	name = "popular_book",
+	uniqueConstraints = {
+		@UniqueConstraint(name = "uq_popular_book_dataset_book", columnNames = {"dataset_id","book_id"}),
+		@UniqueConstraint(name = "uq_popular_book_dataset_ranking", columnNames = {"dataset_id","ranking"})
+	}
 )
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -40,8 +40,11 @@ public class PopularBook extends BaseEntity {
 	@Column(name = "book_id", nullable = false)
 	private UUID bookId;
 
+	@Column(name = "dataset_id", nullable = false)
+	private Long datasetId;
+
 	@Enumerated(EnumType.STRING)
-	@Column(name = "period", nullable = false, columnDefinition = "ENUM('DAILY', 'WEEKLY', 'MONTHLY', 'ALL_TIME')")
+	@Column(name = "period", nullable = false)
 	private PeriodType period;
 
 	@Column(name = "ranking", nullable = false)

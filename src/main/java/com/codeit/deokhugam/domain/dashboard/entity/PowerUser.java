@@ -26,8 +26,10 @@ import lombok.experimental.SuperBuilder;
 @Table(
 		name = "power_user",
 		uniqueConstraints = {
-				@UniqueConstraint(name = "uq_power_user_date", columnNames = {"period", "user_id", "batch_date"}),
-				@UniqueConstraint(name = "uq_power_user_ranking", columnNames = {"period", "batch_date", "ranking"})
+				@UniqueConstraint(name = "uq_power_user_dataset_user",
+					columnNames = {"dataset_id","user_id"}),
+				@UniqueConstraint(name = "uq_power_user_dataset_ranking",
+					columnNames = {"dataset_id","ranking"})
 		}
 )
 @Getter
@@ -40,8 +42,11 @@ public class PowerUser extends BaseEntity {
 	@Column(name = "user_id", nullable = false)
 	private UUID userId;
 
+	@Column(name="dataset_id", nullable=false)
+	private Long datasetId;
+
 	@Enumerated(EnumType.STRING)
-	@Column(name = "period", nullable = false, columnDefinition = "ENUM('DAILY', 'WEEKLY', 'MONTHLY', 'ALL_TIME')")
+	@Column(name = "period", nullable = false)
 	private PeriodType period;
 
 	@Column(name = "ranking", nullable = false)
