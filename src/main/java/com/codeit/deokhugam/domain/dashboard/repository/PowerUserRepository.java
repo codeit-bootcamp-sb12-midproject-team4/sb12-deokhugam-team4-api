@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 
 import com.codeit.deokhugam.domain.dashboard.entity.PeriodType;
 import com.codeit.deokhugam.domain.dashboard.entity.PowerUser;
@@ -15,5 +16,6 @@ public interface PowerUserRepository extends JpaRepository<PowerUser, UUID> {
     List<PowerUser> findByPeriodAndBatchDateOrderByRankingAsc(PeriodType period, LocalDate batchDate);
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("DELETE FROM PopularBook p WHERE p.period = :period AND p.batchDate = :batchDate")
     long deleteByPeriodAndBatchDate(PeriodType period, LocalDate batchDate);
 }

@@ -15,6 +15,7 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,11 +24,13 @@ import lombok.experimental.SuperBuilder;
 
 @Entity
 @Table(
-	name = "power_user",
-	uniqueConstraints = {
-		@UniqueConstraint(name = "uq_power_user_date", columnNames = {"period", "user_id", "batch_date"}),
-		@UniqueConstraint(name = "uq_power_user_ranking", columnNames = {"period", "batch_date", "ranking"})
-	}
+		name = "power_user",
+		uniqueConstraints = {
+				@UniqueConstraint(name = "uq_power_user_dataset_user",
+					columnNames = {"dataset_id","user_id"}),
+				@UniqueConstraint(name = "uq_power_user_dataset_ranking",
+					columnNames = {"dataset_id","ranking"})
+		}
 )
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -39,8 +42,11 @@ public class PowerUser extends BaseEntity {
 	@Column(name = "user_id", nullable = false)
 	private UUID userId;
 
+	@Column(name="dataset_id", nullable=false)
+	private Long datasetId;
+
 	@Enumerated(EnumType.STRING)
-	@Column(name = "period", nullable = false, columnDefinition = "ENUM('DAILY', 'WEEKLY', 'MONTHLY', 'ALL_TIME')")
+	@Column(name = "period", nullable = false)
 	private PeriodType period;
 
 	@Column(name = "ranking", nullable = false)
