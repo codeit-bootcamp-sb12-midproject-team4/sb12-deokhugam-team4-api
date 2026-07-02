@@ -5,11 +5,14 @@ import com.codeit.deokhugam.domain.comment.dto.CommentCreateRequest;
 import com.codeit.deokhugam.domain.comment.dto.CommentResponse;
 import com.codeit.deokhugam.domain.comment.dto.CommentUpdateRequest;
 import com.codeit.deokhugam.domain.comment.repository.CommentRepository;
+import com.codeit.deokhugam.domain.notification.event.CommentCreatedEvent;
 import com.codeit.deokhugam.domain.review.entity.Review;
 import com.codeit.deokhugam.domain.review.repository.ReviewRepository;
 import com.codeit.deokhugam.domain.user.User;
 import com.codeit.deokhugam.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
@@ -24,6 +27,8 @@ public class CommentService {
     private final ReviewRepository reviewRepository;
     private final UserRepository userRepository;
 
+    private final ApplicationEventPublisher eventPublisher;
+
     // 댓글 등록
     @Transactional
     public CommentResponse createComment(CommentCreateRequest request) {
@@ -33,7 +38,14 @@ public class CommentService {
                 .orElseThrow(() -> new RuntimeException("리뷰를 찾을 수 없습니다"));
 
         Comment comment = new Comment(request.content(), user, review);
-        return CommentResponse.from(commentRepository.save(comment));
+        Comment savedComment = commentRepository.save(comment);
+
+        eventPublisher.publishEvent(new CommentCreatedEvent(
+            review.getId(),
+            user.getId()
+        ));
+
+        return CommentResponse.from(savedComment);
     }
 
     // 댓글 목록 조회
