@@ -10,7 +10,6 @@ import jakarta.validation.constraints.PastOrPresent;
 
 @ValidDashboardSearchCondition
 public record DashboardSearchCondition(
-
     @NotNull(message = "조회 기간(PeriodType)은 필수입니다.")
     PeriodType period,
 
