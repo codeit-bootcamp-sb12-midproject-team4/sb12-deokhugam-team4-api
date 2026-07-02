@@ -7,12 +7,14 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.codeit.deokhugam.domain.book.Book;
 import com.codeit.deokhugam.domain.book.BookRepository;
 import com.codeit.deokhugam.domain.common.CursorPageResponse;
+import com.codeit.deokhugam.domain.notification.event.ReviewLikedEvent;
 import com.codeit.deokhugam.domain.review.dto.LikedReviewSearchRequest;
 import com.codeit.deokhugam.domain.review.dto.ReviewCreateRequest;
 import com.codeit.deokhugam.domain.review.dto.ReviewResponse;
@@ -40,6 +42,8 @@ public class ReviewServiceImpl implements ReviewService {
 
 	private final BookRepository bookRepository;
 	private final UserRepository userRepository;
+
+	private final ApplicationEventPublisher eventPublisher;
 
 	@Override
 	@Transactional
@@ -172,6 +176,11 @@ public class ReviewServiceImpl implements ReviewService {
 			reviewLikeRepository.save(reviewLike);
 			review.increaseLikeCount();
 			liked = true;
+
+			eventPublisher.publishEvent(new ReviewLikedEvent(
+				reviewId,
+				userId
+			));
 		}
 
 		return ReviewLikeResponse.builder()
