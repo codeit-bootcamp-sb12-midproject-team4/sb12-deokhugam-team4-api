@@ -144,8 +144,7 @@ ALTER TABLE notification ADD CONSTRAINT pk_notification_id PRIMARY KEY (id);
 ALTER TABLE notification ADD CONSTRAINT fk_notification_user FOREIGN KEY (user_id) REFERENCES `users`(id);
 ALTER TABLE notification ADD CONSTRAINT fk_notifications_review FOREIGN KEY (review_id) REFERENCES review(id);
 
-CREATE TABLE batch_metadata
-(
+CREATE TABLE batch_metadata (
 
     metadata_type ENUM(
         'POPULAR_BOOK',
