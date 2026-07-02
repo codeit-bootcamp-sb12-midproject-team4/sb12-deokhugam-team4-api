@@ -16,6 +16,6 @@ public interface PowerUserRepository extends JpaRepository<PowerUser, UUID> {
     List<PowerUser> findByPeriodAndBatchDateOrderByRankingAsc(PeriodType period, LocalDate batchDate);
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
-    @Query("DELETE FROM PopularBook p WHERE p.period = :period AND p.batchDate = :batchDate")
+    @Query("DELETE FROM PowerUser u WHERE u.period = :period AND u.batchDate = :batchDate")
     long deleteByPeriodAndBatchDate(PeriodType period, LocalDate batchDate);
 }
