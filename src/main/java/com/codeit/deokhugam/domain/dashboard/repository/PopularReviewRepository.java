@@ -16,6 +16,6 @@ public interface PopularReviewRepository extends JpaRepository<PopularReview, UU
     List<PopularReview> findByPeriodAndBatchDateOrderByRankingAsc(PeriodType period, LocalDate batchDate);
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
-    @Query("DELETE FROM PopularBook p WHERE p.period = :period AND p.batchDate = :batchDate")
-    long deleteByPeriodAndBatchDate(PeriodType period, LocalDate batchDate);
+    @Query("DELETE FROM PopularReview r WHERE r.period = :period AND r.batchDate = :batchDate")
+    long deleteByPeriodAndBatchDate(@Param("period") PeriodType period, @Param("batchDate") LocalDate batchDate);
 }
