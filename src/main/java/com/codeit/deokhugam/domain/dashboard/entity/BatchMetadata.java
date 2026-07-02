@@ -2,6 +2,7 @@ package com.codeit.deokhugam.domain.dashboard.entity;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.Objects;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -50,7 +51,11 @@ public class BatchMetadata {
 	@Column(name = "batch_date")
 	private LocalDate batchDate;
 
-	@Column(name = "updated_at", nullable = false)
+	@Column(name = "updated_at", nullable = false, insertable = false, updatable = false)
 	private Instant updatedAt;
 
+	public void update(Long datasetId, LocalDate batchDate) {
+		this.datasetId = Objects.requireNonNull(datasetId);
+		this.batchDate = batchDate;
+	}
 }
