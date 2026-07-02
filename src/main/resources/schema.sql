@@ -144,112 +144,151 @@ ALTER TABLE notification ADD CONSTRAINT pk_notification_id PRIMARY KEY (id);
 ALTER TABLE notification ADD CONSTRAINT fk_notification_user FOREIGN KEY (user_id) REFERENCES `users`(id);
 ALTER TABLE notification ADD CONSTRAINT fk_notifications_review FOREIGN KEY (review_id) REFERENCES review(id);
 
-CREATE TABLE batch_metadata (
-                                id              BINARY(16)      NOT NULL,
-                                domain          ENUM('POPULAR_BOOK', 'POPULAR_REVIEW', 'POWER_USER', 'TRENDING_KEYWORD') NOT NULL,
-                                period          ENUM('DAILY', 'WEEKLY', 'MONTHLY', 'ALL_TIME', 'NONE') NOT NULL DEFAULT 'NONE',
-                                batch_date      DATE            NOT NULL DEFAULT '1970-01-01',
-                                dataset_id      BINARY(16)      NOT NULL,
-                                updated_at      DATETIME(6)     NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
-                                created_at      DATETIME(6)     NOT NULL DEFAULT CURRENT_TIMESTAMP(6)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+CREATE TABLE batch_metadata
+(
 
-ALTER TABLE batch_metadata ADD CONSTRAINT pk_batch_metadata_id PRIMARY KEY (id);
-ALTER TABLE batch_metadata ADD CONSTRAINT uq_batch_metadata_pointer UNIQUE (domain, period, batch_date);
+    metadata_type ENUM(
+        'POPULAR_BOOK',
+        'POPULAR_REVIEW',
+        'POWER_USER',
+        'TRENDING_KEYWORD'
+    ) NOT NULL,
 
-CREATE TABLE popular_book (
-                              id                  BINARY(16)      NOT NULL,
-                              dataset_id          BINARY(16)      NOT NULL,
-                              book_id             BINARY(16)      NOT NULL,
-                              period              ENUM('DAILY', 'WEEKLY', 'MONTHLY', 'ALL_TIME') NOT NULL,
-                              ranking             INT UNSIGNED    NOT NULL,
-                              book_title          VARCHAR(255)    NOT NULL,
-                              author              VARCHAR(50)     NOT NULL,
-                              thumbnail_url       VARCHAR(300)    NULL,
-                              score               DECIMAL(10,2)   NOT NULL,
-                              review_count        INT UNSIGNED    NOT NULL,
-                              like_count          INT UNSIGNED    NOT NULL,
-                              comment_count       INT UNSIGNED    NOT NULL,
-                              average_rating      DECIMAL(3,2)    NOT NULL,
-                              batch_date          DATE            NOT NULL,
-                              created_at          DATETIME(6)     NOT NULL DEFAULT CURRENT_TIMESTAMP(6)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    period ENUM(
+        'DAILY',
+        'WEEKLY',
+        'MONTHLY',
+        'ALL_TIME'
+        ) NULL,
 
-ALTER TABLE popular_book ADD CONSTRAINT pk_popular_book_id PRIMARY KEY (id);
-ALTER TABLE popular_book ADD CONSTRAINT uq_popular_book_dataset_book UNIQUE (dataset_id, book_id);
-ALTER TABLE popular_book ADD CONSTRAINT uq_popular_book_dataset_rank UNIQUE (dataset_id, ranking);
-ALTER TABLE popular_book ADD CONSTRAINT chk_popular_book_ranking CHECK (ranking BETWEEN 1 AND 50);
-ALTER TABLE popular_book ADD CONSTRAINT chk_popular_book_avg_rating CHECK (average_rating BETWEEN 0.00 AND 5.00);
-ALTER TABLE popular_book ADD CONSTRAINT chk_popular_book_score CHECK (score >= 0);
-CREATE INDEX idx_popular_book_period_date ON popular_book (period, batch_date);
+    dataset_id    BIGINT NOT NULL,
+    batch_date    DATE NULL,
+    updated_at    DATETIME(6)
+        NOT NULL
+        DEFAULT CURRENT_TIMESTAMP(6)
+        ON UPDATE CURRENT_TIMESTAMP(6),
 
-CREATE TABLE popular_review (
-                                id                  BINARY(16)      NOT NULL,
-                                dataset_id          BINARY(16)      NOT NULL,
-                                review_id           BINARY(16)      NOT NULL,
-                                `period`            ENUM('DAILY', 'WEEKLY', 'MONTHLY', 'ALL_TIME') NOT NULL,
-                                ranking             INT UNSIGNED    NOT NULL,
-                                book_title          VARCHAR(255)    NOT NULL,
-                                book_author         VARCHAR(50)     NOT NULL,
-                                thumbnail_url       VARCHAR(300)    NULL,
-                                user_nickname       VARCHAR(20)     NOT NULL,
-                                review_content      VARCHAR(1000)   NOT NULL,
-                                review_rating       INT UNSIGNED    NOT NULL,
-                                score               DECIMAL(10,2)   NOT NULL,
-                                like_count          INT UNSIGNED    NOT NULL,
-                                comment_count       INT UNSIGNED    NOT NULL,
-                                batch_date          DATE            NOT NULL,
-                                created_at          DATETIME(6)     NOT NULL DEFAULT CURRENT_TIMESTAMP(6)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    PRIMARY KEY (metadata_type, period),
 
-ALTER TABLE popular_review ADD CONSTRAINT pk_popular_review_id PRIMARY KEY (id);
-ALTER TABLE popular_review ADD CONSTRAINT uq_popular_review_dataset_review UNIQUE (dataset_id, review_id);
-ALTER TABLE popular_review ADD CONSTRAINT uq_popular_review_dataset_rank UNIQUE (dataset_id, ranking);
-ALTER TABLE popular_review ADD CONSTRAINT chk_popular_review_ranking CHECK (ranking BETWEEN 1 AND 50);
-ALTER TABLE popular_review ADD CONSTRAINT chk_popular_review_rating CHECK (review_rating BETWEEN 0 AND 5);
-ALTER TABLE popular_review ADD CONSTRAINT chk_popular_review_score CHECK (score >= 0);
-CREATE INDEX idx_popular_review_period_date ON popular_review (period, batch_date);
+    UNIQUE (dataset_id)
 
-CREATE TABLE power_user (
-                            id                  BINARY(16)      NOT NULL,
-                            dataset_id          BINARY(16)      NOT NULL,
-                            user_id             BINARY(16)      NOT NULL,
-                            `period`            ENUM('DAILY', 'WEEKLY', 'MONTHLY', 'ALL_TIME') NOT NULL,
-                            ranking             INT UNSIGNED    NOT NULL,
-                            nickname            VARCHAR(20)     NOT NULL,
-                            score               DECIMAL(10,2)   NOT NULL,
-                            review_count        INT UNSIGNED    NOT NULL,
-                            like_count          INT UNSIGNED    NOT NULL,
-                            comment_count       INT UNSIGNED    NOT NULL,
-                            batch_date          DATE            NOT NULL,
-                            created_at          DATETIME(6)     NOT NULL DEFAULT CURRENT_TIMESTAMP(6)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+);
 
-ALTER TABLE power_user ADD CONSTRAINT pk_power_user_id PRIMARY KEY (id);
-ALTER TABLE power_user ADD CONSTRAINT uq_power_user_dataset_user UNIQUE (dataset_id, user_id);
-ALTER TABLE power_user ADD CONSTRAINT uq_power_user_dataset_rank UNIQUE (dataset_id, ranking);
-ALTER TABLE power_user ADD CONSTRAINT chk_power_user_ranking CHECK (ranking BETWEEN 1 AND 10);
-ALTER TABLE power_user ADD CONSTRAINT chk_power_user_score CHECK (score >= 0);
-CREATE INDEX idx_power_user_period_date ON power_user (period, batch_date);
 
-CREATE TABLE trending_keyword_snapshot (
-                                           snapshot_id     BIGINT          NOT NULL AUTO_INCREMENT,
-                                           dataset_id      BINARY(16)      NOT NULL,
-                                           calculated_at   DATETIME        NOT NULL,
-                                           PRIMARY KEY (snapshot_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+CREATE TABLE popular_book
+(
+    id             BINARY(16)      NOT NULL,
+    dataset_id     BIGINT         NOT NULL,
+    book_id        BINARY(16)      NOT NULL,
+    period ENUM('DAILY','WEEKLY','MONTHLY','ALL_TIME') NOT NULL,
+    batch_date     DATE           NOT NULL,
+    ranking        INT UNSIGNED    NOT NULL,
+    book_title     VARCHAR(255)   NOT NULL,
+    author         VARCHAR(100)   NOT NULL,
+    thumbnail_url  VARCHAR(300) NULL,
+    score          DECIMAL(10, 2) NOT NULL,
+    review_count   INT UNSIGNED    NOT NULL,
+    like_count     INT UNSIGNED    NOT NULL,
+    comment_count  INT UNSIGNED    NOT NULL,
+    average_rating DECIMAL(3, 2)  NOT NULL,
+    created_at     DATETIME(6)     NOT NULL
+                        DEFAULT CURRENT_TIMESTAMP(6),
+    PRIMARY KEY (id),
+    CONSTRAINT uq_popular_book_dataset_book
+        UNIQUE (dataset_id, book_id),
+    CONSTRAINT uq_popular_book_dataset_rank
+        UNIQUE (dataset_id, ranking),
+    CONSTRAINT chk_popular_book_ranking
+        CHECK (ranking BETWEEN 1 AND 50),
+    CONSTRAINT chk_popular_book_avg_rating
+        CHECK (average_rating BETWEEN 0.00 AND 5.00),
+    CONSTRAINT chk_popular_book_score
+        CHECK (score >= 0)
+);
 
-ALTER TABLE trending_keyword_snapshot ADD CONSTRAINT uq_trending_keyword_snapshot_time UNIQUE (calculated_at);
-ALTER TABLE trending_keyword_snapshot ADD CONSTRAINT uq_trending_keyword_snapshot_dataset UNIQUE (dataset_id);
 
-CREATE TABLE trending_keyword (
-                                  snapshot_id     BIGINT          NOT NULL,
-                                  ranking         INT UNSIGNED    NOT NULL,
-                                  keyword         VARCHAR(50)     NOT NULL,
-                                  score           DECIMAL(8,2)    NOT NULL,
-                                  PRIMARY KEY (snapshot_id, ranking)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+CREATE TABLE popular_review
+(
+    id             BINARY(16)      NOT NULL,
+    dataset_id     BIGINT         NOT NULL,
+    review_id      BINARY(16)      NOT NULL,
+    period ENUM('DAILY','WEEKLY','MONTHLY','ALL_TIME') NOT NULL,
+    batch_date     DATE           NOT NULL,
+    ranking        INT UNSIGNED    NOT NULL,
+    book_title     VARCHAR(255)   NOT NULL,
+    book_author    VARCHAR(100)   NOT NULL,
+    thumbnail_url  VARCHAR(300) NULL,
+    user_nickname  VARCHAR(20)    NOT NULL,
+    review_content VARCHAR(1000)  NOT NULL,
+    review_rating  INT UNSIGNED    NOT NULL,
+    score          DECIMAL(10, 2) NOT NULL,
+    like_count     INT UNSIGNED    NOT NULL,
+    comment_count  INT UNSIGNED    NOT NULL,
+    created_at     DATETIME(6)     NOT NULL
+                        DEFAULT CURRENT_TIMESTAMP(6),
+    PRIMARY KEY (id),
+    CONSTRAINT uq_popular_review_dataset_review
+        UNIQUE (dataset_id, review_id),
+    CONSTRAINT uq_popular_review_dataset_rank
+        UNIQUE (dataset_id, ranking),
+    CONSTRAINT chk_popular_review_ranking
+        CHECK (ranking BETWEEN 1 AND 50),
+    CONSTRAINT chk_popular_review_rating
+        CHECK (review_rating BETWEEN 0 AND 5),
+    CONSTRAINT chk_popular_review_score
+        CHECK (score >= 0)
+);
 
-ALTER TABLE trending_keyword ADD CONSTRAINT fk_trending_keyword_snapshot_id FOREIGN KEY (snapshot_id) REFERENCES trending_keyword_snapshot (snapshot_id) ON DELETE CASCADE;
-ALTER TABLE trending_keyword ADD CONSTRAINT chk_trending_keyword_ranking CHECK (ranking BETWEEN 1 AND 10);
-ALTER TABLE trending_keyword ADD CONSTRAINT chk_trending_keyword_score CHECK (score >= 0);
+
+CREATE TABLE power_user
+(
+    id            BINARY(16)      NOT NULL,
+    dataset_id    BIGINT         NOT NULL,
+    user_id       BINARY(16)      NOT NULL,
+    period ENUM('DAILY','WEEKLY','MONTHLY','ALL_TIME') NOT NULL,
+    batch_date    DATE           NOT NULL,
+    ranking       INT UNSIGNED    NOT NULL,
+    nickname      VARCHAR(20)    NOT NULL,
+    score         DECIMAL(10, 2) NOT NULL,
+    like_count    INT UNSIGNED    NOT NULL,
+    comment_count INT UNSIGNED    NOT NULL,
+    created_at    DATETIME(6)     NOT NULL
+                        DEFAULT CURRENT_TIMESTAMP(6),
+    PRIMARY KEY (id),
+    CONSTRAINT uq_power_user_dataset_user
+        UNIQUE (dataset_id, user_id),
+    CONSTRAINT uq_power_user_dataset_rank
+        UNIQUE (dataset_id, ranking),
+    CONSTRAINT chk_power_user_ranking
+        CHECK (ranking BETWEEN 1 AND 10),
+    CONSTRAINT chk_power_user_score
+        CHECK (score >= 0)
+);
+
+
+CREATE TABLE trending_keyword_snapshot
+(
+    dataset_id    BIGINT   NOT NULL AUTO_INCREMENT,
+    calculated_at DATETIME NOT NULL,
+    PRIMARY KEY (dataset_id),
+    CONSTRAINT uq_trending_keyword_snapshot_time
+        UNIQUE (calculated_at)
+);
+
+
+CREATE TABLE trending_keyword
+(
+    dataset_id BIGINT        NOT NULL,
+    ranking    INT UNSIGNED    NOT NULL,
+    keyword    VARCHAR(50)   NOT NULL,
+    score      DECIMAL(8, 2) NOT NULL,
+    PRIMARY KEY (dataset_id, ranking),
+    CONSTRAINT fk_trending_keyword_dataset
+        FOREIGN KEY (dataset_id)
+            REFERENCES trending_keyword_snapshot (dataset_id)
+            ON DELETE CASCADE,
+    CONSTRAINT chk_trending_keyword_ranking
+        CHECK (ranking BETWEEN 1 AND 10),
+    CONSTRAINT chk_trending_keyword_score
+        CHECK (score >= 0)
+);
