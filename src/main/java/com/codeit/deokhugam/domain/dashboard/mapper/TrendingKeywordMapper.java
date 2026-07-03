@@ -17,6 +17,7 @@ public class TrendingKeywordMapper {
             keywords.stream()
                 .map(TrendingKeyword::getKeyword)
                 .toList()
+
         );
     }
 }

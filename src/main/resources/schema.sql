@@ -272,7 +272,7 @@ CREATE TABLE trending_keyword
 CREATE TABLE `oauth_kakao` (
    id              BINARY(16)      NOT NULL,
    user_id         BINARY(16)      NOT NULL,
-   kako_id         VARCHAR(50)     NOT NULL,
+   kakao_id         VARCHAR(50)     NOT NULL,
    email           VARCHAR(320)    NOT NULL,
    nickname        VARCHAR(20)     NOT NULL,
    deleted_at      DATETIME(6)     NULL,
