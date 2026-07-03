@@ -11,6 +11,8 @@ import com.codeit.deokhugam.domain.bookstatus.BookStatus;
 import com.codeit.deokhugam.domain.bookstatus.BookStatusRepository;
 import com.codeit.deokhugam.domain.bookstatus.BookStatusService;
 import com.codeit.deokhugam.domain.bookstatus.BookStatusType;
+import com.codeit.deokhugam.domain.user.User;
+import com.codeit.deokhugam.domain.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -19,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 public class BookStatusServiceImpl implements BookStatusService {
 	private final BookStatusRepository bookStatusRepository;
 	private final BookRepository bookRepository;
+	private final UserRepository userRepository;
 
 	@Override
 	@Transactional
@@ -30,10 +33,10 @@ public class BookStatusServiceImpl implements BookStatusService {
 				},
 				() -> {
 					Book book = bookRepository.getReferenceById(bookId);
-					//User user = userRepository.getReferenceById(userId);
+					User user = userRepository.getReferenceById(userId);
 					BookStatus newStatus = BookStatus.builder()
 						.book(book)
-						.user(null)
+						.user(user)
 						.status(type)
 						.build();
 					bookStatusRepository.save(newStatus);

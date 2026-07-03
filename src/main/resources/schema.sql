@@ -49,11 +49,11 @@ CREATE TABLE book (
     publisher       VARCHAR(50)     NOT NULL,
     published_date  DATE            NULL,
     isbn            VARCHAR(20)     NULL UNIQUE,
-    thumbnail_url   VARCHAR(255)    NULL,
+    thumbnail_key   VARCHAR(255)    NULL,
     review_count    BIGINT          NOT NULL DEFAULT 0,
     rating          DOUBLE          NOT NULL DEFAULT 0,
     book_category_id
-                    BINARY(16)      NOT NULL,
+                    BINARY(16)      NULL,
     created_at      DATETIME(6)     NOT NULL,
     updated_at      DATETIME(6)     NOT NULL,
     deleted_at      DATETIME(6)     NULL
