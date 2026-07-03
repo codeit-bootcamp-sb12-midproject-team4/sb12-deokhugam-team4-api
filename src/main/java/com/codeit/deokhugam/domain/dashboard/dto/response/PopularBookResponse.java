@@ -6,7 +6,7 @@ import java.util.UUID;
 public record PopularBookResponse(
         UUID bookId,
         Integer ranking,
-        String title,
+        String bookTitle,
         String author,
         String thumbnailUrl,
         BigDecimal score,

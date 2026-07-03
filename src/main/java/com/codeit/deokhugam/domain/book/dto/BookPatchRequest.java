@@ -24,7 +24,7 @@ import lombok.Setter;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class BookPatchRequest {
 
-	@NotNull(message = "사용자 정보는 필수입니다.")
+	@Nullable
 	private UUID userId;
 
 	@NotBlank(message = "도서 제목은 필수입니다.")

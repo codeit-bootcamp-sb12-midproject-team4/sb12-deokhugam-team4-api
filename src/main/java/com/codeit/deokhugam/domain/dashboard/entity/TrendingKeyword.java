@@ -29,10 +29,9 @@ public class TrendingKeyword {
 
 	@Id
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "snapshot_id", nullable = false)
+	@JoinColumn(name = "dataset_id", referencedColumnName = "dataset_id", nullable = false)
 	@ToString.Exclude
-	private TrendingKeywordSnapshot snapshot; // 식별자 관계 (PK이자 FK)
-
+	private TrendingKeywordSnapshot snapshot;
 	@Id
 	@Column(name = "ranking", nullable = false)
 	private Integer ranking;
