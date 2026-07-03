@@ -19,7 +19,14 @@ public enum ErrorCode {
 	// Review
 	REVIEW_NOT_FOUND(404, "리뷰를 찾을 수 없습니다."),
 	REVIEW_ALREADY_EXISTS(409, "해당 도서에 대한 리뷰가 이미 존재합니다."),
-	REVIEW_NOT_OWNED(403, "해당 리뷰에 대한 권한이 없습니다.");
+	REVIEW_NOT_OWNED(403, "해당 리뷰에 대한 권한이 없습니다."),
+
+	// Dashboard
+	DATASET_NOT_FOUND(404, "대시보드 데이터셋을 찾을 수 없습니다."),
+	INVALID_RANK(400, "rank 값이 올바르지 않습니다."),
+	INVALID_LIMIT(400, "limit 값이 올바르지 않습니다."),
+	INVALID_PERIOD(400, "period 값이 올바르지 않습니다."),
+	INVALID_DATE_FORMAT(400, "날짜 형식이 올바르지 않습니다.");
 
 	private final int status;
 	private final String message;
