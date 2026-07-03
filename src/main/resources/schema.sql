@@ -209,7 +209,7 @@ CREATE TABLE popular_review
     book_author    VARCHAR(50)     NOT NULL,
     thumbnail_url  VARCHAR(300)    NULL,
     user_nickname  VARCHAR(20)     NOT NULL,
-    review_content VARCHAR(1000)   NOT NULL,
+    review_summary VARCHAR(300)    NOT NULL,
     review_rating  INT UNSIGNED    NOT NULL,
     score          DECIMAL(10, 2)  NOT NULL,
     like_count     INT UNSIGNED    NOT NULL,
