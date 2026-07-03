@@ -14,7 +14,6 @@ import com.codeit.deokhugam.domain.dashboard.service.PopularReviewService;
 import com.codeit.deokhugam.domain.dashboard.service.PowerUserService;
 import com.codeit.deokhugam.domain.dashboard.service.TrendingKeywordService;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -35,9 +34,9 @@ public class DashboardController {
 	private final PowerUserService powerUserService;
 	private final TrendingKeywordService trendingKeywordService;
 
-	@GetMapping("/book")
+	@GetMapping("/books")
 	public ResponseEntity<CursorPageRankingResponse<PopularBookResponse>> getPopularBooks(
-		@RequestParam @NotNull PeriodType period,
+		@RequestParam PeriodType period,
 		@RequestParam(defaultValue = "1") @Min(1) int minRank,
 		@RequestParam(defaultValue = "5") @Min(1) int limit
 	) {
@@ -56,9 +55,9 @@ public class DashboardController {
 		);
 	}
 
-	@GetMapping("/review")
+	@GetMapping("/reviews")
 	public ResponseEntity<CursorPageRankingResponse<PopularReviewResponse>> getPopularReviews(
-		@RequestParam @NotNull PeriodType period,
+		@RequestParam PeriodType period,
 		@RequestParam(defaultValue = "1") @Min(1) int minRank,
 		@RequestParam(defaultValue = "5") @Min(1) int limit
 	) {
@@ -77,9 +76,9 @@ public class DashboardController {
 		);
 	}
 
-	@GetMapping("/power-user")
+	@GetMapping("/power-users")
 	public ResponseEntity<FixedTopRankResponse<PowerUserResponse>> getPowerUsers(
-		@RequestParam @NotNull PeriodType period
+		@RequestParam PeriodType period
 	) {
 
 		Long datasetId = dashboardQueryService.getDatasetId(
@@ -92,11 +91,12 @@ public class DashboardController {
 		);
 	}
 
-	@GetMapping("/trending-keyword")
+	@GetMapping("/trending-keywords")
 	public ResponseEntity<KeywordListResponse> getTrendingKeywords() {
 
 		Long datasetId = dashboardQueryService.getDatasetId(
-			BatchMetadataType.TRENDING_KEYWORD
+			BatchMetadataType.TRENDING_KEYWORD,
+			PeriodType.REALTIME
 		);
 
 		return ResponseEntity.ok(

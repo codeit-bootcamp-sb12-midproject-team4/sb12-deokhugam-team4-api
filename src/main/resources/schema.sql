@@ -153,6 +153,7 @@ CREATE TABLE batch_metadata
         'TRENDING_KEYWORD'
     ) NOT NULL,
     period ENUM(
+        'REALTIME',
         'DAILY',
         'WEEKLY',
         'MONTHLY',
@@ -267,9 +268,6 @@ CREATE TABLE trending_keyword
     CONSTRAINT chk_trending_keyword_ranking CHECK (ranking BETWEEN 1 AND 10),
     CONSTRAINT chk_trending_keyword_score CHECK (score >= 0)
 );
-ALTER TABLE trending_keyword ADD CONSTRAINT fk_trending_keyword_snapshot_id FOREIGN KEY (snapshot_id) REFERENCES trending_keyword_snapshot (snapshot_id) ON DELETE CASCADE;
-ALTER TABLE trending_keyword ADD CONSTRAINT chk_trending_keyword_ranking CHECK (ranking BETWEEN 1 AND 10);
-ALTER TABLE trending_keyword ADD CONSTRAINT chk_trending_keyword_score CHECK (score >= 0);
 
 CREATE TABLE `oauth_kakao` (
    id              BINARY(16)      NOT NULL,

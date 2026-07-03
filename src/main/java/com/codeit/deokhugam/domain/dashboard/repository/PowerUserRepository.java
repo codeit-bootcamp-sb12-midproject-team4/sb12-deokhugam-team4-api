@@ -13,7 +13,7 @@ import com.codeit.deokhugam.domain.dashboard.entity.PowerUser;
 
 public interface PowerUserRepository extends JpaRepository<PowerUser, UUID> {
 
-    List<PowerUser> findByPeriodAndBatchDateOrderByRankingAsc(PeriodType period, LocalDate batchDate);
+    List<PowerUser> findByDatasetIdOrderByRankingAsc(Long datasetId);
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("DELETE FROM PowerUser u WHERE u.period = :period AND u.batchDate = :batchDate")

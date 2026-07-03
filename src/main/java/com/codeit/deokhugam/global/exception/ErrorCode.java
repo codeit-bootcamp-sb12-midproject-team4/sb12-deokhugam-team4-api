@@ -23,10 +23,10 @@ public enum ErrorCode {
 
 	// Dashboard
 	DATASET_NOT_FOUND(404, "대시보드 데이터셋을 찾을 수 없습니다."),
-	INVALID_RANK(400, "rank 값이 올바르지 않습니다."),
-	INVALID_LIMIT(400, "limit 값이 올바르지 않습니다."),
-	INVALID_PERIOD(400, "period 값이 올바르지 않습니다."),
-	INVALID_DATE_FORMAT(400, "날짜 형식이 올바르지 않습니다.");
+
+	// Common
+	INVALID_REQUEST(400, "잘못된 요청입니다."),
+	INVALID_PARAMETER(400, "잘못된 요청 파라미터입니다.");
 
 	private final int status;
 	private final String message;
