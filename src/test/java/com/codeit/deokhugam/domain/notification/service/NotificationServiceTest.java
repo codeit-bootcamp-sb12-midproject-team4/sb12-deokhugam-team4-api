@@ -14,6 +14,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.test.context.ActiveProfiles;
 
 import com.codeit.deokhugam.domain.book.Book;
 import com.codeit.deokhugam.domain.common.CursorPageResponse;
@@ -27,10 +28,8 @@ import com.codeit.deokhugam.domain.review.entity.Review;
 import com.codeit.deokhugam.domain.user.User;
 import com.codeit.deokhugam.global.config.QueryDslConfig;
 
-@DataJpaTest(properties = {
-	"spring.sql.init.mode=never",
-	"spring.jpa.hibernate.ddl-auto=create-drop"
-})
+@DataJpaTest
+@ActiveProfiles("test")
 @Import({
 	NotificationServiceImpl.class,
 	NotificationMapperImpl.class,
