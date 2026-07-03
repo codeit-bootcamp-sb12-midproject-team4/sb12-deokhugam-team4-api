@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.codeit.deokhugam.domain.comment.exception.CommentException;
 import com.codeit.deokhugam.domain.notification.exception.NotificationException;
+import com.codeit.deokhugam.domain.review.exception.ReviewException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -40,6 +41,20 @@ public class GlobalExceptionHandler {
 				exception.getClass().getSimpleName(),
 				exception.getStatus()
 		);
+		return ResponseEntity.status(exception.getStatus()).body(response);
+	}
+
+	@ExceptionHandler(ReviewException.class)
+	public ResponseEntity<ErrorResponse> handleReviewException(ReviewException exception) {
+		ErrorResponse response = new ErrorResponse(
+			Instant.now(),
+			exception.getErrorCode().name(),
+			exception.getMessage(),
+			exception.getDetails(),
+			exception.getClass().getSimpleName(),
+			exception.getStatus()
+		);
+
 		return ResponseEntity.status(exception.getStatus()).body(response);
 	}
 }
