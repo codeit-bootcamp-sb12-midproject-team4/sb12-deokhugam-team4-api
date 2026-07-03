@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 
 import com.codeit.deokhugam.domain.dashboard.entity.PeriodType;
 import com.codeit.deokhugam.domain.dashboard.entity.PopularBook;
@@ -17,5 +18,6 @@ public interface PopularBookRepository extends JpaRepository<PopularBook, UUID> 
 
     // [배치] JPQL 없이 Spring Data JPA 컨벤션으로 처리하는 벌크 삭제
     @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("DELETE FROM PopularBook p WHERE p.period = :period AND p.batchDate = :batchDate")
     long deleteByPeriodAndBatchDate(PeriodType period, LocalDate batchDate);
 }
