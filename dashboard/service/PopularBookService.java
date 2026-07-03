@@ -25,9 +25,7 @@ public class PopularBookService {
 	) {
 
 		List<PopularBook> books = cacheService.getPopularBooks(datasetId);
-
 		int fromIndex = Math.max(0, minRank - 1);
-
 		if (fromIndex >= books.size()) {
 			return mapper.toCursorPageRankingResponse(
 				List.of(),
@@ -37,11 +35,8 @@ public class PopularBookService {
 		}
 
 		int toIndex = Math.min(fromIndex + limit, books.size());
-
 		List<PopularBook> page = books.subList(fromIndex, toIndex);
-
 		boolean hasNext = toIndex < books.size();
-
 		Integer nextRank = hasNext
 			? books.get(toIndex).getRanking()
 			: null;
