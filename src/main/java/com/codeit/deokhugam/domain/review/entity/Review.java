@@ -46,7 +46,7 @@ public class Review extends SoftDeletableEntity {
 	@Column(name = "content", length = 1000, nullable = false)
 	private String content;
 
-	@Column(name = "attachment_url", length = 100)
+	@Column(name = "attachment_url", length = 255)
 	private String attachmentUrl;
 
 	@Column(name = "rating", nullable = false)
@@ -71,6 +71,10 @@ public class Review extends SoftDeletableEntity {
 	public void update(String content, Integer rating) {
 		this.content = content;
 		this.rating = rating;
+	}
+
+	public void updateAttachmentUrl(String attachmentUrl) {
+		this.attachmentUrl = attachmentUrl;
 	}
 
 	/// TODO: 동시성 이슈 발생지점! -> Repository Layer에서 @OptimisticLock으로 처리

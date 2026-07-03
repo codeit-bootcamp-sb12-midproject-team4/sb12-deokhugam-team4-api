@@ -67,7 +67,7 @@ CREATE TABLE review (
     book_id         BINARY(16)      NOT NULL,
     user_id         BINARY(16)      NOT NULL,
     content         VARCHAR(1000)   NOT NULL,
-    attachment_url  VARCHAR(100)    NULL,
+    attachment_url  VARCHAR(255)    NULL,
     rating          INTEGER         NOT NULL CHECK (rating BETWEEN 1 AND 5),
     like_count      BIGINT          NOT NULL DEFAULT 0,
     comment_count   BIGINT          NOT NULL DEFAULT 0,
