@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import com.codeit.deokhugam.domain.comment.exception.CommentException;
 import com.codeit.deokhugam.domain.notification.exception.NotificationException;
 import com.codeit.deokhugam.domain.review.exception.ReviewException;
-import com.codeit.deokhugam.domain.dashboard.exception.DashboardException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -64,7 +63,7 @@ public class GlobalExceptionHandler {
 		return ResponseEntity.status(exception.getStatus()).body(response);
 	}
 
-	@ExceptionHandler(DashboardException.class)
+	/*@ExceptionHandler(DashboardException.class)
 	public ResponseEntity<ErrorResponse> handleDashboardException(
 		DashboardException exception
 	) {
@@ -78,7 +77,7 @@ public class GlobalExceptionHandler {
 		);
 
 		return ResponseEntity.status(exception.getStatus()).body(response);
-	}
+	}*/
 
 	@ExceptionHandler(ConstraintViolationException.class)
 	public ResponseEntity<ErrorResponse> handleConstraintViolationException(

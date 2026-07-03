@@ -23,7 +23,6 @@ public class UserServiceImpl implements UserService {
   @Override
   public UserDto create(UserRegisterRequest request) {
     if(userRepository.existsByEmail(request.email())){
-      if(userRepository.findByEmail(request.de))
       throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
     }
 
