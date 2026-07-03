@@ -67,6 +67,9 @@ public class PopularReview extends BaseEntity {
 	@Column(name = "review_content", nullable = false, length = 1000)
 	private String reviewContent;
 
+	@Column(name = "review_summary", nullable = false, length = 300)
+	private String reviewSummary;
+
 	@Column(name = "review_rating", nullable = false)
 	private Integer reviewRating;
 
