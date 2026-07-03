@@ -31,7 +31,7 @@ public class TrendingKeywordMapper {
 
         return new TrendingKeywordResponse.TrendingKeywordItem(
                 keyword.getRanking(),
-                keyword.getKeyword(),
+                keyword.getKeyword()
         );
     }
 }
