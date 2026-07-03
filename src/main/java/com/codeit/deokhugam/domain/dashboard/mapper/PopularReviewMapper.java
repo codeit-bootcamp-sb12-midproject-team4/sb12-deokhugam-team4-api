@@ -39,8 +39,8 @@ public class PopularReviewMapper {
 
         return new CursorPageRankingResponse<>(
             items,
-            hasNext,
-            nextMinRank
-        );
+            nextMinRank,
+            hasNext
+            );
     }
 }

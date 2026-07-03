@@ -1,37 +1,23 @@
 package com.codeit.deokhugam.domain.dashboard.mapper;
 
-import java.util.List;
-
+import com.codeit.deokhugam.domain.dashboard.dto.response.KeywordListResponse;
+import com.codeit.deokhugam.domain.dashboard.entity.TrendingKeyword;
 import org.springframework.stereotype.Component;
 
-import com.codeit.deokhugam.domain.dashboard.dto.response.TrendingKeywordResponse;
-import com.codeit.deokhugam.domain.dashboard.entity.TrendingKeyword;
-import com.codeit.deokhugam.domain.dashboard.entity.TrendingKeywordSnapshot;
+import java.util.List;
 
 @Component
 public class TrendingKeywordMapper {
 
-    public TrendingKeywordResponse toResponse(
-            TrendingKeywordSnapshot snapshot,
-            List<TrendingKeyword> keywords
+    public KeywordListResponse toKeywordListResponse(
+        List<TrendingKeyword> keywords
     ) {
 
-        return new TrendingKeywordResponse(
-                snapshot.getSnapshotId(),
-                snapshot.getCalculatedAt(),
-                keywords.stream()
-                        .map(this::toItem)
-                        .toList()
-        );
-    }
+        return new KeywordListResponse(
+            keywords.stream()
+                .map(TrendingKeyword::getKeyword)
+                .toList()
 
-    private TrendingKeywordResponse.TrendingKeywordItem toItem(
-            TrendingKeyword keyword
-    ) {
-
-        return new TrendingKeywordResponse.TrendingKeywordItem(
-                keyword.getRanking(),
-                keyword.getKeyword()
         );
     }
 }

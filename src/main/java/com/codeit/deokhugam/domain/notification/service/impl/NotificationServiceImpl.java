@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.codeit.deokhugam.domain.common.CursorPageResponse;
-import com.codeit.deokhugam.domain.dashboard.entity.PeriodType;
 import com.codeit.deokhugam.domain.notification.dto.NotificationResponse;
 import com.codeit.deokhugam.domain.notification.entity.Notification;
 import com.codeit.deokhugam.domain.notification.event.CommentCreatedEvent;
@@ -92,7 +91,7 @@ public class NotificationServiceImpl implements NotificationService {
 		String message = String.format(
 			"[%s]님의 리뷰가 [%s] 인기 리뷰에 선정되었습니다.",
 			receiver.getNickname(),
-			toPeriodLabel(event.period())
+			event.period().getDescription()
 		);
 
 		saveNotification(receiver, review, message);
@@ -106,15 +105,6 @@ public class NotificationServiceImpl implements NotificationService {
 			.build();
 
 		notificationRepository.save(notification);
-	}
-
-	private String toPeriodLabel(PeriodType period) {
-		return switch (period) {
-			case DAILY -> "일간";
-			case WEEKLY -> "주간";
-			case MONTHLY -> "월간";
-			case ALL_TIME -> "전체";
-		};
 	}
 
 	@Override

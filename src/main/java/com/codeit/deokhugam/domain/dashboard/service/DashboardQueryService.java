@@ -1,6 +1,6 @@
 package com.codeit.deokhugam.domain.dashboard.service;
 
-import static com.codeit.deokhugam.domain.dashboard.exception.DashboardErrorCode.DATASET_NOT_FOUND;
+import static com.codeit.deokhugam.global.exception.ErrorCode.DATASET_NOT_FOUND;
 
 import com.codeit.deokhugam.domain.dashboard.entity.BatchMetadata;
 import com.codeit.deokhugam.domain.dashboard.entity.BatchMetadataType;
@@ -26,18 +26,7 @@ public class DashboardQueryService {
 			.findByMetadataTypeAndPeriod(metadataType, period)
 			.map(BatchMetadata::getDatasetId)
 			.orElseThrow(() ->
-				new DashboardException(DATASET_NOT_FOUND));
-	}
-
-	// Period를 사용하지 않는 Dataset 조회
-	// TRENDING_KEYWORD
-	public Long getDatasetId(
-		BatchMetadataType metadataType
-	) {
-		return batchMetadataRepository
-			.findByMetadataType(metadataType)
-			.map(BatchMetadata::getDatasetId)
-			.orElseThrow(() ->
-				new DashboardException(DATASET_NOT_FOUND));
+				new DashboardException(DATASET_NOT_FOUND)
+			);
 	}
 }
