@@ -6,7 +6,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.codeit.deokhugam.domain.comment.exception.CommentException;
 import com.codeit.deokhugam.domain.notification.exception.NotificationException;
+import com.codeit.deokhugam.domain.review.exception.ReviewException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -14,11 +16,36 @@ import lombok.extern.slf4j.Slf4j;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-	//  IllegalArgument와 MethodArgumentNotValid는 나중에 같이 추가.
-	//  나중에 공통 상위 커스텀 예외를 만들고 그걸 상속하는 방향으로 수정 필요.
 	@ExceptionHandler(NotificationException.class)
 	public ResponseEntity<ErrorResponse> handleNotificationException(
-		NotificationException exception) {
+			NotificationException exception) {
+		ErrorResponse response = new ErrorResponse(
+				Instant.now(),
+				exception.getErrorCode().name(),
+				exception.getMessage(),
+				exception.getDetails(),
+				exception.getClass().getSimpleName(),
+				exception.getStatus()
+		);
+		return ResponseEntity.status(exception.getStatus()).body(response);
+	}
+
+	@ExceptionHandler(CommentException.class)
+	public ResponseEntity<ErrorResponse> handleCommentException(
+			CommentException exception) {
+		ErrorResponse response = new ErrorResponse(
+				Instant.now(),
+				exception.getErrorCode().name(),
+				exception.getMessage(),
+				exception.getDetails(),
+				exception.getClass().getSimpleName(),
+				exception.getStatus()
+		);
+		return ResponseEntity.status(exception.getStatus()).body(response);
+	}
+
+	@ExceptionHandler(ReviewException.class)
+	public ResponseEntity<ErrorResponse> handleReviewException(ReviewException exception) {
 		ErrorResponse response = new ErrorResponse(
 			Instant.now(),
 			exception.getErrorCode().name(),

@@ -3,6 +3,8 @@ package com.codeit.deokhugam.domain.book.impl;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -18,9 +20,11 @@ import com.codeit.deokhugam.domain.book.dto.BookSearchUserRequest;
 import com.codeit.deokhugam.domain.bookstatus.QBookStatus;
 import com.codeit.deokhugam.domain.common.CursorPageResponse;
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
@@ -39,12 +43,14 @@ public class BookQueryRepositoryImpl implements BookQueryRepository {
 
 		BooleanBuilder searchCondition = new BooleanBuilder();
 		searchCondition.and(b.deletedAt.isNull());
-		BooleanBuilder keywordWhere = new BooleanBuilder();
-		keywordWhere.or(b.title.containsIgnoreCase(req.getKeyword()));
-		keywordWhere.or(b.author.containsIgnoreCase(req.getKeyword()));
-		keywordWhere.or(b.isbn.eq(req.getKeyword()));
-		keywordWhere.or(b.bookCategory.path.containsIgnoreCase(req.getKeyword()));
-		searchCondition.and(keywordWhere);
+		if (!req.getKeyword().isBlank()) {
+			BooleanBuilder keywordWhere = new BooleanBuilder();
+			keywordWhere.or(b.title.containsIgnoreCase(req.getKeyword()));
+			keywordWhere.or(b.author.containsIgnoreCase(req.getKeyword()));
+			keywordWhere.or(b.isbn.eq(req.getKeyword()));
+			keywordWhere.or(b.bookCategory.path.containsIgnoreCase(req.getKeyword()));
+			searchCondition.and(keywordWhere);
+		}
 
 		Long totalElements = queryFactory
 			.select(b.count())
@@ -130,31 +136,38 @@ public class BookQueryRepositoryImpl implements BookQueryRepository {
 					}
 				}
 				where.and(cursorCondition);
-			} catch (Exception ignored) {
-			}
+			} catch (Exception ignored) {}
 		}
 
 		int limit = req.getLimit();
-		List<BookResponse> content = queryFactory
-			.select(Projections.fields(BookResponse.class,
-				b.id,
-				b.title,
-				b.author,
-				b.description,
-				b.publisher,
-				b.publishedDate,
-				b.isbn,
-				b.thumbnailUrl,
-				b.reviewCount,
-				b.rating,
-				bc.path.as("categoryPath"),
-				bs.status.as("status"),
-				b.createdAt,
-				b.updatedAt
-			))
+		List<Expression<?>> selectFields = new ArrayList<>(Arrays.asList(
+			b.id,
+			b.title,
+			b.author,
+			b.description,
+			b.publisher,
+			b.publishedDate,
+			b.isbn,
+			b.thumbnailKey.as("thumbnailUrl"),
+			b.reviewCount,
+			b.rating,
+			bc.path.as("categoryPath"),
+			b.createdAt,
+			b.updatedAt
+		));
+		if (req.getUserId() != null) {
+			selectFields.add(bs.status.as("status"));
+		}
+
+		JPAQuery<BookResponse> query = queryFactory
+			.select(Projections.fields(BookResponse.class, selectFields.toArray(new Expression[0])))
 			.from(b)
-			.leftJoin(b.bookCategory, bc)
-			.leftJoin(bs).on(bs.book.id.eq(b.id).and(bs.user.id.eq(req.getUserId())))
+			.leftJoin(b.bookCategory, bc);
+		if (req.getUserId() != null) {
+			query.leftJoin(bs).on(bs.book.id.eq(b.id).and(bs.user.id.eq(req.getUserId())));
+		}
+
+		List<BookResponse> content = query
 			.where(where)
 			.orderBy(
 				orderSpecifier,
@@ -296,7 +309,7 @@ public class BookQueryRepositoryImpl implements BookQueryRepository {
 				b.publisher,
 				b.publishedDate,
 				b.isbn,
-				b.thumbnailUrl,
+				b.thumbnailKey.as("thumbnailUrl"),
 				b.reviewCount,
 				b.rating,
 				bc.path.as("categoryPath"),

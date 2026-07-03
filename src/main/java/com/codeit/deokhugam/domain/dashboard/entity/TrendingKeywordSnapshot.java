@@ -31,9 +31,9 @@ import lombok.ToString;
 public class TrendingKeywordSnapshot {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY) // 순차적 PK 생성으로 Clustered Index 최적화
-	@Column(name = "snapshot_id", nullable = false)
-	private Long snapshotId;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name="dataset_id", nullable = false)
+	private Long datasetId;
 
 	@Column(name = "calculated_at", nullable = false)
 	private LocalDateTime calculatedAt;
