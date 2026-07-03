@@ -1,4 +1,4 @@
-package com.codeit.deokhugam.domain.user.service;
+package com.codeit.deokhugam.domain.user.service.Impl;
 
 import com.codeit.deokhugam.domain.user.dto.request.UserLoginRequest;
 import com.codeit.deokhugam.domain.user.dto.request.UserRegisterRequest;
@@ -6,6 +6,7 @@ import com.codeit.deokhugam.domain.user.dto.request.UserUpdateRequest;
 import com.codeit.deokhugam.domain.user.dto.response.UserDto;
 import com.codeit.deokhugam.domain.user.repository.UserRepository;
 import com.codeit.deokhugam.domain.user.User;
+import com.codeit.deokhugam.domain.user.service.UserService;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
