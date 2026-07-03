@@ -45,15 +45,25 @@ public class CommentController {
     @PatchMapping("/{commentId}")
     public ResponseEntity<CommentResponse> updateComment(
             @PathVariable UUID commentId,
+            @RequestParam UUID userId,
             @Valid @RequestBody CommentUpdateRequest request) {
-        return ResponseEntity.ok(commentService.updateComment(commentId, request));
+        return ResponseEntity.ok(commentService.updateComment(commentId, userId, request));
     }
 
     // 댓글 논리 삭제
     @DeleteMapping("/{commentId}")
     public ResponseEntity<Void> deleteComment(
+            @PathVariable UUID commentId,
+            @RequestParam UUID userId) {
+        commentService.deleteComment(commentId, userId);
+        return ResponseEntity.noContent().build();
+    }
+
+    // 댓글 물리 삭제
+    @DeleteMapping("/{commentId}/hard")
+    public ResponseEntity<Void> hardDeleteComment(
             @PathVariable UUID commentId) {
-        commentService.deleteComment(commentId);
+        commentService.hardDeleteComment(commentId);
         return ResponseEntity.noContent().build();
     }
 }
