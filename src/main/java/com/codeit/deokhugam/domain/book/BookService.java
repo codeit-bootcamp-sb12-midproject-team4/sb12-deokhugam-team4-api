@@ -11,7 +11,7 @@ import com.codeit.deokhugam.domain.common.CursorPageResponse;
 
 public interface BookService {
 
-	BookResponse save(BookPostRequest req, String url, String category);
+	public BookResponse save(BookPostRequest req, String imgKey, String imgUrl, String category);
 
 	CursorPageResponse<BookResponse> findAllByKeyword(BookSearchRequest req);
 
@@ -19,7 +19,7 @@ public interface BookService {
 
 	BookResponse findById(UUID bookId, UUID userId);
 
-	String getImageUrl(UUID bookId);
+	String getImageKey(UUID bookId);
 
 	BookResponse update(UUID bookId, BookPatchRequest req, String url);
 

@@ -47,8 +47,8 @@ public class Book extends SoftDeletableEntity {
 	@Column(name = "isbn", unique = true, length = 20)
 	private String isbn;
 
-	@Column(name = "thumbnail_url", length = 255)
-	private String thumbnailUrl;
+	@Column(name = "thumbnail_key", length = 255)
+	private String thumbnailKey;
 
 	@Builder.Default
 	@Column(name = "review_count", nullable = false, columnDefinition = "BIGINT DEFAULT 0")
@@ -63,7 +63,7 @@ public class Book extends SoftDeletableEntity {
 	@JoinColumn(name = "book_category_id")
 	private BookCategory bookCategory;
 
-	public void update(String title, String author, String description, String publisher, LocalDate publishedDate) {
+	public void update(String title, String author, String description, String publisher, LocalDate publishedDate, String thumbnailKey) {
 		if (title != null)
 			this.title = title;
 		if (author != null)
@@ -72,6 +72,8 @@ public class Book extends SoftDeletableEntity {
 		if (publisher != null)
 			this.publisher = publisher;
 		this.publishedDate = publishedDate;
+		if (thumbnailKey != null)
+			this.thumbnailKey = thumbnailKey;
 	}
 
 }

@@ -49,7 +49,7 @@ public class BookController {
 	@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<BookResponse> postBook(
 			@RequestPart(value = "bookData") @Valid BookPostRequest req,
-			@RequestPart(value = "thumbnailImage", required = false)MultipartFile img
+			@RequestPart(value = "thumbnailImage", required = false) MultipartFile img
 	) {
 		BookResponse res = bookFacade.post(req, img);
 		return ResponseEntity.status(HttpStatus.CREATED).body(res);
@@ -77,7 +77,7 @@ public class BookController {
 	public ResponseEntity<CursorPageResponse<BookResponse>> getBooks(
 			@ModelAttribute @Valid BookSearchRequest req
 	) {
-		CursorPageResponse<BookResponse> res = bookService.findAllByKeyword(req);	// -> userId 필요
+		CursorPageResponse<BookResponse> res = bookFacade.findAllByKeyword(req);	// -> userId 필요
 		return ResponseEntity.status(HttpStatus.OK).body(res);
 	}
 
@@ -86,7 +86,7 @@ public class BookController {
 			@PathVariable UUID userId,
 			@ModelAttribute @Valid BookSearchUserRequest req
 	) {
-		CursorPageResponse<BookResponse> res = bookService.findAllByUserId(req, userId);
+		CursorPageResponse<BookResponse> res = bookFacade.findAllByUserId(req, userId);
 		return ResponseEntity.status(HttpStatus.OK).body(res);
 	}
 
@@ -95,7 +95,7 @@ public class BookController {
 			@PathVariable UUID bookId,
 			@RequestParam @Nullable UUID userId
 	) {
-		BookResponse res = bookService.findById(bookId, userId);
+		BookResponse res = bookFacade.findById(bookId, userId);
 		return ResponseEntity.status(HttpStatus.OK).body(res);
 	}
 
@@ -117,7 +117,7 @@ public class BookController {
 
 	@DeleteMapping("/{bookId}/hard")
 	public ResponseEntity<Void> physicalDeleteBook(@PathVariable UUID bookId) {
-		bookService.delete(bookId);
+		bookFacade.delete(bookId);
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
 	}
 

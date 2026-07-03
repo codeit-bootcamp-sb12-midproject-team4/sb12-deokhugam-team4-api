@@ -136,8 +136,7 @@ public class BookQueryRepositoryImpl implements BookQueryRepository {
 					}
 				}
 				where.and(cursorCondition);
-			} catch (Exception ignored) {
-			}
+			} catch (Exception ignored) {}
 		}
 
 		int limit = req.getLimit();
@@ -149,7 +148,7 @@ public class BookQueryRepositoryImpl implements BookQueryRepository {
 			b.publisher,
 			b.publishedDate,
 			b.isbn,
-			b.thumbnailUrl,
+			b.thumbnailKey.as("thumbnailUrl"),
 			b.reviewCount,
 			b.rating,
 			bc.path.as("categoryPath"),
@@ -310,7 +309,7 @@ public class BookQueryRepositoryImpl implements BookQueryRepository {
 				b.publisher,
 				b.publishedDate,
 				b.isbn,
-				b.thumbnailUrl,
+				b.thumbnailKey.as("thumbnailUrl"),
 				b.reviewCount,
 				b.rating,
 				bc.path.as("categoryPath"),
