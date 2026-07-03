@@ -4,9 +4,7 @@ import com.codeit.deokhugam.domain.dashboard.dto.response.CursorPageRankingRespo
 import com.codeit.deokhugam.domain.dashboard.dto.response.PopularReviewResponse;
 import com.codeit.deokhugam.domain.dashboard.entity.PopularReview;
 import com.codeit.deokhugam.domain.dashboard.mapper.PopularReviewMapper;
-import com.codeit.deokhugam.domain.dashboard.repository.PopularReviewRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,12 +15,12 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class PopularReviewService {
 
-	private final PopularReviewRepository repository;
+	private final PopularReviewCacheService cacheService;
 	private final PopularReviewMapper mapper;
 
 	/**
-	 * 배치가 생성한 Top50 인기 리뷰 랭킹을 조회한다.
-	 * datasetId 단위로 전체 랭킹을 캐싱한 후 메모리에서 잘라 반환하는 Pseudo Paging 방식이다.
+	 * 배치가 생성한 Top50 인기 리뷰 랭킹을 조회
+	 * datasetId 단위로 전체 랭킹을 캐싱한 후 메모리에서 잘라 반환하는 Pseudo Paging 방식
 	 */
 	public CursorPageRankingResponse<PopularReviewResponse> getPopularReviews(
 		Long datasetId,
@@ -30,7 +28,7 @@ public class PopularReviewService {
 		int limit
 	) {
 
-		List<PopularReview> reviews = getCachedPopularReviews(datasetId);
+		List<PopularReview> reviews = cacheService.getPopularReviews(datasetId);
 
 		int fromIndex = Math.max(0, minRank - 1);
 
@@ -44,23 +42,18 @@ public class PopularReviewService {
 
 		int toIndex = Math.min(fromIndex + limit, reviews.size());
 
-		List<PopularReview> target = reviews.subList(fromIndex, toIndex);
+		List<PopularReview> page = reviews.subList(fromIndex, toIndex);
 
 		boolean hasNext = toIndex < reviews.size();
 
-		Integer nextMinRank = hasNext
+		Integer nextRank = hasNext
 			? reviews.get(toIndex).getRanking()
 			: null;
 
 		return mapper.toCursorPageRankingResponse(
-			target,
+			page,
 			hasNext,
-			nextMinRank
+			nextRank
 		);
-	}
-
-	@Cacheable(cacheNames = "dashboardPopularReviews", key = "#datasetId")
-	protected List<PopularReview> getCachedPopularReviews(Long datasetId) {
-		return repository.findByDatasetIdOrderByRankingAsc(datasetId);
 	}
 }

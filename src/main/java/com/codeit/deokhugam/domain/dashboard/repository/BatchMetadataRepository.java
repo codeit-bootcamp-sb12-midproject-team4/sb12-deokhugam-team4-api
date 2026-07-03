@@ -12,7 +12,7 @@ import com.codeit.deokhugam.domain.dashboard.entity.PeriodType;
 public interface BatchMetadataRepository
 	extends JpaRepository<BatchMetadata, BatchMetadataId> {
 
-	 // 메타데이터 타입과 기간에 해당하는 현재 배치 메타데이터 조회
+	// 메타데이터 타입과 기간에 해당하는 현재 유효한 Dataset 조회
 	Optional<BatchMetadata> findByMetadataTypeAndPeriod(
 		BatchMetadataType metadataType,
 		PeriodType period

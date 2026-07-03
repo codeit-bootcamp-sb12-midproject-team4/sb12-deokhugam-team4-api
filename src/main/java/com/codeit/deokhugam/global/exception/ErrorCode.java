@@ -19,7 +19,14 @@ public enum ErrorCode {
 	// Review
 	REVIEW_NOT_FOUND(404, "리뷰를 찾을 수 없습니다."),
 	REVIEW_ALREADY_EXISTS(409, "해당 도서에 대한 리뷰가 이미 존재합니다."),
-	REVIEW_NOT_OWNED(403, "해당 리뷰에 대한 권한이 없습니다.");
+	REVIEW_NOT_OWNED(403, "해당 리뷰에 대한 권한이 없습니다."),
+
+	// Dashboard
+	DATASET_NOT_FOUND(404, "대시보드 데이터셋을 찾을 수 없습니다."),
+
+	// Common
+	INVALID_REQUEST(400, "잘못된 요청입니다."),
+	INVALID_PARAMETER(400, "잘못된 요청 파라미터입니다.");
 
 	private final int status;
 	private final String message;

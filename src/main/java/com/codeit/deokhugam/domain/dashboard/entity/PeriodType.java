@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum PeriodType {
 
+    REALTIME("REALTIME", "실시간"),
     DAILY("DAILY", "일간"),
     WEEKLY("WEEKLY", "주간"),
     MONTHLY("MONTHLY", "월간"),
