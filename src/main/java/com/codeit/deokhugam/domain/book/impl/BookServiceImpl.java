@@ -33,16 +33,16 @@ public class BookServiceImpl implements BookService {
 
 	@Override
 	@Transactional
-	public BookResponse save(BookPostRequest req, String url, String category) {
-		if (bookRepository.existsByIsbn(req.getIsbn())) {
+	public BookResponse save(BookPostRequest req, String imgKey, String imgUrl, String category) {
+		/*if (bookRepository.existsByIsbn(req.getIsbn())) { // -> Facade에서 검증필요..!
 			throw new IllegalArgumentException("이미 등록된 도서입니다. (ISBN중복 : " + req.getIsbn() + ")");
-		}
+		}*/
 		BookCategory bookCategory = null;
-		if (!category.isBlank()) {
+		if (category != null && !category.isBlank()) {
 			bookCategory = findBookCategory(category);
 		}
-		Book book = bookRepository.save(bookMapper.toBook(req, url, bookCategory));
-		return bookMapper.toResponse(book, null);
+		Book book = bookRepository.save(bookMapper.toBook(req, bookCategory, imgKey));
+		return bookMapper.toResponse(book, null, imgUrl);
 	}
 	private BookCategory findBookCategory(String fullPath) {
 		return bookCategoryRepository.findByPath(fullPath)
@@ -53,6 +53,7 @@ public class BookServiceImpl implements BookService {
 		BookCategory currentParent = null;
 		StringBuilder currentPathBuilder = new StringBuilder();
 
+		int depth = 1;
 		for (String name : categoryNames) {
 			if (name.isBlank()) continue;
 			if (!currentPathBuilder.isEmpty()) {
@@ -62,14 +63,17 @@ public class BookServiceImpl implements BookService {
 			String currentPath = currentPathBuilder.toString();
 
 			final BookCategory finalParent = currentParent;
+			final Integer finalDepth = depth;
 			currentParent = bookCategoryRepository.findByNameAndParent(name, currentParent)
 				.orElseGet(() -> bookCategoryRepository.save(
 					BookCategory.builder()
 						.name(name)
 						.path(currentPath)
 						.parent(finalParent)
+						.depth(finalDepth)
 						.build()
 				));
+			depth += 1;
 		}
 
 		return currentParent;
@@ -89,20 +93,36 @@ public class BookServiceImpl implements BookService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public BookResponse findByIdWithStatus(UUID bookId, UUID userId) {
-		return bookRepository.findByIdWithStatus(bookId, userId)
+	public BookResponse findById(UUID bookId, UUID userId) {
+		if (userId != null) {
+			return bookRepository.findByIdWithStatus(bookId, userId)
+				.orElseThrow(() -> new NoSuchElementException("해당하는 도서 정보가 없습니다. (bookId : " + bookId + ")"));
+		} else {
+			Book book = bookRepository.findById(bookId)
+				.orElseThrow(() -> new NoSuchElementException("해당하는 도서 정보가 없습니다. (bookId : " + bookId + ")"));
+			return bookMapper.toResponse(book, null, null);
+		}
+	}
+
+	@Transactional(readOnly = true)
+	public String getImageKey(UUID bookId) {
+		Book book = bookRepository.findById(bookId)
 			.orElseThrow(() -> new NoSuchElementException("해당하는 도서 정보가 없습니다. (bookId : " + bookId + ")"));
+		return book.getThumbnailKey();
 	}
 
 	@Override
 	@Transactional
-	public BookResponse update(UUID bookId, BookPatchRequest req, String url) {
+	public BookResponse update(UUID bookId, BookPatchRequest req, String imgKey) {
 		Book book = bookRepository.findById(bookId)
 			.orElseThrow(() -> new NoSuchElementException("해당하는 도서 정보가 없습니다. (bookId : " + bookId + ")"));
-		book.update(req.getTitle(), req.getAuthor(), req.getDescription(), req.getPublisher(), req.getPublishedDate());
-		BookStatus bookStatus = bookStatusRepository.findByBookIdAndUserId(bookId, req.getUserId())
-			.orElse(null);
-		return bookMapper.toResponse(bookRepository.save(book), bookStatus);
+		book.update(req.getTitle(), req.getAuthor(), req.getDescription(), req.getPublisher(), req.getPublishedDate(), imgKey);
+		BookStatus bookStatus = null;
+		if (req.getUserId() != null) {
+			bookStatus = bookStatusRepository.findByBookIdAndUserId(bookId, req.getUserId())
+				.orElse(null);
+		}
+		return bookMapper.toResponse(bookRepository.save(book), bookStatus, imgKey);
 	}
 
 	@Override
