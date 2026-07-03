@@ -20,18 +20,18 @@ public interface BookMapper {
 	@Mapping(target = "createdAt",   	ignore = true)
 	@Mapping(target = "updatedAt",   	ignore = true)
 	@Mapping(target = "deletedAt",   	ignore = true)
-	@Mapping(target = "thumbnailUrl", 	source = "url")
 	@Mapping(target = "reviewCount", 	constant = "0L")
 	@Mapping(target = "rating",		 	constant = "0.0")
 	@Mapping(target = "bookCategory",	source = "category")
-	Book toBook(BookPostRequest req, String url, BookCategory category);
+	Book toBook(BookPostRequest req, BookCategory category, String thumbnailKey);
 
 	@Mapping(target = "id",				source = "book.id")
 	@Mapping(target = "createdAt",		source = "book.createdAt")
 	@Mapping(target = "updatedAt", 		source = "book.updatedAt")
 	@Mapping(target = "categoryPath", 	source = "book.bookCategory.path")
 	@Mapping(target = "status", 		source = "status", qualifiedByName = "mapStatus")
-	BookResponse toResponse(Book book, BookStatus status);
+	@Mapping(target = "thumbnailUrl", 	source = "imgUrl")
+	BookResponse toResponse(Book book, BookStatus status, String imgUrl);
 
 	@Named("mapStatus")
 	default BookStatusType mapStatus(BookStatus status) {

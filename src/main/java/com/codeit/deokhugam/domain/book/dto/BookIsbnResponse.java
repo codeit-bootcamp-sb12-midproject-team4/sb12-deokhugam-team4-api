@@ -2,6 +2,8 @@ package com.codeit.deokhugam.domain.book.dto;
 
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,6 +21,7 @@ public class BookIsbnResponse {
 	private String author;
 	private String description;
 	private String publisher;
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	private LocalDate publishedDate;
 	private String isbn;
 	private String thumbnailImage;
