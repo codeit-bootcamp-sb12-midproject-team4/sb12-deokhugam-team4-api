@@ -3,9 +3,6 @@ package com.codeit.deokhugam.domain.comment.exception;
 import com.codeit.deokhugam.global.exception.DeokhugamException;
 import com.codeit.deokhugam.global.exception.ErrorCode;
 
-import lombok.Getter;
-
-@Getter
 public class CommentException extends DeokhugamException {
 	public CommentException(ErrorCode errorCode) {
 		super(errorCode);
