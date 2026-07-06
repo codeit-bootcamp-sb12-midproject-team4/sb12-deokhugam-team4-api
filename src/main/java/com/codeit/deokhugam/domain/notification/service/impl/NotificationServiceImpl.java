@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.codeit.deokhugam.domain.common.CursorPageResponse;
@@ -43,7 +44,7 @@ public class NotificationServiceImpl implements NotificationService {
 	//  알림 생성 메서드는 알림을 생성하는 서비스에서 검증 후 결과로 이벤트 생성을 한다.
 	//  그렇기에 알림 생성 메서드는 내부에서 추가 검증 보다는 조회가 정상인지 체크 진행.
 	@Override
-	@Transactional
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void saveCommentCreatedNotification(CommentCreatedEvent event) {
 		Review review = reviewRepository.findById(event.reviewId())
 			.orElseThrow(() -> new RuntimeException("review not found"));
@@ -62,7 +63,7 @@ public class NotificationServiceImpl implements NotificationService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void saveReviewLikedNotification(ReviewLikedEvent event) {
 		Review review = reviewRepository.findById(event.reviewId())
 			.orElseThrow(() -> new RuntimeException("review not found"));
@@ -81,7 +82,7 @@ public class NotificationServiceImpl implements NotificationService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void savePopularReviewSelectedNotification(PopularReviewSelectedEvent event) {
 		Review review = reviewRepository.findById(event.reviewId())
 			.orElseThrow(() -> new RuntimeException("review not found"));
