@@ -28,9 +28,10 @@ public interface ReviewMapper {
 
 	@Mapping(target = "bookId", source = "review.book.id")
 	@Mapping(target = "bookTitle", source = "review.book.title")
-	@Mapping(target = "bookThumbnailUrl", source = "review.book.thumbnailKey")  // -> 수정필요
+	@Mapping(target = "bookThumbnailUrl", ignore = true)
 	@Mapping(target = "userId", source = "review.user.id")
 	@Mapping(target = "userNickname", source = "review.user.nickname")
 	@Mapping(target = "likedByMe", expression = "java(likedByMe)")
+	@Mapping(target = "attachmentUrl", ignore = true)
 	ReviewResponse toResponse(Review review, @Context boolean likedByMe);
 }
