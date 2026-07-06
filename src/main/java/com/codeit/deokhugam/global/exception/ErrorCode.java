@@ -11,12 +11,10 @@ public enum ErrorCode {
 	NOTIFICATION_NOT_OWNED(403, "본인의 알림만 조회/수정할 수 있습니다."),
 	NOTIFICATION_NOT_FOUND(404, "알림을 찾을 수 없습니다."),
 
-
 	// Comment
 	COMMENT_NOT_FOUND(404, "댓글을 찾을 수 없습니다."),
 	COMMENT_NOT_OWNED(403, "본인의 댓글만 수정/삭제할 수 있습니다."),
 	COMMENT_ALREADY_DELETED(400, "이미 삭제된 댓글입니다."),
-
 
 	// Review
 	REVIEW_NOT_FOUND(404, "리뷰를 찾을 수 없습니다."),
@@ -27,8 +25,11 @@ public enum ErrorCode {
 	DATASET_NOT_FOUND(404, "대시보드 데이터셋을 찾을 수 없습니다."),
 
 	// Common
-	INVALID_REQUEST(400, "잘못된 요청입니다."),
-	INVALID_PARAMETER(400, "잘못된 요청 파라미터입니다.");
+	INVALID_REQUEST(400, "잘못된 요청입니다."),//IllegalArgument
+	INVALID_PARAMETER(400, "잘못된 요청 파라미터입니다."),//MethodArgumentNotValid, ConstraintViolation
+
+	// Server
+	INTERNAL_SERVER_ERROR(500, "서버 내부 오류가 발생했습니다.");
 
 	private final int status;
 	private final String message;
