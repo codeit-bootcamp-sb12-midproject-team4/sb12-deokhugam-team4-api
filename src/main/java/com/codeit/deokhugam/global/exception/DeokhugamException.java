@@ -21,7 +21,7 @@ public class DeokhugamException extends RuntimeException {
 	}
 
 	public DeokhugamException addDetail(String key, Object value) {
-		this.getDetails().put(key, value);
+		this.details.put(key, value);
 		return this;
 	}
 
