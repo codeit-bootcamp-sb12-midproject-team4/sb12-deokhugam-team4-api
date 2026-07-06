@@ -27,7 +27,7 @@ public interface BookRepository extends JpaRepository<Book, UUID>, BookQueryRepo
 				b.publisher,
 				b.publishedDate,
 				b.isbn,
-				b.thumbnailUrl,
+				b.thumbnailKey,
 				b.reviewCount,
 				b.rating,
 				bc.path,

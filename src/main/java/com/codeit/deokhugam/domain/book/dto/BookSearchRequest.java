@@ -24,10 +24,10 @@ import lombok.Setter;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class BookSearchRequest {
 
-	@NotNull(message = "사용자 정보는 필수입니다.")
+	@Nullable
 	private UUID userId;
 
-	@NotBlank(message = "검색어는 필수입니다.")
+	@NotNull(message = "검색어는 필수입니다.")
 	private String keyword;
 
 	@NotBlank(message = "정렬 기준은 필수입니다.")

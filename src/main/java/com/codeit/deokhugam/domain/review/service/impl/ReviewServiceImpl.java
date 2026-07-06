@@ -21,6 +21,9 @@ import com.codeit.deokhugam.domain.review.dto.ReviewResponse;
 import com.codeit.deokhugam.domain.review.dto.ReviewSearchRequest;
 import com.codeit.deokhugam.domain.review.dto.ReviewUpdateRequest;
 import com.codeit.deokhugam.domain.review.entity.Review;
+import com.codeit.deokhugam.domain.review.exception.ReviewAlreadyExistsException;
+import com.codeit.deokhugam.domain.review.exception.ReviewNotFoundException;
+import com.codeit.deokhugam.domain.review.exception.ReviewNotOwnedException;
 import com.codeit.deokhugam.domain.review.mapper.ReviewMapper;
 import com.codeit.deokhugam.domain.review.repository.ReviewRepository;
 import com.codeit.deokhugam.domain.review.service.ReviewService;
@@ -55,7 +58,7 @@ public class ReviewServiceImpl implements ReviewService {
 			.orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없습니다."));
 
 		if (reviewRepository.existsByBookIdAndUserId(request.getBookId(), request.getUserId())) {
-			throw new NoSuchElementException("해당 도서에 대한 리뷰가 이미 존재합니다.");
+			throw ReviewAlreadyExistsException.withBookAndUser(request.getBookId(), request.getUserId());
 		}
 
 		Review review = reviewMapper.toEntity(request, book, user);
@@ -68,7 +71,7 @@ public class ReviewServiceImpl implements ReviewService {
 	@Transactional(readOnly = true)
 	public ReviewResponse findByReviewId(UUID reviewId, UUID userId) {
 		Review review = reviewRepository.findById(reviewId)
-			.orElseThrow(() -> new NoSuchElementException("리뷰를 찾을 수 없습니다."));
+			.orElseThrow(() -> ReviewNotFoundException.withReviewId(reviewId));
 
 		boolean likedByMe = reviewLikeRepository.findByReviewIdAndUserId(reviewId, userId).isPresent();
 
@@ -109,10 +112,10 @@ public class ReviewServiceImpl implements ReviewService {
 	@Transactional
 	public ReviewResponse update(UUID reviewId, UUID userId, ReviewUpdateRequest request) {
 		Review review = reviewRepository.findById(reviewId)
-			.orElseThrow(() -> new NoSuchElementException("리뷰를 찾을 수 없습니다."));
+			.orElseThrow(() -> ReviewNotFoundException.withReviewId(reviewId));
 
 		if (!review.isOwnedBy(userId)) {
-			throw new IllegalStateException("리뷰 수정 권한이 없습니다.");
+			throw ReviewNotOwnedException.withUserId(userId);
 		}
 
 		review.update(
@@ -129,10 +132,10 @@ public class ReviewServiceImpl implements ReviewService {
 	@Transactional
 	public void deleteReview(UUID reviewId, UUID userId) {
 		Review review = reviewRepository.findById(reviewId)
-			.orElseThrow(() -> new NoSuchElementException("리뷰를 찾을 수 없습니다."));
+			.orElseThrow(() -> ReviewNotFoundException.withReviewId(reviewId));
 
 		if (!review.isOwnedBy(userId)) {
-			throw new IllegalStateException("리뷰 삭제 권한이 없습니다.");
+			throw ReviewNotOwnedException.withUserId(userId);
 		}
 
 		reviewRepository.delete(review);
@@ -142,10 +145,10 @@ public class ReviewServiceImpl implements ReviewService {
 	@Transactional
 	public void hardDeleteReview(UUID reviewId, UUID userId) {
 		Review review = reviewRepository.findByIdIncludingDeleted(reviewId)
-			.orElseThrow(() -> new NoSuchElementException("리뷰를 찾을 수 없습니다."));
+			.orElseThrow(() -> ReviewNotFoundException.withReviewId(reviewId));
 
 		if (!review.isOwnedBy(userId)) {
-			throw new IllegalStateException("리뷰 삭제 권한이 없습니다.");
+			throw ReviewNotOwnedException.withUserId(userId);
 		}
 
 		reviewLikeRepository.deleteAllByReviewId(reviewId);
@@ -156,7 +159,7 @@ public class ReviewServiceImpl implements ReviewService {
 	@Transactional
 	public ReviewLikeResponse toggleLike(UUID reviewId, UUID userId) {
 		Review review = reviewRepository.findById(reviewId)
-			.orElseThrow(() -> new NoSuchElementException("리뷰를 찾을 수 없습니다."));
+			.orElseThrow(() -> ReviewNotFoundException.withReviewId(reviewId));
 
 		User user = userRepository.findById(userId)
 			.orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없습니다."));
@@ -194,7 +197,7 @@ public class ReviewServiceImpl implements ReviewService {
 	public CursorPageResponse<ReviewResponse> findLikedReviews(LikedReviewSearchRequest request,
 		UUID userId) {
 		if (!request.getUserId().equals(userId)) {
-			throw new IllegalStateException("본인의 좋아요 목록만 조회할 수 있습니다.");
+			throw ReviewNotOwnedException.withUserId(userId);
 		}
 
 		CursorPageResponse<Review> reviewPage =
