@@ -1,6 +1,7 @@
 package com.codeit.deokhugam.domain.comment.controller;
 
 import com.codeit.deokhugam.domain.comment.dto.CommentCreateRequest;
+import com.codeit.deokhugam.domain.comment.dto.CommentReportRequest;
 import com.codeit.deokhugam.domain.comment.dto.CommentResponse;
 import com.codeit.deokhugam.domain.comment.dto.CommentUpdateRequest;
 import com.codeit.deokhugam.domain.comment.service.CommentService;
@@ -65,5 +66,14 @@ public class CommentController {
             @PathVariable UUID commentId) {
         commentService.hardDeleteComment(commentId);
         return ResponseEntity.noContent().build();
+    }
+
+    // 댓글 신고
+    @PostMapping("/{commentId}/reports")
+    public ResponseEntity<Void> reportComment(
+            @PathVariable UUID commentId,
+            @Valid @RequestBody CommentReportRequest request) {
+        commentService.reportComment(commentId, request);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }

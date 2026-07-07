@@ -68,10 +68,11 @@ class ReviewRepositoryTest {
 			.publisher("아니지롱")
 			.publishedDate(LocalDate.of(2026, 1, 1))
 			.isbn("12345")
-			.thumbnailKey("thumbnail-key")
-			.reviewCount(0L)
-			.rating(0.0)
-			.build());
+				.thumbnailKey("thumbnail-key")
+				.reviewCount(0L)
+				.rating(0.0)
+				.build()
+		);
 		book2 = entityManager.persist(Book.builder()
 			.title("개구리 왕자")
 			.author("개구리")
@@ -79,10 +80,10 @@ class ReviewRepositoryTest {
 			.publisher("아니지롱")
 			.publishedDate(LocalDate.of(2026, 1, 2))
 			.isbn("23456")
-			.thumbnailKey("thumbnail-key")
-			.reviewCount(0L)
-			.rating(0.0)
-			.build());
+				.thumbnailKey("thumbnail-key")
+				.reviewCount(0L)
+				.rating(0.0)
+				.build());
 		book3 = entityManager.persist(Book.builder()
 			.title("백설공주")
 			.author("사과")
