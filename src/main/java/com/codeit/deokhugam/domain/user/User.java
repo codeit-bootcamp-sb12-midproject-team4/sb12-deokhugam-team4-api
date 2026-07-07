@@ -20,8 +20,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@SQLDelete(sql = "UPDATE `user` SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
-@SQLRestriction("deleted_at IS NULL")
+@SQLDelete(sql = "UPDATE `users` SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+//@SQLRestriction("deleted_at IS NULL")
 public class User extends SoftDeletableEntity {
 
 	@Column(name = "email", nullable = false, unique = true, length = 320)
