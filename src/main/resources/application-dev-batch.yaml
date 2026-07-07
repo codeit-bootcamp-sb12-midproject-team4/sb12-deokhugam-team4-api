@@ -48,8 +48,12 @@ spring:
 
 logging:
   level:
+    tracer: TRACE
     org.hibernate.SQL: debug
     org.hibernate.orm.jdbc.bind: trace
     org.hibernate.type.descriptor.sql: trace
     org.springframework.web: trace
     com.deokhugam.team4.sb12: trace
+    root: INFO
+    org.springframework.web.servlet.DispatcherServlet: INFO
+    org.springframework.data.elasticsearch.core: DEBUG

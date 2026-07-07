@@ -12,7 +12,7 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 
 @Configuration
-@Profile("dev")
+@Profile("dev-batch")
 public class S3Config {
 
 	@Value("${AWS_S3_ACCESS_KEY}")
