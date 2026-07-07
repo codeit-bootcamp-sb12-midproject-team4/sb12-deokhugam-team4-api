@@ -7,7 +7,10 @@ spring:
       max-file-size: 100MB
       max-request-size: 300MB
   profiles:
-    active: dev   # dev, dev-batch, prod 선택 가능
+    active: dev-batch   # dev, dev-batch, prod 선택 가능
+  jackson:
+    parser:
+      allow-unquoted-control-chars: true  # 탭(code 9), 줄바꿈 등을 허용
 
   jpa:
     open-in-view: false
@@ -20,14 +23,23 @@ spring:
         physical_naming_strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
         jdbc.time_zone: UTC
 
+  resilience4j:
+    retry:
+      instances:
+        aladinApi:
+          maxAttempts: 3            # 최대 재시도 횟수
+          waitDuration: 2s          # 재시도 간격
+          retryExceptions: # 이 예외 발생 시 재시도
+            - org.springframework.web.client.RestClientException
+            - java.io.IOException
+    circuitbreaker:
+      instances:
+        aladinApi:
+          slidingWindowSize: 10     # 최근 10번 호출을 기준으로 판단
+          failureRateThreshold: 50  # 실패율이 50%를 넘으면 차단(Open)
+          waitDurationInOpenState: 10s # 10초 동안 차단 유지 후 Half-Open으로 전환
+
 # log
 logging:
-  level:
-    root: info
-    org.hibernate.SQL: off
-    org.hibernate.orm.jdbc.bind: trace
-    org.hibernate.type.descriptor.sql: trace
-    org.springframework.web: trace
-    org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG
   pattern:
     console: "%d{HH:mm:ss} %-5level %logger{36} - %msg%n"

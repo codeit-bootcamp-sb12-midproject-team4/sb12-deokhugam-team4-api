@@ -2,8 +2,13 @@ package com.codeit.deokhugam.domain.book.dto;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.UUID;
 
+import org.springframework.util.StringUtils;
+
+import com.codeit.deokhugam.domain.booksearch.BookDocument;
 import com.codeit.deokhugam.domain.bookstatus.BookStatusType;
 
 import lombok.AccessLevel;
@@ -33,4 +38,31 @@ public class BookResponse {
 	private BookStatusType status;
 	private Instant createdAt;
 	private Instant updatedAt;
+
+	public static BookResponse from(BookDocument doc) {
+		return BookResponse.builder()
+			.id(UUID.fromString(doc.getId()))
+			.title(doc.getTitle())
+			.author(doc.getAuthor())
+			.description(doc.getDescription())
+			.publisher(doc.getPublisher())
+			.isbn(doc.getIsbn())
+			.thumbnailUrl(doc.getThumbnailKey() != null ? doc.getThumbnailKey() : null)
+			.reviewCount(doc.getReviewCount())
+			.rating(doc.getRating())
+			.publishedDate(parseLocalDate(doc.getPublishedDate()))
+			.categoryPath(doc.getCategoryPath())
+			.createdAt(doc.getCreatedAt())
+			.updatedAt(doc.getUpdatedAt())
+			.build();
+	}
+
+	private static LocalDate parseLocalDate(String dateStr) {
+		if (!StringUtils.hasText(dateStr)) {
+			return null;
+		}
+		return Instant.parse(dateStr)
+			.atZone(ZoneId.of("Asia/Seoul"))
+			.toLocalDate();
+	}
 }

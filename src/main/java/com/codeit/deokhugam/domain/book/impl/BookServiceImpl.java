@@ -1,9 +1,13 @@
 package com.codeit.deokhugam.domain.book.impl;
 
+import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.codeit.deokhugam.domain.book.Book;
@@ -19,6 +23,7 @@ import com.codeit.deokhugam.domain.book.dto.BookSearchRequest;
 import com.codeit.deokhugam.domain.book.dto.BookSearchUserRequest;
 import com.codeit.deokhugam.domain.bookstatus.BookStatus;
 import com.codeit.deokhugam.domain.bookstatus.BookStatusRepository;
+import com.codeit.deokhugam.domain.bookstatus.BookStatusType;
 import com.codeit.deokhugam.domain.common.CursorPageResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -32,11 +37,15 @@ public class BookServiceImpl implements BookService {
 	private final BookStatusRepository bookStatusRepository;
 
 	@Override
-	@Transactional
+	@Transactional(readOnly = true)
+	public void validateIsbn(String isbn) {
+		if (bookRepository.existsByIsbn(isbn)) { // -> Facade에서 검증필요..!
+			throw new IllegalArgumentException("이미 등록된 도서입니다. (ISBN중복 : " + isbn + ")");
+		}
+	}
+	@Override
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public BookResponse save(BookPostRequest req, String imgKey, String imgUrl, String category) {
-		/*if (bookRepository.existsByIsbn(req.getIsbn())) { // -> Facade에서 검증필요..!
-			throw new IllegalArgumentException("이미 등록된 도서입니다. (ISBN중복 : " + req.getIsbn() + ")");
-		}*/
 		BookCategory bookCategory = null;
 		if (category != null && !category.isBlank()) {
 			bookCategory = findBookCategory(category);
@@ -83,6 +92,17 @@ public class BookServiceImpl implements BookService {
 	@Transactional(readOnly = true)
 	public CursorPageResponse<BookResponse> findAllByKeyword(BookSearchRequest req) {
 		return bookRepository.findAllByKeyword(req);
+	}
+
+	@Override
+	public Map<UUID, BookStatusType> getBookStatuses(List<UUID> bookIds, UUID userId) {
+		List<BookStatus> bookStatuses = bookStatusRepository.findByBookIdInAndUserId(bookIds, userId);
+
+		return bookStatuses.stream()
+			.collect(Collectors.toMap(
+				bs -> bs.getBook().getId(),
+				BookStatus::getStatus
+			));
 	}
 
 	@Override

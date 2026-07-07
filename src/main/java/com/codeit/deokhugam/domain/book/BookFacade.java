@@ -17,6 +17,8 @@ public interface BookFacade {
 
 	CursorPageResponse<BookResponse> findAllByKeyword(BookSearchRequest req);
 
+	CursorPageResponse<BookResponse> searchAllByKeyword(BookSearchRequest req);
+
 	CursorPageResponse<BookResponse> findAllByUserId(BookSearchUserRequest req, UUID userId);
 
 	BookResponse findById(UUID bookId, UUID userID);

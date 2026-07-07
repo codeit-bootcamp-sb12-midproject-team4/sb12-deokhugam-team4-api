@@ -1,8 +1,12 @@
 package com.codeit.deokhugam.domain.book.impl;
 
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.codeit.deokhugam.domain.book.BookFacade;
@@ -12,6 +16,9 @@ import com.codeit.deokhugam.domain.book.dto.BookPostRequest;
 import com.codeit.deokhugam.domain.book.dto.BookResponse;
 import com.codeit.deokhugam.domain.book.dto.BookSearchRequest;
 import com.codeit.deokhugam.domain.book.dto.BookSearchUserRequest;
+import com.codeit.deokhugam.domain.booksearch.BookElasticsearchService;
+import com.codeit.deokhugam.domain.booksearch.impl.BookElasticsearchServiceImpl;
+import com.codeit.deokhugam.domain.bookstatus.BookStatusType;
 import com.codeit.deokhugam.domain.client.category.CategoryClient;
 import com.codeit.deokhugam.domain.client.s3.FileStorageClient;
 import com.codeit.deokhugam.domain.common.CursorPageResponse;
@@ -26,12 +33,15 @@ public class BookFacadeImpl implements BookFacade {
 	private final BookService bookService;
 	private final CategoryClient categoryClient;
 	private final FileStorageClient fileStorageClient;
+	private final BookElasticsearchService bookElasticsearchServiceImpl;
 
 	@Override
 	public BookResponse post(BookPostRequest req, MultipartFile img) {
 		String imgUrl = null;
 		String imgKey = null;
 		String category = null;
+
+		bookService.validateIsbn(req.getIsbn());
 
 		if (img != null && !img.isEmpty()) {
 			imgKey = fileStorageClient.uploadImage(img);
@@ -54,6 +64,37 @@ public class BookFacadeImpl implements BookFacade {
 				book.setThumbnailUrl(imgUrl);
 			}
 		});
+		return res;
+	}
+
+	@Override
+	public CursorPageResponse<BookResponse> searchAllByKeyword(BookSearchRequest req) {
+		CursorPageResponse<BookResponse> res = bookElasticsearchServiceImpl.searchBooks(req);
+
+		List<BookResponse> books = res.getContent();
+		if (CollectionUtils.isEmpty(books)) {
+			return res;
+		}
+		List<UUID> bookIds = books.stream()
+			.map(BookResponse::getId)
+			.collect(Collectors.toList());
+
+		if (req.getUserId() != null) {
+			Map<UUID, BookStatusType> statusMap = bookService.getBookStatuses(bookIds, req.getUserId());
+
+			books.forEach(book -> {;
+				BookStatusType status = statusMap.get(book.getId());
+				book.setStatus(status);
+			});
+		}
+
+		books.forEach(book -> {
+			if (book.getThumbnailUrl() != null) {
+				String imgUrl = fileStorageClient.getAttachFileUrl(book.getThumbnailUrl());
+				book.setThumbnailUrl(imgUrl);
+			}
+		});
+
 		return res;
 	}
 
