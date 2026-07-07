@@ -67,10 +67,10 @@ public class NotificationRepositoryTest {
 			.publisher("publisher")
 			.publishedDate(LocalDate.of(2024, 1, 1))
 			.isbn("9781234567890")
-			.thumbnailKey("thumbnail-key")
-			.reviewCount(0L)
-			.rating(0.0)
-			.build()
+				.thumbnailKey("thumbnail-key")
+				.reviewCount(0L)
+				.rating(0.0)
+				.build()
 		);
 
 		review = entityManager.persist(Review.builder()

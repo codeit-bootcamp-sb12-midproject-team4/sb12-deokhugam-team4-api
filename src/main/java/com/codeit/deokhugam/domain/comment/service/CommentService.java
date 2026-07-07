@@ -9,11 +9,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.codeit.deokhugam.domain.comment.Comment;
 import com.codeit.deokhugam.domain.comment.dto.CommentCreateRequest;
+import com.codeit.deokhugam.domain.comment.dto.CommentReportRequest;
 import com.codeit.deokhugam.domain.comment.dto.CommentResponse;
 import com.codeit.deokhugam.domain.comment.dto.CommentUpdateRequest;
+import com.codeit.deokhugam.domain.comment.entity.CommentReport;
+import com.codeit.deokhugam.domain.comment.exception.CommentAlreadyReportedException;
 import com.codeit.deokhugam.domain.comment.exception.CommentNotFoundException;
 import com.codeit.deokhugam.domain.comment.exception.CommentNotOwnedException;
 import com.codeit.deokhugam.domain.comment.repository.CommentRepository;
+import com.codeit.deokhugam.domain.comment.repository.CommentReportRepository;
 import com.codeit.deokhugam.domain.notification.event.CommentCreatedEvent;
 import com.codeit.deokhugam.domain.review.entity.Review;
 import com.codeit.deokhugam.domain.review.repository.ReviewRepository;
@@ -28,18 +32,18 @@ import lombok.RequiredArgsConstructor;
 public class CommentService {
 
 	private final CommentRepository commentRepository;
+	private final CommentReportRepository commentReportRepository;
 	private final ReviewRepository reviewRepository;
 	private final UserRepository userRepository;
-
 	private final ApplicationEventPublisher eventPublisher;
 
 	// 댓글 등록
 	@Transactional
 	public CommentResponse createComment(CommentCreateRequest request) {
 		User user = userRepository.findById(request.userId())
-			.orElseThrow(CommentNotFoundException::new);
+				.orElseThrow(CommentNotFoundException::new);
 		Review review = reviewRepository.findById(request.reviewId())
-			.orElseThrow(CommentNotFoundException::new);
+				.orElseThrow(CommentNotFoundException::new);
 
 		Comment comment = new Comment(request.content(), user, review);
 		Comment savedComment = commentRepository.save(comment);
@@ -47,8 +51,8 @@ public class CommentService {
 		review.increaseCommentCount();
 
 		eventPublisher.publishEvent(new CommentCreatedEvent(
-			review.getId(),
-			user.getId()
+				review.getId(),
+				user.getId()
 		));
 
 		return CommentResponse.from(savedComment);
@@ -57,15 +61,15 @@ public class CommentService {
 	// 댓글 목록 조회
 	public List<CommentResponse> getComments(UUID reviewId) {
 		return commentRepository.findByReviewIdAndDeletedAtIsNull(reviewId)
-			.stream()
-			.map(CommentResponse::from)
-			.toList();
+				.stream()
+				.map(CommentResponse::from)
+				.toList();
 	}
 
 	// 댓글 단건 조회
 	public CommentResponse getComment(UUID commentId) {
 		Comment comment = commentRepository.findById(commentId)
-			.orElseThrow(CommentNotFoundException::new);
+				.orElseThrow(CommentNotFoundException::new);
 		if (comment.isDeleted()) {
 			throw new CommentNotFoundException();
 		}
@@ -76,7 +80,7 @@ public class CommentService {
 	@Transactional
 	public CommentResponse updateComment(UUID commentId, UUID userId, CommentUpdateRequest request) {
 		Comment comment = commentRepository.findById(commentId)
-			.orElseThrow(CommentNotFoundException::new);
+				.orElseThrow(CommentNotFoundException::new);
 		if (comment.isDeleted()) {
 			throw new CommentNotFoundException();
 		}
@@ -90,7 +94,7 @@ public class CommentService {
 	@Transactional
 	public void deleteComment(UUID commentId, UUID userId) {
 		Comment comment = commentRepository.findById(commentId)
-			.orElseThrow(CommentNotFoundException::new);
+				.orElseThrow(CommentNotFoundException::new);
 		if (comment.isDeleted()) {
 			throw new CommentNotFoundException();
 		}
@@ -104,10 +108,26 @@ public class CommentService {
 	@Transactional
 	public void hardDeleteComment(UUID commentId) {
 		Comment comment = commentRepository.findById(commentId)
-			.orElseThrow(CommentNotFoundException::new);
+				.orElseThrow(CommentNotFoundException::new);
 		commentRepository.delete(comment);
 
 		Review review = comment.getReview();
 		review.decreaseCommentCount();
+	}
+
+	// 댓글 신고
+	@Transactional
+	public void reportComment(UUID commentId, CommentReportRequest request) {
+		Comment comment = commentRepository.findById(commentId)
+				.orElseThrow(CommentNotFoundException::new);
+		if (comment.isDeleted()) {
+			throw new CommentNotFoundException();
+		}
+		if (commentReportRepository.existsByCommentIdAndUserId(commentId, request.userId())) {
+			throw new CommentAlreadyReportedException();
+		}
+		User user = userRepository.findById(request.userId())
+				.orElseThrow(CommentNotFoundException::new);
+		commentReportRepository.save(new CommentReport(comment, user, request.reason()));
 	}
 }
