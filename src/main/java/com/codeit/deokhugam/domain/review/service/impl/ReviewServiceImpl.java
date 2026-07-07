@@ -10,9 +10,11 @@ import java.util.UUID;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.codeit.deokhugam.domain.book.Book;
 import com.codeit.deokhugam.domain.book.BookRepository;
+import com.codeit.deokhugam.domain.client.s3.FileStorageClient;
 import com.codeit.deokhugam.domain.common.CursorPageResponse;
 import com.codeit.deokhugam.domain.notification.event.ReviewLikedEvent;
 import com.codeit.deokhugam.domain.review.dto.LikedReviewSearchRequest;
@@ -48,9 +50,11 @@ public class ReviewServiceImpl implements ReviewService {
 
 	private final ApplicationEventPublisher eventPublisher;
 
+	private final FileStorageClient fileStorageClient;
+
 	@Override
 	@Transactional
-	public ReviewResponse save(ReviewCreateRequest request) {
+	public ReviewResponse save(ReviewCreateRequest request, MultipartFile image) {
 		Book book = bookRepository.findById(request.getBookId())
 			.orElseThrow(() -> new NoSuchElementException("도서를 찾을 수 없습니다."));
 
@@ -61,10 +65,16 @@ public class ReviewServiceImpl implements ReviewService {
 			throw ReviewAlreadyExistsException.withBookAndUser(request.getBookId(), request.getUserId());
 		}
 
+		String imgKey = null;
+		if (image != null && !image.isEmpty()) {
+			imgKey = fileStorageClient.uploadImage(image);
+		}
+
 		Review review = reviewMapper.toEntity(request, book, user);
+		review.updateAttachmentUrl(imgKey);
 		reviewRepository.save(review);
 
-		return reviewMapper.toResponse(review, false);
+		return toResponseWithUrls(review, false);
 	}
 
 	@Override
@@ -75,7 +85,7 @@ public class ReviewServiceImpl implements ReviewService {
 
 		boolean likedByMe = reviewLikeRepository.findByReviewIdAndUserId(reviewId, userId).isPresent();
 
-		return reviewMapper.toResponse(review, likedByMe);
+		return toResponseWithUrls(review, likedByMe);
 	}
 
 	@Override
@@ -95,7 +105,7 @@ public class ReviewServiceImpl implements ReviewService {
 
 		Set<UUID> finalLikedReviewIds = likedReviewIds;
 		List<ReviewResponse> content = reviewPage.getContent().stream()
-			.map(r -> reviewMapper.toResponse(r, finalLikedReviewIds.contains(r.getId())))
+			.map(r -> toResponseWithUrls(r, finalLikedReviewIds.contains(r.getId())))
 			.toList();
 
 		return CursorPageResponse.<ReviewResponse>builder()
@@ -110,7 +120,7 @@ public class ReviewServiceImpl implements ReviewService {
 
 	@Override
 	@Transactional
-	public ReviewResponse update(UUID reviewId, UUID userId, ReviewUpdateRequest request) {
+	public ReviewResponse update(UUID reviewId, UUID userId, ReviewUpdateRequest request, MultipartFile image) {
 		Review review = reviewRepository.findById(reviewId)
 			.orElseThrow(() -> ReviewNotFoundException.withReviewId(reviewId));
 
@@ -118,14 +128,18 @@ public class ReviewServiceImpl implements ReviewService {
 			throw ReviewNotOwnedException.withUserId(userId);
 		}
 
-		review.update(
-			request.getContent(),
-			request.getRating()
-		);
+		if (image != null && !image.isEmpty()) {
+			if (review.getAttachmentUrl() != null) {
+				fileStorageClient.deleteImage(review.getAttachmentUrl());
+			}
+			String imgKey = fileStorageClient.uploadImage(image);
+			review.updateAttachmentUrl(imgKey);
+		}
 
+		review.update(request.getContent(), request.getRating());
 		boolean likedByMe = reviewLikeRepository.findByReviewIdAndUserId(reviewId, userId).isPresent();
 
-		return reviewMapper.toResponse(review, likedByMe);
+		return toResponseWithUrls(review, likedByMe);
 	}
 
 	@Override
@@ -204,7 +218,7 @@ public class ReviewServiceImpl implements ReviewService {
 			reviewRepository.findLikedReviewsByRequest(request);
 
 		List<ReviewResponse> content = reviewPage.getContent().stream()
-			.map(r -> reviewMapper.toResponse(r, true))
+			.map(r -> toResponseWithUrls(r, true))
 			.toList();
 
 		return CursorPageResponse.<ReviewResponse>builder()
@@ -215,5 +229,19 @@ public class ReviewServiceImpl implements ReviewService {
 			.totalElements(reviewPage.getTotalElements())
 			.hasNext(reviewPage.isHasNext())
 			.build();
+	}
+
+	private ReviewResponse toResponseWithUrls(Review review, boolean likedByMe) {
+		ReviewResponse response = reviewMapper.toResponse(review, likedByMe);
+
+		if (review.getAttachmentUrl() != null) {
+			response.setAttachmentUrl(fileStorageClient.getAttachFileUrl(review.getAttachmentUrl()));
+		}
+
+		if (review.getBook().getThumbnailKey() != null) {
+			response.setBookThumbnailUrl(fileStorageClient.getAttachFileUrl(review.getBook().getThumbnailKey()));
+		}
+
+		return response;
 	}
 }

@@ -5,6 +5,7 @@ import static org.mockito.BDDMockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -14,7 +15,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,18 +57,21 @@ class ReviewControllerTest {
 			.likedByMe(false)
 			.build();
 
-		given(reviewService.save(any())).willReturn(response);
+		given(reviewService.save(any(), isNull())).willReturn(response);
 
-		mockMvc.perform(post("/api/reviews")
-				.contentType(MediaType.APPLICATION_JSON)
-				.content("""
-					{
-					    "bookId": "%s",
-					    "userId": "%s",
-					    "content": "테스트 리뷰",
-					    "rating": 5
-					}
-					""".formatted(bookId, userId)))
+		MockMultipartFile request = new MockMultipartFile(
+			"request", "", "application/json",
+			"""
+				{
+				    "bookId": "%s",
+				    "userId": "%s",
+				    "content": "테스트 리뷰",
+				    "rating": 5
+				}
+				""".formatted(bookId, userId).getBytes(StandardCharsets.UTF_8));
+
+		mockMvc.perform(multipart("/api/reviews")
+				.file(request))
 			.andExpect(status().isCreated())
 			.andExpect(jsonPath("$.content").value("테스트 리뷰"))
 			.andExpect(jsonPath("$.rating").value(5));
@@ -145,17 +151,20 @@ class ReviewControllerTest {
 			.likedByMe(false)
 			.build();
 
-		given(reviewService.update(eq(reviewId), eq(userId), any())).willReturn(response);
+		given(reviewService.update(eq(reviewId), eq(userId), any(), isNull())).willReturn(response);
 
-		mockMvc.perform(patch("/api/reviews/{reviewId}", reviewId)
-				.header("Deokhugam-Request-User-ID", userId)
-				.contentType(MediaType.APPLICATION_JSON)
-				.content("""
-					{
-					    "content": "수정된 리뷰",
-					    "rating": 3
-					}
-					"""))
+		MockMultipartFile request = new MockMultipartFile(
+			"request", "", "application/json",
+			"""
+				{
+				    "content": "수정된 리뷰",
+				    "rating": 3
+				}
+				""".getBytes(StandardCharsets.UTF_8));
+
+		mockMvc.perform(multipart(HttpMethod.PATCH, "/api/reviews/{reviewId}", reviewId)
+				.file(request)
+				.header("Deokhugam-Request-User-ID", userId))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.content").value("수정된 리뷰"));
 	}
