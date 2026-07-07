@@ -32,6 +32,19 @@ jobs:
         env:
           SPRING_PROFILES_ACTIVE: test
 
+          AWS_REGION: ${{ secrets.AWS_S3_REGION }}
+          AWS_S3_REGION: ${{ secrets.AWS_S3_REGION }}
+          AWS_S3_ACCESS_KEY: ${{ secrets.AWS_S3_ACCESS_KEY }}
+          AWS_S3_SECRET_KEY: ${{ secrets.AWS_S3_SECRET_KEY }}
+          AWS_S3_BUCKET_NAME_DEV: ${{ secrets.AWS_S3_BUCKET_NAME_DEV }}
+          AWS_S3_PRESIGNED_URL_EXPIRATION: ${{ secrets.AWS_S3_PRESIGNED_URL_EXPIRATION }}
+
+          ALADIN_API_CLIENT_SECRET: ${{ secrets.ALADIN_API_CLIENT_SECRET }}
+          ALADIN_API_CLIENT_URI: ${{ secrets.ALADIN_API_CLIENT_URI }}
+          NAVER_API_CLIENT_ID: ${{ secrets.NAVER_API_CLIENT_ID }}
+          NAVER_API_CLIENT_SECRET: ${{ secrets.NAVER_API_CLIENT_SECRET }}
+          NAVER_API_CLIENT_URI: ${{ secrets.NAVER_API_CLIENT_URI }}
+
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5
         with:
