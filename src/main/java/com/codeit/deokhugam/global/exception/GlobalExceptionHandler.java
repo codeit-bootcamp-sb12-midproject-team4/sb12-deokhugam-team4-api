@@ -6,8 +6,12 @@ import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingRequestHeaderException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -31,6 +35,18 @@ public class GlobalExceptionHandler {
 		log.warn("잘못된 요청 예외 발생: message={}", ex.getMessage());
 
 		ErrorCode errorCode = ErrorCode.INVALID_REQUEST;
+		ErrorResponse response = new ErrorResponse(ex, errorCode);
+		return ResponseEntity.status(errorCode.getStatus()).body(response);
+	}
+
+	@ExceptionHandler({
+		MissingRequestHeaderException.class,
+		MissingServletRequestParameterException.class,
+		MethodArgumentTypeMismatchException.class,
+		HandlerMethodValidationException.class
+	})
+	public ResponseEntity<ErrorResponse> handleBadRequestException(Exception ex) {
+		ErrorCode errorCode = ErrorCode.INVALID_PARAMETER;
 		ErrorResponse response = new ErrorResponse(ex, errorCode);
 		return ResponseEntity.status(errorCode.getStatus()).body(response);
 	}
