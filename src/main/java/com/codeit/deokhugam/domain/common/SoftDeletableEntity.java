@@ -27,4 +27,8 @@ public abstract class SoftDeletableEntity extends UpdatableEntity {
 		return this.deletedAt != null;
 	}
 
+	public void updateDeleteAt(Instant deletedAt) {
+		this.deletedAt = deletedAt;
+	}
+
 }
