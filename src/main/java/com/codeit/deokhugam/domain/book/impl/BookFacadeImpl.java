@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,6 +18,7 @@ import com.codeit.deokhugam.domain.book.dto.BookResponse;
 import com.codeit.deokhugam.domain.book.dto.BookSearchRequest;
 import com.codeit.deokhugam.domain.book.dto.BookSearchUserRequest;
 import com.codeit.deokhugam.domain.booksearch.BookElasticsearchService;
+import com.codeit.deokhugam.domain.booksearch.event.BookSyncEvent;
 import com.codeit.deokhugam.domain.booksearch.impl.BookElasticsearchServiceImpl;
 import com.codeit.deokhugam.domain.bookstatus.BookStatusType;
 import com.codeit.deokhugam.domain.client.category.CategoryClient;

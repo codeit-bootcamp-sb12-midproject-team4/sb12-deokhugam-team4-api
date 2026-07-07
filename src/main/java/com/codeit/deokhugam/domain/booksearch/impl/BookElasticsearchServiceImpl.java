@@ -67,19 +67,16 @@ public class BookElasticsearchServiceImpl implements BookElasticsearchService {
 		NativeQueryBuilder builder = NativeQuery.builder()
 			.withQuery(q -> q
 				.bool(b -> b
-					// 🕸️ [1] 넓은 그물망 (기본 검색 - Nori 분석기로 쪼개서 매칭)
+					// 🕸️ [1] 넓은 그물망 (기본 검색 - 형태소 분석 대상에 isbn 추가)
 					.must(must -> must
 						.multiMatch(m -> m
-								.fields("title^5", "author^3", "categoryPath^2", "publisher^2", "description")
-								.query(req.getKeyword())
-							// 필요하다면 여기에 .minimumShouldMatch("70%")를 추가해도 좋습니다.
+							.fields("title^5", "author^3", "categoryPath^2", "publisher^2", "description", "isbn") // ⭐️ 여기에 isbn 추가!
+							.query(req.getKeyword())
 						)
 					)
 					// 🎯 [2] 핀셋 부스터 1 (완벽 일치)
 					.should(should -> should
 						.multiMatch(m -> m
-							// ⭐️ 핵심: .keyword 필드와 완전히 똑같으면 점수 20배 폭격!
-							// "소설미학" 검색 시, publisher가 "소설미학"인 책이 무조건 1등으로 올라옵니다.
 							.fields("publisher.keyword^20", "author.keyword^20", "title.keyword^20")
 							.query(req.getKeyword())
 						)
@@ -87,11 +84,17 @@ public class BookElasticsearchServiceImpl implements BookElasticsearchService {
 					// 🎯 [3] 핀셋 부스터 2 (구문 일치 - Phrase)
 					.should(should -> should
 						.multiMatch(m -> m
-							// ⭐️ Phrase 타입: 단어가 쪼개지더라도 '입력한 순서대로 딱 붙어있어야' 인정 (점수 10배)
-							// 예: "민음사 소설" 검색 시, 두 단어가 띄어쓰기 그대로 붙어있는 책의 점수 급상승
 							.fields("title^10", "publisher^10", "categoryPath^10")
 							.type(TextQueryType.Phrase)
 							.query(req.getKeyword())
+						)
+					)
+					// 🎯 [4] ISBN 전용 부스터 (검색어가 ISBN과 정확히 일치하면 검색 결과 최상단으로 멱살 잡고 올림)
+					.should(should -> should
+						.term(t -> t
+							.field("isbn")
+							.value(req.getKeyword())
+							.boost(100.0f) // 100배 가중치
 						)
 					)
 				)

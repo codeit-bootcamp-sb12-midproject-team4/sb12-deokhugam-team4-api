@@ -6,6 +6,7 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +22,10 @@ import com.codeit.deokhugam.domain.book.dto.BookPostRequest;
 import com.codeit.deokhugam.domain.book.dto.BookResponse;
 import com.codeit.deokhugam.domain.book.dto.BookSearchRequest;
 import com.codeit.deokhugam.domain.book.dto.BookSearchUserRequest;
+import com.codeit.deokhugam.domain.booksearch.event.BookCreateEvent;
+import com.codeit.deokhugam.domain.booksearch.event.BookDeleteEvent;
+import com.codeit.deokhugam.domain.booksearch.event.BookSyncEvent;
+import com.codeit.deokhugam.domain.booksearch.event.BookUpdateEvent;
 import com.codeit.deokhugam.domain.bookstatus.BookStatus;
 import com.codeit.deokhugam.domain.bookstatus.BookStatusRepository;
 import com.codeit.deokhugam.domain.bookstatus.BookStatusType;
@@ -35,6 +40,7 @@ public class BookServiceImpl implements BookService {
 	private final BookCategoryRepository bookCategoryRepository;
 	private final BookRepository bookRepository;
 	private final BookStatusRepository bookStatusRepository;
+	private final ApplicationEventPublisher eventPublisher;
 
 	@Override
 	@Transactional(readOnly = true)
@@ -47,10 +53,13 @@ public class BookServiceImpl implements BookService {
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public BookResponse save(BookPostRequest req, String imgKey, String imgUrl, String category) {
 		BookCategory bookCategory = null;
+		String categoryPath = null;
 		if (category != null && !category.isBlank()) {
 			bookCategory = findBookCategory(category);
+			categoryPath = bookCategory.getPath();
 		}
 		Book book = bookRepository.save(bookMapper.toBook(req, bookCategory, imgKey));
+		eventPublisher.publishEvent(new BookCreateEvent(book.getId(), categoryPath));
 		return bookMapper.toResponse(book, null, imgUrl);
 	}
 	private BookCategory findBookCategory(String fullPath) {
@@ -142,6 +151,8 @@ public class BookServiceImpl implements BookService {
 			bookStatus = bookStatusRepository.findByBookIdAndUserId(bookId, req.getUserId())
 				.orElse(null);
 		}
+		String categoryPath = book.getBookCategory().getPath();
+		eventPublisher.publishEvent(new BookUpdateEvent(book.getId(), categoryPath));
 		return bookMapper.toResponse(bookRepository.save(book), bookStatus, imgKey);
 	}
 
@@ -151,6 +162,7 @@ public class BookServiceImpl implements BookService {
 		Book book = bookRepository.findById(bookId)
 			.orElseThrow(() -> new NoSuchElementException("해당하는 도서 정보가 없습니다. (bookId : " + bookId + ")"));
 		book.markDeleted();
+		eventPublisher.publishEvent(new BookDeleteEvent(book.getId()));
 	}
 
 	@Override

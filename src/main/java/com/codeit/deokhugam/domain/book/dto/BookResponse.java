@@ -56,13 +56,13 @@ public class BookResponse {
 			.updatedAt(doc.getUpdatedAt())
 			.build();
 	}
-
 	private static LocalDate parseLocalDate(String dateStr) {
 		if (!StringUtils.hasText(dateStr)) {
 			return null;
 		}
-		return Instant.parse(dateStr)
-			.atZone(ZoneId.of("Asia/Seoul"))
-			.toLocalDate();
+		if (dateStr.contains("T")) {
+			dateStr = dateStr.substring(0, dateStr.indexOf("T"));
+		}
+		return LocalDate.parse(dateStr);
 	}
 }

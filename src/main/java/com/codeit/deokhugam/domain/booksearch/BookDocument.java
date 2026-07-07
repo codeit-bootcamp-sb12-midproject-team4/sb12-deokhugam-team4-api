@@ -8,9 +8,12 @@ import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 import org.springframework.data.elasticsearch.annotations.InnerField;
 import org.springframework.data.elasticsearch.annotations.MultiField;
+
+import lombok.Builder;
 import lombok.Getter;
 
 @Getter
+@Builder
 @Document(indexName = "books")
 public class BookDocument {
 
@@ -52,7 +55,7 @@ public class BookDocument {
 	@Field(type = FieldType.Double)
 	private Double rating;
 
-	@Field(type = FieldType.Date)
+	@Field(type = FieldType.Date, format = {}, pattern = "uuuu-MM-dd")
 	private String publishedDate;
 
 	@Field(type = FieldType.Keyword)
