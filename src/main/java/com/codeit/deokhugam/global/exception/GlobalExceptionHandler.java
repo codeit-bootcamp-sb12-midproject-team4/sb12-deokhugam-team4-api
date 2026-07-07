@@ -3,11 +3,16 @@ package com.codeit.deokhugam.global.exception;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingRequestHeaderException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -31,6 +36,18 @@ public class GlobalExceptionHandler {
 		log.warn("잘못된 요청 예외 발생: message={}", ex.getMessage());
 
 		ErrorCode errorCode = ErrorCode.INVALID_REQUEST;
+		ErrorResponse response = new ErrorResponse(ex, errorCode);
+		return ResponseEntity.status(errorCode.getStatus()).body(response);
+	}
+
+	@ExceptionHandler({
+		MissingRequestHeaderException.class,
+		MissingServletRequestParameterException.class,
+		MethodArgumentTypeMismatchException.class,
+		HandlerMethodValidationException.class
+	})
+	public ResponseEntity<ErrorResponse> handleBadRequestException(Exception ex) {
+		ErrorCode errorCode = ErrorCode.INVALID_PARAMETER;
 		ErrorResponse response = new ErrorResponse(ex, errorCode);
 		return ResponseEntity.status(errorCode.getStatus()).body(response);
 	}
@@ -91,5 +108,22 @@ public class GlobalExceptionHandler {
 			errorCode.getStatus()
 		);
 		return ResponseEntity.status(errorCode.getStatus()).body(response);
+	}
+
+	// 임시 Notfound용. 제거 필요
+	@ExceptionHandler(NoSuchElementException.class)
+	public ResponseEntity<ErrorResponse> handleNoSuchElementException(NoSuchElementException ex) {
+		log.warn("잘못된 요청 예외 발생: message={}", ex.getMessage());
+
+		int status = 404;
+		ErrorResponse response = new ErrorResponse(
+			Instant.now(),
+			"RESOURCE_NOT_FOUND",
+			ex.getMessage(),
+			new HashMap<>(),
+			ex.getClass().getSimpleName(),
+			status
+		);
+		return ResponseEntity.status(status).body(response);
 	}
 }

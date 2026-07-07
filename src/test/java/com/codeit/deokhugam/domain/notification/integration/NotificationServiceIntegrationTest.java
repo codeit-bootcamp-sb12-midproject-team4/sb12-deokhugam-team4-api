@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.*;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -34,6 +35,7 @@ import com.codeit.deokhugam.domain.notification.repository.NotificationRepositor
 import com.codeit.deokhugam.domain.notification.service.NotificationService;
 import com.codeit.deokhugam.domain.notification.service.impl.NotificationServiceImpl;
 import com.codeit.deokhugam.domain.review.entity.Review;
+import com.codeit.deokhugam.domain.review.exception.ReviewNotFoundException;
 import com.codeit.deokhugam.domain.user.User;
 import com.codeit.deokhugam.global.config.QueryDslConfig;
 
@@ -187,13 +189,11 @@ class NotificationServiceIntegrationTest {
 
 	@Test
 	@DisplayName("알림 생성 대상 리뷰가 없으면 실패한다")
-		// ReviewNotFoundException
 	void saveNotification_reviewNotFound() {
 		assertThatThrownBy(() -> notificationService.saveCommentCreatedNotification(
 			new CommentCreatedEvent(UUID.randomUUID(), actor.getId())
 		))
-			.isInstanceOf(RuntimeException.class)
-			.hasMessage("review not found");
+			.isInstanceOf(ReviewNotFoundException.class);
 
 		assertThat(notificationRepository.findAll()).isEmpty();
 	}
@@ -205,7 +205,7 @@ class NotificationServiceIntegrationTest {
 		assertThatThrownBy(() -> notificationService.saveCommentCreatedNotification(
 			new CommentCreatedEvent(review.getId(), UUID.randomUUID())
 		))
-			.isInstanceOf(RuntimeException.class)
+			.isInstanceOf(NoSuchElementException.class)
 			.hasMessage("commented user not found");
 
 		assertThat(notificationRepository.findAll()).isEmpty();
@@ -213,13 +213,11 @@ class NotificationServiceIntegrationTest {
 
 	@Test
 	@DisplayName("알림 생성 대상 리뷰가 없으면 실패한다")
-		// ReviewNotFoundException
 	void saveReviewLikedNotification_reviewNotFound() {
 		assertThatThrownBy(() -> notificationService.saveReviewLikedNotification(
 			new ReviewLikedEvent(UUID.randomUUID(), actor.getId())
 		))
-			.isInstanceOf(RuntimeException.class)
-			.hasMessage("review not found");
+			.isInstanceOf(ReviewNotFoundException.class);
 
 		assertThat(notificationRepository.findAll()).isEmpty();
 	}
@@ -231,7 +229,7 @@ class NotificationServiceIntegrationTest {
 		assertThatThrownBy(() -> notificationService.saveReviewLikedNotification(
 			new ReviewLikedEvent(review.getId(), UUID.randomUUID())
 		))
-			.isInstanceOf(RuntimeException.class)
+			.isInstanceOf(NoSuchElementException.class)
 			.hasMessage("liked user not found");
 
 		assertThat(notificationRepository.findAll()).isEmpty();
@@ -239,13 +237,11 @@ class NotificationServiceIntegrationTest {
 
 	@Test
 	@DisplayName("알림 생성 대상 리뷰가 없으면 실패한다")
-		// ReviewNotFoundException
 	void savePopularReviewSelectedNotification_reviewNotFound() {
 		assertThatThrownBy(() -> notificationService.savePopularReviewSelectedNotification(
 			new PopularReviewSelectedEvent(UUID.randomUUID(), PeriodType.WEEKLY)
 		))
-			.isInstanceOf(RuntimeException.class)
-			.hasMessage("review not found");
+			.isInstanceOf(ReviewNotFoundException.class);
 
 		assertThat(notificationRepository.findAll()).isEmpty();
 	}
