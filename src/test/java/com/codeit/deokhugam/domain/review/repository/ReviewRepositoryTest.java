@@ -90,7 +90,7 @@ class ReviewRepositoryTest {
 			.publisher("실화")
 			.publishedDate(LocalDate.of(2026, 1, 3))
 			.isbn("34567")
-			.thumbnailKey("thumbnail-key")
+			.thumbnailKey("url")
 			.reviewCount(0L)
 			.rating(0.0)
 			.build());

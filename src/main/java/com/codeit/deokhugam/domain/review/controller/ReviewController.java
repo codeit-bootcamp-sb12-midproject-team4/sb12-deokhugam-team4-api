@@ -10,11 +10,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.codeit.deokhugam.domain.common.CursorPageResponse;
 import com.codeit.deokhugam.domain.review.dto.LikedReviewSearchRequest;
@@ -37,9 +38,10 @@ public class ReviewController {
 
 	@PostMapping
 	public ResponseEntity<ReviewResponse> createReview(
-		@Valid @RequestBody ReviewCreateRequest request
+		@RequestPart @Valid ReviewCreateRequest request,
+		@RequestPart(required = false) MultipartFile image
 	) {
-		ReviewResponse response = reviewService.save(request);
+		ReviewResponse response = reviewService.save(request, image);
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 
@@ -83,9 +85,10 @@ public class ReviewController {
 	public ResponseEntity<ReviewResponse> updateReview(
 		@PathVariable UUID reviewId,
 		@RequestHeader("Deokhugam-Request-User-ID") UUID requestUserId,
-		@Valid @RequestBody ReviewUpdateRequest request
+		@RequestPart @Valid ReviewUpdateRequest request,
+		@RequestPart(required = false) MultipartFile image
 	) {
-		ReviewResponse response = reviewService.update(reviewId, requestUserId, request);
+		ReviewResponse response = reviewService.update(reviewId, requestUserId, request, image);
 		return ResponseEntity.ok(response);
 	}
 

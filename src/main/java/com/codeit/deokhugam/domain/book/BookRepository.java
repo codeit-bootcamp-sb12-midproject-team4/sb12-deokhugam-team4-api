@@ -1,5 +1,6 @@
 package com.codeit.deokhugam.domain.book;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -8,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.codeit.deokhugam.domain.book.dto.BookResponse;
+import com.codeit.deokhugam.domain.bookstatus.BookStatusType;
 
 public interface BookRepository extends JpaRepository<Book, UUID>, BookQueryRepository {
 

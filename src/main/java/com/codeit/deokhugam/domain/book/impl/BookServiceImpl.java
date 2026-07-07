@@ -1,9 +1,14 @@
 package com.codeit.deokhugam.domain.book.impl;
 
+import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.codeit.deokhugam.domain.book.Book;
@@ -17,8 +22,13 @@ import com.codeit.deokhugam.domain.book.dto.BookPostRequest;
 import com.codeit.deokhugam.domain.book.dto.BookResponse;
 import com.codeit.deokhugam.domain.book.dto.BookSearchRequest;
 import com.codeit.deokhugam.domain.book.dto.BookSearchUserRequest;
+import com.codeit.deokhugam.domain.booksearch.event.BookCreateEvent;
+import com.codeit.deokhugam.domain.booksearch.event.BookDeleteEvent;
+import com.codeit.deokhugam.domain.booksearch.event.BookSyncEvent;
+import com.codeit.deokhugam.domain.booksearch.event.BookUpdateEvent;
 import com.codeit.deokhugam.domain.bookstatus.BookStatus;
 import com.codeit.deokhugam.domain.bookstatus.BookStatusRepository;
+import com.codeit.deokhugam.domain.bookstatus.BookStatusType;
 import com.codeit.deokhugam.domain.common.CursorPageResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -30,18 +40,26 @@ public class BookServiceImpl implements BookService {
 	private final BookCategoryRepository bookCategoryRepository;
 	private final BookRepository bookRepository;
 	private final BookStatusRepository bookStatusRepository;
+	private final ApplicationEventPublisher eventPublisher;
 
 	@Override
-	@Transactional
+	@Transactional(readOnly = true)
+	public void validateIsbn(String isbn) {
+		if (bookRepository.existsByIsbn(isbn)) { // -> Facade에서 검증필요..!
+			throw new IllegalArgumentException("이미 등록된 도서입니다. (ISBN중복 : " + isbn + ")");
+		}
+	}
+	@Override
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public BookResponse save(BookPostRequest req, String imgKey, String imgUrl, String category) {
-		/*if (bookRepository.existsByIsbn(req.getIsbn())) { // -> Facade에서 검증필요..!
-			throw new IllegalArgumentException("이미 등록된 도서입니다. (ISBN중복 : " + req.getIsbn() + ")");
-		}*/
 		BookCategory bookCategory = null;
+		String categoryPath = null;
 		if (category != null && !category.isBlank()) {
 			bookCategory = findBookCategory(category);
+			categoryPath = bookCategory.getPath();
 		}
 		Book book = bookRepository.save(bookMapper.toBook(req, bookCategory, imgKey));
+		eventPublisher.publishEvent(new BookCreateEvent(book.getId(), categoryPath));
 		return bookMapper.toResponse(book, null, imgUrl);
 	}
 	private BookCategory findBookCategory(String fullPath) {
@@ -86,6 +104,17 @@ public class BookServiceImpl implements BookService {
 	}
 
 	@Override
+	public Map<UUID, BookStatusType> getBookStatuses(List<UUID> bookIds, UUID userId) {
+		List<BookStatus> bookStatuses = bookStatusRepository.findByBookIdInAndUserId(bookIds, userId);
+
+		return bookStatuses.stream()
+			.collect(Collectors.toMap(
+				bs -> bs.getBook().getId(),
+				BookStatus::getStatus
+			));
+	}
+
+	@Override
 	@Transactional(readOnly = true)
 	public CursorPageResponse<BookResponse> findAllByUserId(BookSearchUserRequest req, UUID userId) {
 		return bookRepository.findAllByUserId(req, userId);
@@ -122,6 +151,8 @@ public class BookServiceImpl implements BookService {
 			bookStatus = bookStatusRepository.findByBookIdAndUserId(bookId, req.getUserId())
 				.orElse(null);
 		}
+		String categoryPath = book.getBookCategory().getPath();
+		eventPublisher.publishEvent(new BookUpdateEvent(book.getId(), categoryPath));
 		return bookMapper.toResponse(bookRepository.save(book), bookStatus, imgKey);
 	}
 
@@ -131,6 +162,7 @@ public class BookServiceImpl implements BookService {
 		Book book = bookRepository.findById(bookId)
 			.orElseThrow(() -> new NoSuchElementException("해당하는 도서 정보가 없습니다. (bookId : " + bookId + ")"));
 		book.markDeleted();
+		eventPublisher.publishEvent(new BookDeleteEvent(book.getId()));
 	}
 
 	@Override

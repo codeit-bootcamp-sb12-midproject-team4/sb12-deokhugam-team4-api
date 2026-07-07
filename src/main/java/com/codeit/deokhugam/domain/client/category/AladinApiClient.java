@@ -13,6 +13,10 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -24,18 +28,22 @@ public class AladinApiClient implements CategoryClient {
 	@Value("${ALADIN_API_CLIENT_SECRET}")
 	private String clientSecret;
 
-	public AladinApiClient(RestClient.Builder restClientBuilder) {
-		MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
-		converter.setSupportedMediaTypes(List.of(
-			MediaType.APPLICATION_JSON,
-			MediaType.TEXT_PLAIN
-		));
+	public AladinApiClient(RestClient.Builder restClientBuilder, ObjectMapper objectMapper) {
+		MappingJackson2HttpMessageConverter myConverter = new MappingJackson2HttpMessageConverter();
+		myConverter.setObjectMapper(objectMapper);
+		myConverter.setSupportedMediaTypes(List.of(MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN));
+
 		this.restClient = restClientBuilder
-			.messageConverters(converters -> converters.add(converter))
+			.messageConverters(converters -> {
+				converters.clear();
+				converters.add(myConverter);
+			})
 			.build();
 	}
 
 	@Override
+	@Retry(name = "aladinApi")
+	@CircuitBreaker(name = "aladinApi")
 	public String getCategoryFromIsbn(String isbn) {
 		URI uri = UriComponentsBuilder
 			.fromUriString(clientUri)
@@ -55,7 +63,8 @@ public class AladinApiClient implements CategoryClient {
 		} catch (HttpClientErrorException | HttpServerErrorException e) {
 			log.error("Aladin API HTTP Error: status={}, body={}", e.getStatusCode(), e.getResponseBodyAsString(), e);
 		} catch (RestClientException e) {
-			log.error("Aladin API Network Error: {}", e.getMessage(), e);
+			log.error("🚨 네트워크 통신 자체에서 예외 발생! ISBN: {} | 에러: {}", isbn, e.getMessage());
+			return null;
 		} catch (Exception e) {
 			log.error("Aladin API Unknown Error: {}", e.getMessage(), e);
 		}
