@@ -3,6 +3,7 @@ package com.codeit.deokhugam.global.exception;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -107,5 +108,22 @@ public class GlobalExceptionHandler {
 			errorCode.getStatus()
 		);
 		return ResponseEntity.status(errorCode.getStatus()).body(response);
+	}
+
+	// 임시 Notfound용. 제거 필요
+	@ExceptionHandler(NoSuchElementException.class)
+	public ResponseEntity<ErrorResponse> handleNoSuchElementException(NoSuchElementException ex) {
+		log.warn("잘못된 요청 예외 발생: message={}", ex.getMessage());
+
+		int status = 404;
+		ErrorResponse response = new ErrorResponse(
+			Instant.now(),
+			"RESOURCE_NOT_FOUND",
+			ex.getMessage(),
+			new HashMap<>(),
+			ex.getClass().getSimpleName(),
+			status
+		);
+		return ResponseEntity.status(status).body(response);
 	}
 }
