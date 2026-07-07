@@ -1,5 +1,7 @@
 package com.codeit.deokhugam.domain.book;
 
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import com.codeit.deokhugam.domain.book.dto.BookPatchRequest;
@@ -7,13 +9,18 @@ import com.codeit.deokhugam.domain.book.dto.BookPostRequest;
 import com.codeit.deokhugam.domain.book.dto.BookResponse;
 import com.codeit.deokhugam.domain.book.dto.BookSearchRequest;
 import com.codeit.deokhugam.domain.book.dto.BookSearchUserRequest;
+import com.codeit.deokhugam.domain.bookstatus.BookStatusType;
 import com.codeit.deokhugam.domain.common.CursorPageResponse;
 
 public interface BookService {
 
-	public BookResponse save(BookPostRequest req, String imgKey, String imgUrl, String category);
+	void validateIsbn(String isbn);
+
+	BookResponse save(BookPostRequest req, String imgKey, String imgUrl, String category);
 
 	CursorPageResponse<BookResponse> findAllByKeyword(BookSearchRequest req);
+
+	Map<UUID, BookStatusType> getBookStatuses(List<UUID> bookIds, UUID userId);
 
 	CursorPageResponse<BookResponse> findAllByUserId(BookSearchUserRequest req, UUID userId);
 

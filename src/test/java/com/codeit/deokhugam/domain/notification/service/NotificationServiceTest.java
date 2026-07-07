@@ -72,7 +72,7 @@ public class NotificationServiceTest {
 			.publisher("publisher")
 			.publishedDate(LocalDate.of(2024, 1, 1))
 			.isbn("9781234567890")
-			.thumbnailUrl("thumbnail-url")
+			.thumbnailKey("thumbnail-key")
 			.reviewCount(0L)
 			.rating(0.0)
 			.build());

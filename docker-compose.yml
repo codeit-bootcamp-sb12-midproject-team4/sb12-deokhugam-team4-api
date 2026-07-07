@@ -1,0 +1,32 @@
+version: '3.8'
+services:
+  elasticsearch:
+    build:
+      context: .
+      dockerfile: Dockerfile.elasticsearch
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m" # 로컬 메모리 제한 (필요시 조절)
+    ports:
+      - "9200:9200"
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.11.1
+    container_name: kibana
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+
+  logstash:
+    image: logstash:8.11.1
+    container_name: logstash
+    depends_on:
+      - elasticsearch
+    volumes:
+      - ./logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
+      - ./logstash/mysql-connector-j-8.0.33.jar:/usr/share/logstash/mysql-connector-j-8.0.33.jar:ro

@@ -31,7 +31,7 @@ public class BookSearchRequest {
 	private String keyword;
 
 	@NotBlank(message = "정렬 기준은 필수입니다.")
-	@Pattern(regexp = "title|publishedDate|rating|reviewCount", message = "정렬 기준은 title, publishedDate, rating, reviewCount 중 하나여야 합니다.")
+	@Pattern(regexp = "title|publishedDate|rating|reviewCount|score", message = "정렬 기준은 title, publishedDate, rating, reviewCount, score 중 하나여야 합니다.")
 	private String orderBy;
 
 	@Builder.Default
