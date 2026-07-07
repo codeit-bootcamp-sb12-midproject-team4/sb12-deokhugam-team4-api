@@ -83,7 +83,7 @@ class ReviewServiceTest {
 			.publisher("아니지롱")
 			.publishedDate(LocalDate.of(2026, 1, 1))
 			.isbn("12345")
-			.thumbnailUrl("url")
+			.thumbnailKey("url")
 			.reviewCount(0L)
 			.rating(0.0)
 			.build());
@@ -94,7 +94,7 @@ class ReviewServiceTest {
 			.publisher("아니지롱")
 			.publishedDate(LocalDate.of(2026, 1, 2))
 			.isbn("23456")
-			.thumbnailUrl("url")
+			.thumbnailKey("url")
 			.reviewCount(0L)
 			.rating(0.0)
 			.build());
