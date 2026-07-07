@@ -13,9 +13,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import com.codeit.deokhugam.domain.book.Book;
+import com.codeit.deokhugam.domain.client.s3.FileStorageClient;
 import com.codeit.deokhugam.domain.common.CursorPageResponse;
 import com.codeit.deokhugam.domain.review.dto.LikedReviewSearchRequest;
 import com.codeit.deokhugam.domain.review.dto.ReviewCreateRequest;
@@ -57,6 +59,9 @@ class ReviewServiceTest {
 	@Autowired
 	private TestEntityManager entityManager;
 
+	@MockitoBean
+	private FileStorageClient fileStorageClient;
+
 	private User user1;
 	private User user2;
 
@@ -83,7 +88,7 @@ class ReviewServiceTest {
 			.publisher("아니지롱")
 			.publishedDate(LocalDate.of(2026, 1, 1))
 			.isbn("12345")
-			.thumbnailUrl("url")
+			.thumbnailKey("url")
 			.reviewCount(0L)
 			.rating(0.0)
 			.build());
@@ -94,7 +99,7 @@ class ReviewServiceTest {
 			.publisher("아니지롱")
 			.publishedDate(LocalDate.of(2026, 1, 2))
 			.isbn("23456")
-			.thumbnailUrl("url")
+			.thumbnailKey("url")
 			.reviewCount(0L)
 			.rating(0.0)
 			.build());
@@ -109,7 +114,7 @@ class ReviewServiceTest {
 		ReflectionTestUtils.setField(request, "content", "테스트 리뷰");
 		ReflectionTestUtils.setField(request, "rating", 5);
 
-		ReviewResponse result = reviewService.save(request);
+		ReviewResponse result = reviewService.save(request, null);
 
 		assertThat(result.getContent()).isEqualTo("테스트 리뷰");
 		assertThat(result.getRating()).isEqualTo(5);
@@ -126,7 +131,7 @@ class ReviewServiceTest {
 		ReflectionTestUtils.setField(request, "content", "테스트 리뷰");
 		ReflectionTestUtils.setField(request, "rating", 5);
 
-		assertThatThrownBy(() -> reviewService.save(request))
+		assertThatThrownBy(() -> reviewService.save(request, null))
 			.isInstanceOf(NoSuchElementException.class);
 	}
 
@@ -139,7 +144,7 @@ class ReviewServiceTest {
 		ReflectionTestUtils.setField(request, "content", "테스트 리뷰");
 		ReflectionTestUtils.setField(request, "rating", 5);
 
-		assertThatThrownBy(() -> reviewService.save(request))
+		assertThatThrownBy(() -> reviewService.save(request, null))
 			.isInstanceOf(NoSuchElementException.class);
 	}
 
@@ -160,7 +165,7 @@ class ReviewServiceTest {
 		org.springframework.test.util.ReflectionTestUtils.setField(request, "content", "중복 리뷰");
 		org.springframework.test.util.ReflectionTestUtils.setField(request, "rating", 5);
 
-		assertThatThrownBy(() -> reviewService.save(request))
+		assertThatThrownBy(() -> reviewService.save(request, null))
 			.isInstanceOf(ReviewAlreadyExistsException.class);
 	}
 
@@ -233,7 +238,7 @@ class ReviewServiceTest {
 		ReflectionTestUtils.setField(updateRequest, "content", "수정된 리뷰");
 		ReflectionTestUtils.setField(updateRequest, "rating", 3);
 
-		ReviewResponse result = reviewService.update(review.getId(), user1.getId(), updateRequest);
+		ReviewResponse result = reviewService.update(review.getId(), user1.getId(), updateRequest, null);
 
 		assertThat(result.getContent()).isEqualTo("수정된 리뷰");
 		assertThat(result.getRating()).isEqualTo(3);
@@ -254,7 +259,7 @@ class ReviewServiceTest {
 		ReflectionTestUtils.setField(updateRequest, "content", "수정된 리뷰");
 		ReflectionTestUtils.setField(updateRequest, "rating", 3);
 
-		assertThatThrownBy(() -> reviewService.update(review.getId(), user2.getId(), updateRequest))
+		assertThatThrownBy(() -> reviewService.update(review.getId(), user2.getId(), updateRequest, null))
 			.isInstanceOf(ReviewNotOwnedException.class);
 	}
 
@@ -265,7 +270,7 @@ class ReviewServiceTest {
 		org.springframework.test.util.ReflectionTestUtils.setField(updateRequest, "content", "수정된 리뷰");
 		org.springframework.test.util.ReflectionTestUtils.setField(updateRequest, "rating", 3);
 
-		assertThatThrownBy(() -> reviewService.update(UUID.randomUUID(), user1.getId(), updateRequest))
+		assertThatThrownBy(() -> reviewService.update(UUID.randomUUID(), user1.getId(), updateRequest, null))
 			.isInstanceOf(ReviewNotFoundException.class);
 	}
 
