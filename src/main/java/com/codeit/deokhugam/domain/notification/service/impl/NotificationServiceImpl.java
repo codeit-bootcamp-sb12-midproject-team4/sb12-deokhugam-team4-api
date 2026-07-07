@@ -2,6 +2,7 @@ package com.codeit.deokhugam.domain.notification.service.impl;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -25,6 +26,7 @@ import com.codeit.deokhugam.domain.notification.mapper.NotificationMapper;
 import com.codeit.deokhugam.domain.notification.repository.NotificationRepository;
 import com.codeit.deokhugam.domain.notification.service.NotificationService;
 import com.codeit.deokhugam.domain.review.entity.Review;
+import com.codeit.deokhugam.domain.review.exception.ReviewNotFoundException;
 import com.codeit.deokhugam.domain.review.repository.ReviewRepository;
 import com.codeit.deokhugam.domain.user.User;
 import com.codeit.deokhugam.domain.user.repository.UserRepository;
@@ -40,19 +42,19 @@ public class NotificationServiceImpl implements NotificationService {
 	private final NotificationRepository notificationRepository;
 	private final NotificationMapper notificationMapper;
 
-	//  TODO: review와 User의 예외 처리는 나중에 통합을 하는 단계에서 예외를 받아서 사용하도록 수정.
+	//  TODO: User의 예외 대기
 	//  알림 생성 메서드는 알림을 생성하는 서비스에서 검증 후 결과로 이벤트 생성을 한다.
 	//  그렇기에 알림 생성 메서드는 내부에서 추가 검증 보다는 조회가 정상인지 체크 진행.
 	@Override
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void saveCommentCreatedNotification(CommentCreatedEvent event) {
 		Review review = reviewRepository.findById(event.reviewId())
-			.orElseThrow(() -> new RuntimeException("review not found"));
+			.orElseThrow(() -> ReviewNotFoundException.withReviewId(event.reviewId()));
 
 		User receiver = review.getUser();
 
 		User commentedUser = userRepository.findById(event.commentedUserId())
-			.orElseThrow(() -> new RuntimeException("commented user not found"));
+			.orElseThrow(() -> new NoSuchElementException("commented user not found"));
 
 		String message = String.format(
 			"[%s]님이 나의 리뷰에 댓글을 남겼습니다.",
@@ -66,12 +68,12 @@ public class NotificationServiceImpl implements NotificationService {
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void saveReviewLikedNotification(ReviewLikedEvent event) {
 		Review review = reviewRepository.findById(event.reviewId())
-			.orElseThrow(() -> new RuntimeException("review not found"));
+			.orElseThrow(() -> ReviewNotFoundException.withReviewId(event.reviewId()));
 
 		User receiver = review.getUser();
 
 		User likedByUser = userRepository.findById(event.likedByUserId())
-			.orElseThrow(() -> new RuntimeException("liked user not found"));
+			.orElseThrow(() -> new NoSuchElementException("liked user not found"));
 
 		String message = String.format(
 			"[%s]님이 나의 리뷰를 좋아합니다.",
@@ -85,7 +87,7 @@ public class NotificationServiceImpl implements NotificationService {
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void savePopularReviewSelectedNotification(PopularReviewSelectedEvent event) {
 		Review review = reviewRepository.findById(event.reviewId())
-			.orElseThrow(() -> new RuntimeException("review not found"));
+			.orElseThrow(() -> ReviewNotFoundException.withReviewId(event.reviewId()));
 
 		User receiver = review.getUser();
 
