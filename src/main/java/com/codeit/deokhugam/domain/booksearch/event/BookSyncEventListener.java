@@ -5,6 +5,7 @@ import org.springframework.data.elasticsearch.core.document.Document;
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.data.elasticsearch.core.query.UpdateQuery;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
@@ -16,6 +17,7 @@ import com.codeit.deokhugam.domain.booksearch.BookDocument;
 import lombok.RequiredArgsConstructor;
 
 @Component
+@Profile({"dev", "dev-batch", "prod", "test-es"})
 @RequiredArgsConstructor
 public class BookSyncEventListener {
 	private final BookRepository bookRepository;
