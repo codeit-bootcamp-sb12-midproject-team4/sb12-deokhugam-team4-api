@@ -23,6 +23,7 @@ import com.codeit.deokhugam.domain.booksearch.impl.BookElasticsearchServiceImpl;
 import com.codeit.deokhugam.domain.bookstatus.BookStatusType;
 import com.codeit.deokhugam.domain.client.category.CategoryClient;
 import com.codeit.deokhugam.domain.client.s3.FileStorageClient;
+import com.codeit.deokhugam.domain.client.s3.ImgType;
 import com.codeit.deokhugam.domain.common.CursorPageResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -46,7 +47,7 @@ public class BookFacadeImpl implements BookFacade {
 		bookService.validateIsbn(req.getIsbn());
 
 		if (img != null && !img.isEmpty()) {
-			imgKey = fileStorageClient.uploadImage(img);
+			imgKey = fileStorageClient.uploadImage(img, ImgType.PREFIX_BOOK);
 			imgUrl = fileStorageClient.getAttachFileUrl(imgKey);
 		}
 
@@ -130,7 +131,7 @@ public class BookFacadeImpl implements BookFacade {
 		BookResponse res = null;
 
 		if (img != null && !img.isEmpty()) {
-			newKey = fileStorageClient.uploadImage(img);
+			newKey = fileStorageClient.uploadImage(img, ImgType.PREFIX_BOOK);
 			newUrl = fileStorageClient.getAttachFileUrl(newKey);
 		}
 

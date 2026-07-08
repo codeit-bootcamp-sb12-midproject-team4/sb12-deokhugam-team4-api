@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.codeit.deokhugam.domain.book.Book;
 import com.codeit.deokhugam.domain.book.BookRepository;
 import com.codeit.deokhugam.domain.client.s3.FileStorageClient;
+import com.codeit.deokhugam.domain.client.s3.ImgType;
 import com.codeit.deokhugam.domain.common.CursorPageResponse;
 import com.codeit.deokhugam.domain.notification.event.ReviewLikedEvent;
 import com.codeit.deokhugam.domain.review.dto.LikedReviewSearchRequest;
@@ -36,7 +37,9 @@ import com.codeit.deokhugam.domain.user.User;
 import com.codeit.deokhugam.domain.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ReviewServiceImpl implements ReviewService {
@@ -62,17 +65,20 @@ public class ReviewServiceImpl implements ReviewService {
 			.orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없습니다."));
 
 		if (reviewRepository.existsByBookIdAndUserId(request.getBookId(), request.getUserId())) {
+			log.info("오류 : 이미 작성된 리뷰가 있습니다");
 			throw ReviewAlreadyExistsException.withBookAndUser(request.getBookId(), request.getUserId());
 		}
 
 		String imgKey = null;
 		if (image != null && !image.isEmpty()) {
-			imgKey = fileStorageClient.uploadImage(image);
+			imgKey = fileStorageClient.uploadImage(image, ImgType.PREFIX_REVIEW);
 		}
 
 		Review review = reviewMapper.toEntity(request, book, user);
 		review.updateAttachmentUrl(imgKey);
 		reviewRepository.save(review);
+
+		bookRepository.increaseRatingAndCountBulk(book.getId(), request.getRating());
 
 		return toResponseWithUrls(review, false);
 	}
@@ -92,6 +98,8 @@ public class ReviewServiceImpl implements ReviewService {
 	@Transactional(readOnly = true)
 	public CursorPageResponse<ReviewResponse> findByRequest(ReviewSearchRequest request) {
 		CursorPageResponse<Review> reviewPage = reviewRepository.findReviewsByRequest(request);
+
+		log.info("조회된 리뷰결과	: {}", reviewPage.getContent().size());
 
 		List<UUID> reviewIds = reviewPage.getContent().stream()
 			.map(Review::getId)
@@ -121,7 +129,7 @@ public class ReviewServiceImpl implements ReviewService {
 	@Override
 	@Transactional
 	public ReviewResponse update(UUID reviewId, UUID userId, ReviewUpdateRequest request, MultipartFile image) {
-		Review review = reviewRepository.findById(reviewId)
+		Review review = reviewRepository.findByIdWithDetails(reviewId)
 			.orElseThrow(() -> ReviewNotFoundException.withReviewId(reviewId));
 
 		if (!review.isOwnedBy(userId)) {
@@ -132,11 +140,16 @@ public class ReviewServiceImpl implements ReviewService {
 			if (review.getAttachmentUrl() != null) {
 				fileStorageClient.deleteImage(review.getAttachmentUrl());
 			}
-			String imgKey = fileStorageClient.uploadImage(image);
+			String imgKey = fileStorageClient.uploadImage(image, ImgType.PREFIX_REVIEW);
 			review.updateAttachmentUrl(imgKey);
 		}
 
+		int oldRating = review.getRating();
 		review.update(request.getContent(), request.getRating());
+		int newRating = review.getRating();
+		if (oldRating != newRating) {
+			bookRepository.updateRatingBulk(review.getBook().getId(), oldRating, newRating);
+		}
 		boolean likedByMe = reviewLikeRepository.findByReviewIdAndUserId(reviewId, userId).isPresent();
 
 		return toResponseWithUrls(review, likedByMe);
@@ -153,6 +166,8 @@ public class ReviewServiceImpl implements ReviewService {
 		}
 
 		reviewRepository.delete(review);
+
+		bookRepository.decreaseRatingAndCountBulk(review.getBook().getId(), review.getRating());
 	}
 
 	@Override

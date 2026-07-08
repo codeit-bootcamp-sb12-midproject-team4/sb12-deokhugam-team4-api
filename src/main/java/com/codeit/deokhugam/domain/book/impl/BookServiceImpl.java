@@ -102,6 +102,9 @@ public class BookServiceImpl implements BookService {
 	@Override
 	@Transactional(readOnly = true)
 	public CursorPageResponse<BookResponse> findAllByKeyword(BookSearchRequest req) {
+		if (req.getKeyword() == null || req.getKeyword().isBlank()) {
+			req.setKeyword("");
+		}
 		return bookRepository.findAllByKeyword(req);
 	}
 

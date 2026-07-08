@@ -63,34 +63,36 @@ public class BookElasticsearchServiceImpl implements BookElasticsearchService {
 	}
 
 	public CursorPageResponse<BookResponse> searchBooks(BookSearchRequest req) {
+		NativeQueryBuilder builder = NativeQuery.builder();
 
-		NativeQueryBuilder builder = NativeQuery.builder()
-			.withQuery(q -> q
+		// 💡 [핵심 수정] 키워드 유무에 따라 쿼리를 완벽하게 분리
+		if (req.getKeyword() == null || req.getKeyword().isBlank()) {
+			// 1. 키워드가 없으면 조건 없는 전체 조회 (MatchAll)
+			builder.withQuery(q -> q.matchAll(m -> m));
+		} else {
+			// 2. 키워드가 있으면 기존 복합 검색 조건 (Bool)
+			builder.withQuery(q -> q
 				.bool(b -> b
-					// 🕸️ [1] 기본 검색 (Must: 이 조건은 만족해야 함)
+					// 🕸️ [1] 기본 검색 (Must)
 					.must(must -> must
 						.multiMatch(m -> m
 							.fields("title^5", "author^3", "categoryPath^2", "publisher^2", "description", "isbn")
 							.query(req.getKeyword())
 						)
 					)
-
-					// 🎯 [2] ISBN 일치 부스터 (Should: 맞으면 점수 폭발)
+					// 🎯 [2] ISBN 일치 부스터 (Should)
 					.should(should -> should
 						.term(t -> t.field("isbn").value(req.getKeyword()).boost(500.0f))
 					)
-
-					// 🎯 [3] 제목 완전 일치 부스터 (Should: 띄어쓰기까지 완벽할 때)
+					// 🎯 [3] 제목 완전 일치 부스터 (Should)
 					.should(should -> should
 						.term(t -> t.field("title.keyword").value(req.getKeyword()).boost(200.0f))
 					)
-
-					// 🎯 [4] 저자 정확히 일치 부스터 (가중치 폭발)
+					// 🎯 [4] 저자 정확히 일치 부스터 (Should)
 					.should(should -> should
 						.term(t -> t.field("author.keyword").value(req.getKeyword()).boost(400.0f))
 					)
-
-					// 🎯 [5] 제목 구문 일치 부스터 (Should: "왜의 쓸모"가 순서대로 들어있을 때)
+					// 🎯 [5] 제목 구문 일치 부스터 (Should)
 					.should(should -> should
 						.matchPhrase(m -> m
 							.field("title")
@@ -99,8 +101,11 @@ public class BookElasticsearchServiceImpl implements BookElasticsearchService {
 						)
 					)
 				)
-			)
-			.withPageable(PageRequest.of(0, req.getLimit() + 1));
+			);
+		}
+
+		// 페이징 설정
+		builder.withPageable(PageRequest.of(0, req.getLimit() + 1));
 
 		String orderBy = req.getOrderBy();
 

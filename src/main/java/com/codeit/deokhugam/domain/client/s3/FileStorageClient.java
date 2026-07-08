@@ -4,10 +4,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface FileStorageClient {
 
-	String uploadImage(MultipartFile image);
+	public String uploadImage(MultipartFile image, ImgType type);
 
-	String getAttachFileUrl(String imgKey);
+	public String getAttachFileUrl(String imgKey);
 
-	void deleteImage(String imgKey);
+	public void deleteImage(String imgKey);
 
 }
