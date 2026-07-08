@@ -65,43 +65,49 @@ public class BookElasticsearchServiceImpl implements BookElasticsearchService {
 	}
 
 	public CursorPageResponse<BookResponse> searchBooks(BookSearchRequest req) {
+		NativeQueryBuilder builder = NativeQuery.builder();
 
-		NativeQueryBuilder builder = NativeQuery.builder()
-			.withQuery(q -> q
+		// 💡 [핵심 수정] 키워드 유무에 따라 쿼리를 완벽하게 분리
+		if (req.getKeyword() == null || req.getKeyword().isBlank()) {
+			// 1. 키워드가 없으면 조건 없는 전체 조회 (MatchAll)
+			builder.withQuery(q -> q.matchAll(m -> m));
+		} else {
+			// 2. 키워드가 있으면 기존 복합 검색 조건 (Bool)
+			builder.withQuery(q -> q
 				.bool(b -> b
-					// 🕸️ [1] 넓은 그물망 (기본 검색 - 형태소 분석 대상에 isbn 추가)
+					// 🕸️ [1] 기본 검색 (Must)
 					.must(must -> must
 						.multiMatch(m -> m
-							.fields("title^5", "author^3", "categoryPath^2", "publisher^2", "description", "isbn") // ⭐️ 여기에 isbn 추가!
+							.fields("title^5", "author^3", "categoryPath^2", "publisher^2", "description", "isbn")
 							.query(req.getKeyword())
 						)
 					)
-					// 🎯 [2] 핀셋 부스터 1 (완벽 일치)
+					// 🎯 [2] ISBN 일치 부스터 (Should)
 					.should(should -> should
-						.multiMatch(m -> m
-							.fields("publisher.keyword^20", "author.keyword^20", "title.keyword^20")
-							.query(req.getKeyword())
-						)
+						.term(t -> t.field("isbn").value(req.getKeyword()).boost(500.0f))
 					)
-					// 🎯 [3] 핀셋 부스터 2 (구문 일치 - Phrase)
+					// 🎯 [3] 제목 완전 일치 부스터 (Should)
 					.should(should -> should
-						.multiMatch(m -> m
-							.fields("title^10", "publisher^10", "categoryPath^10")
-							.type(TextQueryType.Phrase)
-							.query(req.getKeyword())
-						)
+						.term(t -> t.field("title.keyword").value(req.getKeyword()).boost(200.0f))
 					)
-					// 🎯 [4] ISBN 전용 부스터 (검색어가 ISBN과 정확히 일치하면 검색 결과 최상단으로 멱살 잡고 올림)
+					// 🎯 [4] 저자 정확히 일치 부스터 (Should)
 					.should(should -> should
-						.term(t -> t
-							.field("isbn")
-							.value(req.getKeyword())
-							.boost(100.0f) // 100배 가중치
+						.term(t -> t.field("author.keyword").value(req.getKeyword()).boost(400.0f))
+					)
+					// 🎯 [5] 제목 구문 일치 부스터 (Should)
+					.should(should -> should
+						.matchPhrase(m -> m
+							.field("title")
+							.query(req.getKeyword())
+							.boost(100.0f)
 						)
 					)
 				)
-			)
-			.withPageable(PageRequest.of(0, req.getLimit() + 1));
+			);
+		}
+
+		// 페이징 설정
+		builder.withPageable(PageRequest.of(0, req.getLimit() + 1));
 
 		String orderBy = req.getOrderBy();
 
