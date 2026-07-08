@@ -1,12 +1,7 @@
 spring:
   config:
     activate:
-      on-profile: test
-  autoconfigure:
-    exclude:
-      - org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchClientAutoConfiguration
-      - org.springframework.boot.autoconfigure.data.elasticsearch.ElasticsearchDataAutoConfiguration
-      - org.springframework.boot.autoconfigure.data.elasticsearch.ElasticsearchRepositoriesAutoConfiguration
+      on-profile: test-es
 
   datasource:
     url: jdbc:h2:mem:deokhugam-test;MODE=MySQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH;DB_CLOSE_DELAY=-1
@@ -32,3 +27,6 @@ spring:
   h2:
     console:
       enabled: false
+
+  elasticsearch:
+    uris: http://localhost:9200
