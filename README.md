@@ -1,0 +1,1 @@
+[![codecov](https://codecov.io/gh/codeit-bootcamp-sb12-midproject-team4/sb12-deokhugam-team4-api/branch/dev/graph/badge.svg?token=FYEZVK7FOI)](https://codecov.io/gh/codeit-bootcamp-sb12-midproject-team4/sb12-deokhugam-team4-api)

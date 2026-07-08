@@ -5,6 +5,7 @@ import co.elastic.clients.elasticsearch.core.search.Suggester;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
@@ -27,6 +28,7 @@ import com.codeit.deokhugam.domain.booksearch.BookElasticsearchService;
 import com.codeit.deokhugam.domain.common.CursorPageResponse;
 
 @Service
+@Profile({"dev", "dev-batch", "prod", "test-es"})
 @RequiredArgsConstructor
 public class BookElasticsearchServiceImpl implements BookElasticsearchService {
 	private final ElasticsearchOperations elasticsearchOperations;
