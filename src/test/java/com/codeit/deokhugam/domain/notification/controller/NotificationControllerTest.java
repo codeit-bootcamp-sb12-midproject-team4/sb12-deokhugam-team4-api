@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,15 +27,8 @@ import com.codeit.deokhugam.domain.user.User;
 
 import jakarta.persistence.EntityManager;
 
-@SpringBootTest(properties = {
-	"spring.profiles.active=test",
-	"spring.datasource.url=jdbc:h2:mem:notification-controller-test;MODE=MySQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH",
-	"spring.datasource.driver-class-name=org.h2.Driver",
-	"spring.datasource.username=sa",
-	"spring.datasource.password=",
-	"spring.sql.init.mode=never",
-	"spring.jpa.hibernate.ddl-auto=create-drop"
-})
+@SpringBootTest
+@ActiveProfiles("test")
 @AutoConfigureMockMvc
 @Transactional
 class NotificationControllerTest {
@@ -68,10 +62,10 @@ class NotificationControllerTest {
 			.publisher("publisher")
 			.publishedDate(LocalDate.of(2024, 1, 1))
 			.isbn("9781234567890")
-				.thumbnailKey("thumbnail-key")
-				.reviewCount(0L)
-				.rating(0.0)
-				.build()
+			.thumbnailKey("thumbnail-key")
+			.reviewCount(0L)
+			.rating(0.0)
+			.build()
 		);
 
 		Review review = persist(Review.builder()
