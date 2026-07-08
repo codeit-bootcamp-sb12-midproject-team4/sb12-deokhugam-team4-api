@@ -37,7 +37,7 @@ public interface BookRepository extends JpaRepository<Book, UUID>, BookQueryRepo
 				b.createdAt,
 				b.updatedAt
 			)
-			FROM Book b 
+			FROM Book b
 				LEFT JOIN b.bookCategory bc
 				LEFT JOIN BookStatus bs ON bs.book.id = b.id AND bs.user.id = :userId
 			WHERE b.id = :bookId

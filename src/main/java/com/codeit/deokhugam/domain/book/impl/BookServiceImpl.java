@@ -32,7 +32,9 @@ import com.codeit.deokhugam.domain.bookstatus.BookStatusType;
 import com.codeit.deokhugam.domain.common.CursorPageResponse;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BookServiceImpl implements BookService {
@@ -124,12 +126,13 @@ public class BookServiceImpl implements BookService {
 	@Transactional(readOnly = true)
 	public BookResponse findById(UUID bookId, UUID userId) {
 		if (userId != null) {
+			log.info("----------------도서 상태와 함께 조회중");
 			return bookRepository.findByIdWithStatus(bookId, userId)
 				.orElseThrow(() -> new NoSuchElementException("해당하는 도서 정보가 없습니다. (bookId : " + bookId + ")"));
 		} else {
 			Book book = bookRepository.findById(bookId)
 				.orElseThrow(() -> new NoSuchElementException("해당하는 도서 정보가 없습니다. (bookId : " + bookId + ")"));
-			return bookMapper.toResponse(book, null, null);
+			return bookMapper.toResponse(book, null, book.getThumbnailKey());
 		}
 	}
 

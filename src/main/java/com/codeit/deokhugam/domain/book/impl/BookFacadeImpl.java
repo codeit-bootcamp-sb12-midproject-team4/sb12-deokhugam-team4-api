@@ -84,7 +84,7 @@ public class BookFacadeImpl implements BookFacade {
 		if (req.getUserId() != null) {
 			Map<UUID, BookStatusType> statusMap = bookService.getBookStatuses(bookIds, req.getUserId());
 
-			books.forEach(book -> {;
+			books.forEach(book -> {
 				BookStatusType status = statusMap.get(book.getId());
 				book.setStatus(status);
 			});
@@ -126,18 +126,17 @@ public class BookFacadeImpl implements BookFacade {
 	public BookResponse patch(UUID bookId, BookPatchRequest req, MultipartFile img) {
 		String newKey = null;
 		String newUrl = null;
-		String oldKey = null;
+		String oldKey = bookService.getImageKey(bookId);
 		BookResponse res = null;
 
 		if (img != null && !img.isEmpty()) {
-			oldKey = bookService.getImageKey(bookId);
 			newKey = fileStorageClient.uploadImage(img);
 			newUrl = fileStorageClient.getAttachFileUrl(newKey);
 		}
 
 		try {
 			res = bookService.update(bookId, req, newKey);
-			if (oldKey != null) {
+			if (newKey != null) {
 				fileStorageClient.deleteImage(oldKey);
 				log.info("AWS S3 이미지 삭제 완료 (key : {})", oldKey);
 			}

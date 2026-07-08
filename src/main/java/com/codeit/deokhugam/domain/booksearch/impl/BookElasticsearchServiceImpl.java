@@ -67,34 +67,35 @@ public class BookElasticsearchServiceImpl implements BookElasticsearchService {
 		NativeQueryBuilder builder = NativeQuery.builder()
 			.withQuery(q -> q
 				.bool(b -> b
-					// 🕸️ [1] 넓은 그물망 (기본 검색 - 형태소 분석 대상에 isbn 추가)
+					// 🕸️ [1] 기본 검색 (Must: 이 조건은 만족해야 함)
 					.must(must -> must
 						.multiMatch(m -> m
-							.fields("title^5", "author^3", "categoryPath^2", "publisher^2", "description", "isbn") // ⭐️ 여기에 isbn 추가!
+							.fields("title^5", "author^3", "categoryPath^2", "publisher^2", "description", "isbn")
 							.query(req.getKeyword())
 						)
 					)
-					// 🎯 [2] 핀셋 부스터 1 (완벽 일치)
+
+					// 🎯 [2] ISBN 일치 부스터 (Should: 맞으면 점수 폭발)
 					.should(should -> should
-						.multiMatch(m -> m
-							.fields("publisher.keyword^20", "author.keyword^20", "title.keyword^20")
-							.query(req.getKeyword())
-						)
+						.term(t -> t.field("isbn").value(req.getKeyword()).boost(500.0f))
 					)
-					// 🎯 [3] 핀셋 부스터 2 (구문 일치 - Phrase)
+
+					// 🎯 [3] 제목 완전 일치 부스터 (Should: 띄어쓰기까지 완벽할 때)
 					.should(should -> should
-						.multiMatch(m -> m
-							.fields("title^10", "publisher^10", "categoryPath^10")
-							.type(TextQueryType.Phrase)
-							.query(req.getKeyword())
-						)
+						.term(t -> t.field("title.keyword").value(req.getKeyword()).boost(200.0f))
 					)
-					// 🎯 [4] ISBN 전용 부스터 (검색어가 ISBN과 정확히 일치하면 검색 결과 최상단으로 멱살 잡고 올림)
+
+					// 🎯 [4] 저자 정확히 일치 부스터 (가중치 폭발)
 					.should(should -> should
-						.term(t -> t
-							.field("isbn")
-							.value(req.getKeyword())
-							.boost(100.0f) // 100배 가중치
+						.term(t -> t.field("author.keyword").value(req.getKeyword()).boost(400.0f))
+					)
+
+					// 🎯 [5] 제목 구문 일치 부스터 (Should: "왜의 쓸모"가 순서대로 들어있을 때)
+					.should(should -> should
+						.matchPhrase(m -> m
+							.field("title")
+							.query(req.getKeyword())
+							.boost(100.0f)
 						)
 					)
 				)
