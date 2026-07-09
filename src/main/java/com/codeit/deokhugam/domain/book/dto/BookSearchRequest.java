@@ -27,7 +27,7 @@ public class BookSearchRequest {
 	@Nullable
 	private UUID userId;
 
-	@NotNull(message = "검색어는 필수입니다.")
+	@Nullable
 	private String keyword;
 
 	@NotBlank(message = "정렬 기준은 필수입니다.")

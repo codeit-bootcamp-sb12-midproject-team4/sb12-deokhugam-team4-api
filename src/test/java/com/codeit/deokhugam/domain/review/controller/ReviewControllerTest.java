@@ -1,13 +1,11 @@
 package com.codeit.deokhugam.domain.review.controller;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 import org.junit.jupiter.api.DisplayName;
@@ -18,21 +16,22 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.codeit.deokhugam.domain.common.CursorPageResponse;
 import com.codeit.deokhugam.domain.review.dto.ReviewResponse;
+import com.codeit.deokhugam.domain.review.exception.ReviewNotFoundException;
 import com.codeit.deokhugam.domain.review.service.ReviewService;
 import com.codeit.deokhugam.domain.reviewlike.dto.ReviewLikeResponse;
-
-import jakarta.servlet.ServletException;
 
 @SpringBootTest(properties = {
 	"spring.sql.init.mode=never",
 	"spring.jpa.hibernate.ddl-auto=create-drop"
 })
+@ActiveProfiles("test")
 @AutoConfigureMockMvc
 @Transactional
 class ReviewControllerTest {
@@ -113,14 +112,15 @@ class ReviewControllerTest {
 
 	@Test
 	@DisplayName("리뷰 단건 조회 실패 - 존재하지 않는 리뷰")
-	void getReview_fail() {
+	void getReview_fail() throws Exception {
 		given(reviewService.findByReviewId(any(), any()))
-			.willThrow(new NoSuchElementException("리뷰를 찾을 수 없습니다."));
+			.willThrow(ReviewNotFoundException.withReviewId(reviewId));
 
-		assertThrows(ServletException.class, () ->
-			mockMvc.perform(get("/api/reviews/{reviewId}", reviewId)
+		mockMvc.perform(get("/api/reviews/{reviewId}", reviewId)
 				.header("Deokhugam-Request-User-ID", userId.toString()))
-		);
+			.andExpect(status().isNotFound())
+			.andExpect(jsonPath("$.code").value("REVIEW_NOT_FOUND"))
+			.andExpect(jsonPath("$.status").value(404));
 	}
 
 	@Test

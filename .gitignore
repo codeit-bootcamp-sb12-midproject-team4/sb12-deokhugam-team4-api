@@ -45,3 +45,7 @@ out/
 
 ### Local Data ###
 isbns_100000.json
+isbns_100000_unique.json
+
+### MySQL Backup ###
+**/src/main/resources/02_data.sql

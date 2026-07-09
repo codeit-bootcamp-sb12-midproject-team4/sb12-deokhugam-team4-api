@@ -14,6 +14,9 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.transaction.TestTransaction;
 
 import com.codeit.deokhugam.domain.book.Book;
 import com.codeit.deokhugam.domain.common.CursorPageResponse;
@@ -27,10 +30,9 @@ import com.codeit.deokhugam.domain.review.entity.Review;
 import com.codeit.deokhugam.domain.user.User;
 import com.codeit.deokhugam.global.config.QueryDslConfig;
 
-@DataJpaTest(properties = {
-	"spring.sql.init.mode=never",
-	"spring.jpa.hibernate.ddl-auto=create-drop"
-})
+@DataJpaTest
+@DirtiesContext
+@ActiveProfiles("test")
 @Import({
 	NotificationServiceImpl.class,
 	NotificationMapperImpl.class,
@@ -53,6 +55,8 @@ public class NotificationServiceTest {
 
 	@BeforeEach
 	void setUp() {
+		deleteCommittedTestData();
+
 		receiver = entityManager.persist(new User(
 			"receiver@test.com",
 			"receiver",
@@ -89,6 +93,10 @@ public class NotificationServiceTest {
 
 		entityManager.flush();
 		entityManager.clear();
+
+		TestTransaction.flagForCommit();
+		TestTransaction.end();
+		TestTransaction.start();
 	}
 
 	@Test
@@ -234,6 +242,27 @@ public class NotificationServiceTest {
 				""")
 			.setParameter("createdAt", Instant.parse(createdAt))
 			.setParameter("id", notification.getId())
+			.executeUpdate();
+	}
+
+	private void deleteCommittedTestData() {
+		entityManager.getEntityManager()
+			.createQuery("delete from Notification n")
+			.executeUpdate();
+		entityManager.getEntityManager()
+			.createQuery("delete from ReviewLike rl")
+			.executeUpdate();
+		entityManager.getEntityManager()
+			.createQuery("delete from Comment c")
+			.executeUpdate();
+		entityManager.getEntityManager()
+			.createQuery("delete from Review r")
+			.executeUpdate();
+		entityManager.getEntityManager()
+			.createQuery("delete from Book b")
+			.executeUpdate();
+		entityManager.getEntityManager()
+			.createQuery("delete from User u")
 			.executeUpdate();
 	}
 }

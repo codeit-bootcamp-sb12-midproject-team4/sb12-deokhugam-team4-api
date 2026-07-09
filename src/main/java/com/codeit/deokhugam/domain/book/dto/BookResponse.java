@@ -50,19 +50,10 @@ public class BookResponse {
 			.thumbnailUrl(doc.getThumbnailKey() != null ? doc.getThumbnailKey() : null)
 			.reviewCount(doc.getReviewCount())
 			.rating(doc.getRating())
-			.publishedDate(parseLocalDate(doc.getPublishedDate()))
+			.publishedDate(doc.getPublishedDate())
 			.categoryPath(doc.getCategoryPath())
 			.createdAt(doc.getCreatedAt())
 			.updatedAt(doc.getUpdatedAt())
 			.build();
-	}
-	private static LocalDate parseLocalDate(String dateStr) {
-		if (!StringUtils.hasText(dateStr)) {
-			return null;
-		}
-		if (dateStr.contains("T")) {
-			dateStr = dateStr.substring(0, dateStr.indexOf("T"));
-		}
-		return LocalDate.parse(dateStr);
 	}
 }

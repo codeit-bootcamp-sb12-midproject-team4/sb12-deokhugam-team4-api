@@ -19,6 +19,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.test.context.ActiveProfiles;
 
 import com.codeit.deokhugam.domain.book.Book;
 import com.codeit.deokhugam.domain.notification.entity.Notification;
@@ -28,10 +29,8 @@ import com.codeit.deokhugam.domain.review.entity.Review;
 import com.codeit.deokhugam.domain.user.User;
 import com.codeit.deokhugam.global.config.QueryDslConfig;
 
-@DataJpaTest(properties = {
-	"spring.sql.init.mode=never",
-	"spring.jpa.hibernate.ddl-auto=create-drop"
-})
+@DataJpaTest
+@ActiveProfiles("test")
 @Import({
 	NotificationServiceImpl.class,
 	NotificationMapperImpl.class,
@@ -45,6 +44,7 @@ public class NotificationRepositoryTest {
 	private Notification notification1;
 	private Notification notification2;
 	private Notification notification3;
+	private Notification otherUserNotification;
 
 	@Autowired
 	NotificationRepository notificationRepository;
@@ -57,6 +57,12 @@ public class NotificationRepositoryTest {
 		user = entityManager.persist(new User(
 			"user@test.com",
 			"user",
+			"password"
+		));
+
+		otherUser = entityManager.persist(new User(
+			"other@test.com",
+			"other",
 			"password"
 		));
 
@@ -104,8 +110,18 @@ public class NotificationRepositoryTest {
 			.build()
 		);
 
+		otherUserNotification = entityManager.persist(Notification.builder()
+			.user(otherUser)
+			.review(review)
+			.message("otherUserNotification")
+			.build()
+		);
+
 		updateCreatedAt(notification1, "2024-01-01T00:00:00Z");
 		updateCreatedAt(notification2, "2024-01-02T00:00:00Z");
+		updateCreatedAt(notification3, "2024-01-03T00:00:00Z");
+		updateCreatedAt(otherUserNotification, "2024-01-04T00:00:00Z");
+		entityManager.clear();
 	}
 
 	private void updateCreatedAt(Notification notification, String createdAt) {
@@ -121,7 +137,29 @@ public class NotificationRepositoryTest {
 	}
 
 	@Test
-	@DisplayName("단건 조회 성공")
+	@DisplayName("알림 저장 성공")
+	public void save_success() {
+		Notification notification = Notification.builder()
+			.user(user)
+			.review(review)
+			.message("saved notification")
+			.build();
+
+		Notification savedNotification = notificationRepository.save(notification);
+		entityManager.flush();
+		entityManager.clear();
+
+		Notification result = notificationRepository.findById(savedNotification.getId()).orElseThrow();
+
+		assertThat(result.getId()).isNotNull();
+		assertThat(result.getUser().getId()).isEqualTo(user.getId());
+		assertThat(result.getReview().getId()).isEqualTo(review.getId());
+		assertThat(result.getMessage()).isEqualTo("saved notification");
+		assertThat(result.isConfirmed()).isFalse();
+	}
+
+	@Test
+	@DisplayName("알림 조회 성공")
 	public void findByIdAndUserId_success() {
 		Optional<Notification> result = notificationRepository.findByIdAndUserId(
 			notification1.getId(),
@@ -134,15 +172,14 @@ public class NotificationRepositoryTest {
 	}
 
 	@Test
-	@DisplayName("단건 조회 실패")
+	@DisplayName("단건 조회 실패_본인의 알림이 아님")
 	public void findByIdAndUserId_failed() {
 		Optional<Notification> result = notificationRepository.findByIdAndUserId(
 			notification1.getId(),
-			user.getId()
+			otherUser.getId()
 		);
 
-		assertThat(result).isPresent();
-		assertThat(result.get().getId()).isNotEqualTo(notification2.getId());
+		assertThat(result).isEmpty();
 	}
 
 	@Test
@@ -154,14 +191,21 @@ public class NotificationRepositoryTest {
 		entityManager.flush();
 		entityManager.clear();
 
-		List<Notification> notificationList = notificationRepository.findAll();
+		List<Notification> userNotificationList = notificationRepository.findAllByUserIdWithCursorASC(
+			user.getId(),
+			null,
+			PageRequest.of(0, 10, Sort.by(Direction.ASC, "createdAt"))
+		);
+		Notification otherNotification = notificationRepository.findById(otherUserNotification.getId()).orElseThrow();
 
-		assertThat(notificationList).hasSize(3);
-		assertThat(notificationList)
+		assertThat(userNotificationList).hasSize(3);
+		assertThat(userNotificationList)
 			.allSatisfy(notification -> {
 				assertThat(notification.isConfirmed()).isTrue();
 				assertThat(notification.getUpdatedAt()).isEqualTo(now);
 			});
+		assertThat(otherNotification.isConfirmed()).isFalse();
+		assertThat(otherNotification.getUpdatedAt()).isNotEqualTo(now);
 	}
 
 	@Test
@@ -186,6 +230,10 @@ public class NotificationRepositoryTest {
 				notification3.getId(),
 				notification2.getId()
 			);
+		// 다른 사용자가 포함이 되있는지 추출후 비교
+		assertThat(notificationList)
+			.extracting(notification -> notification.getUser().getId())
+			.containsOnly(user.getId());
 	}
 
 	@Test
@@ -210,10 +258,70 @@ public class NotificationRepositoryTest {
 				notification1.getId(),
 				notification2.getId()
 			);
+		assertThat(notificationList)
+			.extracting(notification -> notification.getUser().getId())
+			.containsOnly(user.getId());
 	}
 
 	@Test
-	@DisplayName("삭제 테스트")
+	@DisplayName("DESC 커서보다 오래된 알림만 조회한다")
+	public void findAllByUserIdWithCursorDESC_onlyBeforeCursor() {
+		Pageable pageable = PageRequest.of(
+			0,
+			10,
+			Sort.by(Direction.DESC, "createdAt")
+		);
+
+		List<Notification> notificationList = notificationRepository.findAllByUserIdWithCursorDESC(
+			user.getId(),
+			Instant.parse("2024-01-03T00:00:00Z"),
+			pageable
+		);
+
+		assertThat(notificationList)
+			.extracting(Notification::getId)
+			.containsExactly(
+				notification2.getId(),
+				notification1.getId()
+			);
+	}
+
+	@Test
+	@DisplayName("ASC 커서보다 최신 알림만 조회한다")
+	public void findAllByUserIdWithCursorASC_onlyAfterCursor() {
+		Pageable pageable = PageRequest.of(
+			0,
+			10,
+			Sort.by(Direction.ASC, "createdAt")
+		);
+
+		List<Notification> notificationList = notificationRepository.findAllByUserIdWithCursorASC(
+			user.getId(),
+			Instant.parse("2024-01-01T00:00:00Z"),
+			pageable
+		);
+
+		assertThat(notificationList)
+			.extracting(Notification::getId)
+			.containsExactly(
+				notification2.getId(),
+				notification3.getId()
+			);
+	}
+
+	@Test
+	@DisplayName("사용자별 알림 수를 조회한다")
+	public void countByUserId_success() {
+		long count = notificationRepository.countByUserId(user.getId());
+		long otherUserCount = notificationRepository.countByUserId(otherUser.getId());
+
+		assertThat(count).isEqualTo(3);
+		assertThat(otherUserCount).isEqualTo(1);
+	}
+
+	// 이 메서드는 배치로 진행.
+	@Test
+	@DisplayName("읽음 처리된 알림 삭제 테스트")
 	public void deleteConfirmedNotificationsAfterWeek() {
 		Optional<Notification> notification = notificationRepository.findByIdAndUserId(
 			notification1.getId(),
@@ -238,6 +346,6 @@ public class NotificationRepositoryTest {
 		assertThat(notificationRepository.findById(notification1.getId())).isEmpty();
 		assertThat(notificationRepository.findById(notification2.getId())).isPresent();
 		assertThat(notificationRepository.findById(notification3.getId())).isPresent();
+		assertThat(notificationRepository.findById(otherUserNotification.getId())).isPresent();
 	}
-
 }

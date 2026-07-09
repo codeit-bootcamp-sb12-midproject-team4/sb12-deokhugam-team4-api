@@ -1,10 +1,13 @@
 package com.codeit.deokhugam.domain.booksearch.event;
 
+import java.time.temporal.ChronoUnit;
+
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.document.Document;
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.data.elasticsearch.core.query.UpdateQuery;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
@@ -16,6 +19,7 @@ import com.codeit.deokhugam.domain.booksearch.BookDocument;
 import lombok.RequiredArgsConstructor;
 
 @Component
+@Profile({"dev", "dev-batch", "prod", "test-es"})
 @RequiredArgsConstructor
 public class BookSyncEventListener {
 	private final BookRepository bookRepository;
@@ -36,11 +40,11 @@ public class BookSyncEventListener {
 			.categoryPath(event.getCategoryPath())
 			.reviewCount(book.getReviewCount())
 			.rating(book.getRating())
-			.publishedDate(book.getPublishedDate().toString())
+			.publishedDate(book.getPublishedDate())
 			.isbn(book.getIsbn())
 			.thumbnailKey(book.getThumbnailKey())
-			.createdAt(book.getCreatedAt())
-			.updatedAt(book.getUpdatedAt())
+			.createdAt(book.getCreatedAt().truncatedTo(ChronoUnit.MICROS))
+			.updatedAt(book.getUpdatedAt().truncatedTo(ChronoUnit.MICROS))
 			.build();
 		esOperations.save(document);
 	}
@@ -63,7 +67,7 @@ public class BookSyncEventListener {
 			doc.put("publishedDate", book.getPublishedDate().toString());
 		}
 		if (book.getUpdatedAt() != null) {
-			doc.put("updatedAt", book.getUpdatedAt().toString());
+			doc.put("updatedAt", book.getUpdatedAt().truncatedTo(ChronoUnit.MICROS).toString());
 		}
 		UpdateQuery updateQuery = UpdateQuery.builder(book.getId().toString())
 			.withDocument(doc)

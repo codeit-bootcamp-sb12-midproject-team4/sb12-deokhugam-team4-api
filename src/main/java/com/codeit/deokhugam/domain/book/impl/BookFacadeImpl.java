@@ -23,6 +23,7 @@ import com.codeit.deokhugam.domain.booksearch.impl.BookElasticsearchServiceImpl;
 import com.codeit.deokhugam.domain.bookstatus.BookStatusType;
 import com.codeit.deokhugam.domain.client.category.CategoryClient;
 import com.codeit.deokhugam.domain.client.s3.FileStorageClient;
+import com.codeit.deokhugam.domain.client.s3.ImgType;
 import com.codeit.deokhugam.domain.common.CursorPageResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -46,7 +47,7 @@ public class BookFacadeImpl implements BookFacade {
 		bookService.validateIsbn(req.getIsbn());
 
 		if (img != null && !img.isEmpty()) {
-			imgKey = fileStorageClient.uploadImage(img);
+			imgKey = fileStorageClient.uploadImage(img, ImgType.PREFIX_BOOK);
 			imgUrl = fileStorageClient.getAttachFileUrl(imgKey);
 		}
 
@@ -84,7 +85,7 @@ public class BookFacadeImpl implements BookFacade {
 		if (req.getUserId() != null) {
 			Map<UUID, BookStatusType> statusMap = bookService.getBookStatuses(bookIds, req.getUserId());
 
-			books.forEach(book -> {;
+			books.forEach(book -> {
 				BookStatusType status = statusMap.get(book.getId());
 				book.setStatus(status);
 			});
@@ -126,18 +127,17 @@ public class BookFacadeImpl implements BookFacade {
 	public BookResponse patch(UUID bookId, BookPatchRequest req, MultipartFile img) {
 		String newKey = null;
 		String newUrl = null;
-		String oldKey = null;
+		String oldKey = bookService.getImageKey(bookId);
 		BookResponse res = null;
 
 		if (img != null && !img.isEmpty()) {
-			oldKey = bookService.getImageKey(bookId);
-			newKey = fileStorageClient.uploadImage(img);
+			newKey = fileStorageClient.uploadImage(img, ImgType.PREFIX_BOOK);
 			newUrl = fileStorageClient.getAttachFileUrl(newKey);
 		}
 
 		try {
 			res = bookService.update(bookId, req, newKey);
-			if (oldKey != null) {
+			if (newKey != null) {
 				fileStorageClient.deleteImage(oldKey);
 				log.info("AWS S3 이미지 삭제 완료 (key : {})", oldKey);
 			}

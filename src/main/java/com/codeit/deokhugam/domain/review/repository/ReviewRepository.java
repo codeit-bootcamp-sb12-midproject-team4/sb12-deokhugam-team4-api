@@ -14,6 +14,9 @@ public interface ReviewRepository extends JpaRepository<Review, UUID>, ReviewRep
 	// 도서별 유저 리뷰 존재 여부
 	boolean existsByBookIdAndUserId(UUID bookId, UUID userId);
 
+	@Query("SELECT r FROM Review r JOIN FETCH r.book JOIN FETCH r.user WHERE r.id = :reviewId")
+	Optional<Review> findByIdWithDetails(@Param("reviewId") UUID reviewId);
+
 	// 리뷰 단건 조회
 	Optional<Review> findByIdAndUserId(UUID reviewId, UUID userId);
 
