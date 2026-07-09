@@ -41,9 +41,9 @@ public class CommentService {
 	@Transactional
 	public CommentResponse createComment(CommentCreateRequest request) {
 		User user = userRepository.findById(request.userId())
-			.orElseThrow(CommentNotFoundException::new);
+				.orElseThrow(CommentNotFoundException::new);
 		Review review = reviewRepository.findById(request.reviewId())
-			.orElseThrow(CommentNotFoundException::new);
+				.orElseThrow(CommentNotFoundException::new);
 
 		Comment comment = new Comment(request.content(), user, review);
 		Comment savedComment = commentRepository.save(comment);
@@ -51,8 +51,8 @@ public class CommentService {
 		reviewRepository.increaseCommentCount(review.getId());
 
 		eventPublisher.publishEvent(new CommentCreatedEvent(
-			review.getId(),
-			user.getId()
+				review.getId(),
+				user.getId()
 		));
 
 		return CommentResponse.from(savedComment);
@@ -61,15 +61,23 @@ public class CommentService {
 	// 댓글 목록 조회
 	public List<CommentResponse> getComments(UUID reviewId) {
 		return commentRepository.findByReviewIdAndDeletedAtIsNull(reviewId)
-			.stream()
-			.map(CommentResponse::from)
-			.toList();
+				.stream()
+				.map(CommentResponse::from)
+				.toList();
+	}
+
+	// 내가 쓴 댓글 목록 조회
+	public List<CommentResponse> findMyComments(UUID userId) {
+		return commentRepository.findByUserIdAndDeletedAtIsNull(userId)
+				.stream()
+				.map(CommentResponse::from)
+				.toList();
 	}
 
 	// 댓글 단건 조회
 	public CommentResponse getComment(UUID commentId) {
 		Comment comment = commentRepository.findById(commentId)
-			.orElseThrow(CommentNotFoundException::new);
+				.orElseThrow(CommentNotFoundException::new);
 		if (comment.isDeleted()) {
 			throw new CommentNotFoundException();
 		}
@@ -80,7 +88,7 @@ public class CommentService {
 	@Transactional
 	public CommentResponse updateComment(UUID commentId, UUID userId, CommentUpdateRequest request) {
 		Comment comment = commentRepository.findById(commentId)
-			.orElseThrow(CommentNotFoundException::new);
+				.orElseThrow(CommentNotFoundException::new);
 		if (comment.isDeleted()) {
 			throw new CommentNotFoundException();
 		}
@@ -94,7 +102,7 @@ public class CommentService {
 	@Transactional
 	public void deleteComment(UUID commentId, UUID userId) {
 		Comment comment = commentRepository.findById(commentId)
-			.orElseThrow(CommentNotFoundException::new);
+				.orElseThrow(CommentNotFoundException::new);
 		if (comment.isDeleted()) {
 			throw new CommentNotFoundException();
 		}
@@ -108,7 +116,7 @@ public class CommentService {
 	@Transactional
 	public void hardDeleteComment(UUID commentId) {
 		Comment comment = commentRepository.findById(commentId)
-			.orElseThrow(CommentNotFoundException::new);
+				.orElseThrow(CommentNotFoundException::new);
 
 		UUID reviewId = comment.getReview().getId();
 		commentRepository.delete(comment);
@@ -120,7 +128,7 @@ public class CommentService {
 	@Transactional
 	public void reportComment(UUID commentId, CommentReportRequest request) {
 		Comment comment = commentRepository.findById(commentId)
-			.orElseThrow(CommentNotFoundException::new);
+				.orElseThrow(CommentNotFoundException::new);
 		if (comment.isDeleted()) {
 			throw new CommentNotFoundException();
 		}
@@ -128,7 +136,7 @@ public class CommentService {
 			throw new CommentAlreadyReportedException();
 		}
 		User user = userRepository.findById(request.userId())
-			.orElseThrow(CommentNotFoundException::new);
+				.orElseThrow(CommentNotFoundException::new);
 		commentReportRepository.save(new CommentReport(comment, user, request.reason()));
 	}
 }
