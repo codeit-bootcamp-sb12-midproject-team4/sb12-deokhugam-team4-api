@@ -21,12 +21,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Entity
-@Table(
-	name = "batch_metadata",
-	uniqueConstraints = {
-		@UniqueConstraint(name = "uq_batch_metadata_dataset_id", columnNames = {"dataset_id"})
-	}
-)
+@Table(name = "batch_metadata")
 @IdClass(BatchMetadataId.class)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
