@@ -29,7 +29,7 @@ spring:
             user-name-attribute: id
 
   datasource:
-    url: jdbc:mysql://localhost:3306/deokhugam-db?useSSL=false&serverTimezone=UTC&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://localhost:3306/deokhugam?useSSL=false&serverTimezone=UTC&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
     username: user
     password: 1234
     driver-class-name: com.mysql.cj.jdbc.Driver
