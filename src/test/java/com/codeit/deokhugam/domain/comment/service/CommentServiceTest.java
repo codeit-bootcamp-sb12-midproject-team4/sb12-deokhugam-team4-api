@@ -27,7 +27,8 @@ import com.codeit.deokhugam.global.config.QueryDslConfig;
 
 @DataJpaTest(properties = {
         "spring.sql.init.mode=never",
-        "spring.jpa.hibernate.ddl-auto=create-drop"
+        "spring.jpa.hibernate.ddl-auto=create-drop",
+        "spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.H2Dialect"
 })
 @Import({
         CommentService.class,
