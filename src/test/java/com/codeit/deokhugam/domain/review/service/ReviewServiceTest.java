@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -36,10 +37,8 @@ import com.codeit.deokhugam.domain.reviewlike.repository.ReviewLikeRepository;
 import com.codeit.deokhugam.domain.user.User;
 import com.codeit.deokhugam.global.config.QueryDslConfig;
 
-@DataJpaTest(properties = {
-	"spring.sql.init.mode=never",
-	"spring.jpa.hibernate.ddl-auto=create-drop"
-})
+@DataJpaTest
+@ActiveProfiles("test")
 @Import({
 	ReviewServiceImpl.class,
 	ReviewMapperImpl.class,
