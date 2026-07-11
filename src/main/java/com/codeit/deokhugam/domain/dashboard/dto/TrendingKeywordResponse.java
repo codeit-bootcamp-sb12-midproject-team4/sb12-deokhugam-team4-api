@@ -1,6 +1,5 @@
-package com.codeit.deokhugam.domain.dashboard.dto.response;
+package com.codeit.deokhugam.domain.dashboard.dto;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 

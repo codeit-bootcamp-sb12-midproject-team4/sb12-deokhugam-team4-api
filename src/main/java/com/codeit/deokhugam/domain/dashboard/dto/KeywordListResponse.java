@@ -1,4 +1,4 @@
-package com.codeit.deokhugam.domain.dashboard.dto.response;
+package com.codeit.deokhugam.domain.dashboard.dto;
 
 import java.util.List;
 
