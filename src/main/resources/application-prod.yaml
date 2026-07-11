@@ -1,0 +1,83 @@
+spring:
+  devtools:
+    livereload:
+      enabled: false
+    restart:
+      enabled: false
+  config:
+    activate:
+      on-profile: prod
+
+  security:
+    oauth2:
+      client:
+        registration:
+          kakao:
+            client-id: ${KAKAO_CLIENT_ID}
+            client-secret: ${KAKAO_CLIENT_SECRET}
+            redirect-uri: http://localhost:8080/api/auth/kakao/callback
+            authorization-grant-type: authorization_code
+            client-authentication-method: client_secret_post
+            scope:
+              - profile_nickname
+              - account_email
+        provider:
+          kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user-name-attribute: id
+
+  datasource:
+    url: jdbc:mysql://${AWS_AURORA_HOST}:3306/deokhugam?useSSL=false&serverTimezone=UTC&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
+    username: ${AWS_AURORA_USERNAME}
+    password: ${AWS_AURORA_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate # 정합성 검증 (엔티티 vs 테이블)
+    properties:
+      hibernate:
+        format_sql: false
+        show_sql: false
+        dialect: org.hibernate.dialect.MySQLDialect
+
+  opensearch:
+    uris: ${AWS_OPENSEARCH_URIS}
+    username: ${AWS_OPENSEARCH_USERNAME}
+    password: ${AWS_OPENSEARCH_PASSWORD}
+
+  cloud:
+    aws:
+      s3:
+        bucket: ${AWS_S3_BUCKET_NAME_DEV}
+      credentials:
+        access-key: ${AWS_S3_ACCESS_KEY}
+        secret-key: ${AWS_S3_SECRET_KEY}
+      region:
+        static: ${AWS_S3_REGION}
+
+  app:
+    aws:
+      s3:
+        presigned-url-expiration: ${AWS_S3_PRESIGNED_URL_EXPIRATION}
+
+  api:
+    aladin:
+      client-uri: ${ALADIN_API_CLIENT_URI}
+      client-secret: ${ALADIN_API_CLIENT_SECRET}
+    naver:
+      client-uri: ${NAVER_API_CLIENT_URI}
+      client-id: ${NAVER_API_CLIENT_ID}
+      client-secret: ${NAVER_API_CLIENT_SECRET}
+    ocr:
+      url: ${OCR_API_CLIENT_URL}
+      secret-key: ${OCR_API_CLIENT_KEY}
+
+logging:
+  level:
+    org.hibernate.SQL: ERROR
+    org.springframework.web: INFO
+    com.deokhugam.team4.sb12: INFO
+    root: INFO
