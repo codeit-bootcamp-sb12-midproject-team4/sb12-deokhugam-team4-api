@@ -86,7 +86,7 @@ public class ReviewServiceImpl implements ReviewService {
 	@Override
 	@Transactional(readOnly = true)
 	public ReviewResponse findByReviewId(UUID reviewId, UUID userId) {
-		Review review = reviewRepository.findById(reviewId)
+		Review review = reviewRepository.findByIdWithDetails(reviewId)
 			.orElseThrow(() -> ReviewNotFoundException.withReviewId(reviewId));
 
 		boolean likedByMe = reviewLikeRepository.findByReviewIdAndUserId(reviewId, userId).isPresent();
@@ -198,7 +198,7 @@ public class ReviewServiceImpl implements ReviewService {
 		boolean liked;
 		if (existing.isPresent()) {
 			reviewLikeRepository.delete(existing.get());
-			review.decreaseLikeCount();
+			reviewRepository.decreaseLikeCount(reviewId);
 			liked = false;
 		} else {
 			ReviewLike reviewLike = ReviewLike.builder()
@@ -206,7 +206,7 @@ public class ReviewServiceImpl implements ReviewService {
 				.user(user)
 				.build();
 			reviewLikeRepository.save(reviewLike);
-			review.increaseLikeCount();
+			reviewRepository.increaseLikeCount(reviewId);
 			liked = true;
 
 			eventPublisher.publishEvent(new ReviewLikedEvent(
