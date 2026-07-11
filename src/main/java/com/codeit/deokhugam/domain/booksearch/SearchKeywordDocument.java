@@ -22,10 +22,6 @@ public class SearchKeywordDocument {
 	private String keyword;
 
 	//검색이 수행된 시각
-	@Field(
-		type = FieldType.Date,
-		format = {},
-		pattern = "uuuu-MM-dd'T'HH:mm:ss.SSSSSSX"
-	)
+	@Field(type = FieldType.Date, format = DateFormat.date_time)
 	private Instant searchedAt;
 }
