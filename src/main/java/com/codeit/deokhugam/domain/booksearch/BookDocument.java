@@ -5,7 +5,6 @@ import java.time.LocalDate;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.CompletionField;
-import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
@@ -24,30 +23,30 @@ public class BookDocument {
 	private String id;
 
 	@MultiField(
-		mainField = @Field(type = FieldType.Text, analyzer = "nori"),
+		mainField = @Field(type = FieldType.Text, analyzer = "korean_analyzer"),
 		otherFields = {
 			@InnerField(suffix = "keyword", type = FieldType.Keyword)
 		}
 	)
 	private String title;
 
-	@Field(type = FieldType.Text, analyzer = "nori")
+	@Field(type = FieldType.Text, analyzer = "korean_analyzer")
 	private String author;
 
-	@Field(type = FieldType.Text, analyzer = "nori")
+	@Field(type = FieldType.Text, analyzer = "korean_analyzer")
 	private String description;
 
-	@CompletionField(analyzer = "nori")
+	@CompletionField(analyzer = "korean_analyzer")
 	private String titleSuggest;
 
 	@MultiField(
-		mainField = @Field(type = FieldType.Text, analyzer = "nori"),
+		mainField = @Field(type = FieldType.Text, analyzer = "korean_analyzer"),
 		otherFields = { @InnerField(suffix = "keyword", type = FieldType.Keyword) }
 	)
 	private String publisher;
 
 	@MultiField(
-		mainField = @Field(type = FieldType.Text, analyzer = "nori"),
+		mainField = @Field(type = FieldType.Text, analyzer = "korean_analyzer"),
 		otherFields = { @InnerField(suffix = "keyword", type = FieldType.Keyword) }
 	)
 	private String categoryPath;

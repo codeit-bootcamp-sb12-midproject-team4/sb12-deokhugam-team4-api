@@ -22,11 +22,26 @@ services:
     depends_on:
       - elasticsearch
 
-  logstash:
+  logstash_dev:
     image: logstash:8.11.1
-    container_name: logstash
+    container_name: logstash_dev
     depends_on:
       - elasticsearch
     volumes:
-      - ./logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
-      - ./logstash/mysql-connector-j-8.0.33.jar:/usr/share/logstash/mysql-connector-j-8.0.33.jar:ro
+      - ./logstash_dev/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
+      - ./logstash_dev/mysql-connector-j-8.0.33.jar:/usr/share/logstash/mysql-connector-j-8.0.33.jar:ro
+
+  logstash_prod:
+    image: opensearchproject/logstash-oss-with-opensearch-output-plugin:latest
+    container_name: logstash_prod
+    network_mode: "host"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    env_file:
+      - .env
+    environment:
+      - PIPELINE_WORKERS=1
+      - PIPELINE_BATCH_SIZE=100
+    volumes:
+      - ./logstash_prod/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
+      - ./logstash_prod/mysql-connector-j-8.0.33.jar:/usr/share/logstash/mysql-connector-j-8.0.33.jar:ro
