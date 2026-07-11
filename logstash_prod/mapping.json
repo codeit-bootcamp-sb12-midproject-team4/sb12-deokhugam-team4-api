@@ -12,7 +12,12 @@
   "mappings": {
     "properties": {
       "_class": { "type": "keyword" },
-      "id": { "type": "keyword" },
+      "id": {
+        "type": "keyword",
+        "fields": {
+          "keyword": { "type": "keyword" }
+        }
+      },
       "title": {
         "type": "text",
         "analyzer": "korean_analyzer",

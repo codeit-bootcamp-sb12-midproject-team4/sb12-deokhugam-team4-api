@@ -1,7 +1,6 @@
 package com.codeit.deokhugam.domain.dashboard.impl;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -12,14 +11,19 @@ import com.codeit.deokhugam.domain.common.CursorPageResponse;
 import com.codeit.deokhugam.domain.dashboard.PopularBookRepository;
 import com.codeit.deokhugam.domain.dashboard.PopularReviewRepository;
 import com.codeit.deokhugam.domain.dashboard.PowerUserRepository;
+import com.codeit.deokhugam.domain.dashboard.TrendingKeywordRepository;
+import com.codeit.deokhugam.domain.dashboard.TrendingKeywordSnapshotRepository;
 import com.codeit.deokhugam.domain.dashboard.dto.DashboardRequest;
 import com.codeit.deokhugam.domain.dashboard.dto.PopularBookResponse;
 import com.codeit.deokhugam.domain.dashboard.dto.PopularReviewResponse;
 import com.codeit.deokhugam.domain.dashboard.dto.PowerUserResponse;
+import com.codeit.deokhugam.domain.dashboard.dto.TrendingKeywordResponse;
 import com.codeit.deokhugam.domain.dashboard.entity.PeriodType;
 import com.codeit.deokhugam.domain.dashboard.entity.PopularBook;
 import com.codeit.deokhugam.domain.dashboard.entity.PopularReview;
 import com.codeit.deokhugam.domain.dashboard.entity.PowerUser;
+import com.codeit.deokhugam.domain.dashboard.entity.TrendingKeyword;
+import com.codeit.deokhugam.domain.dashboard.entity.TrendingKeywordSnapshot;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +35,8 @@ public class DashboardService {
 	private final PopularBookRepository popularBookRepository;
 	private final PopularReviewRepository popularReviewRepository;
 	private final PowerUserRepository powerUserRepository;
+	private final TrendingKeywordRepository trendingKeywordRepository;
+	private final TrendingKeywordSnapshotRepository snapshotRepository;
 
 	public CursorPageResponse<PopularBookResponse> getPopularBooks(DashboardRequest req) {
 		Optional<PopularBook> latestDatasetRecord = popularBookRepository.findFirstByPeriodOrderByDatasetIdDesc(req.getPeriod());
@@ -198,11 +204,26 @@ public class DashboardService {
 			.createdAt(entity.getCreatedAt())
 			.rank(entity.getRanking())
 			.score(entity.getScore() != null ? entity.getScore().doubleValue() : 0.0)
-			// ⚠️ 주의: Entity에 reviewScoreSum 필드가 없어서 일단 0.0으로 처리했습니다.
 			.reviewScoreSum(0.0)
 			.likeCount(entity.getLikeCount() != null ? entity.getLikeCount().longValue() : 0L)
 			.commentCount(entity.getCommentCount() != null ? entity.getCommentCount().longValue() : 0L)
 			.build();
+	}
+
+
+	public List<TrendingKeywordResponse> getLatestTrendingKeywords(DashboardRequest req) {
+
+		Optional<TrendingKeywordSnapshot> latestSnapshot = snapshotRepository.findFirstByOrderByDatasetIdDesc();
+
+		if (latestSnapshot.isEmpty()) {
+			return List.of();
+		}
+
+		return trendingKeywordRepository.findTop10BySnapshot_DatasetIdOrderByRankingAsc(latestSnapshot.get().getDatasetId())
+			.stream()
+			.map(TrendingKeywordResponse::from)
+			.collect(Collectors.toList());
+
 	}
 
 }

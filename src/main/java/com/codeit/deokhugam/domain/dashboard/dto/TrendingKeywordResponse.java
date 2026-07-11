@@ -1,15 +1,28 @@
 package com.codeit.deokhugam.domain.dashboard.dto;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import com.codeit.deokhugam.domain.dashboard.entity.TrendingKeyword;
 
-public record TrendingKeywordResponse(
-        Long snapshotId,
-        LocalDateTime calculatedAt,
-        List<TrendingKeywordItem> keywords
-) {
-    public record TrendingKeywordItem(
-            Integer ranking,
-            String keyword
-    ) {}
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class TrendingKeywordResponse {
+	private Integer rank;
+	private String keyword;
+	private Double score;
+
+	public static TrendingKeywordResponse from(TrendingKeyword entity) {
+		return TrendingKeywordResponse.builder()
+			.rank(entity.getRanking())
+			.keyword(entity.getKeyword())
+			.score(entity.getScore().doubleValue())
+			.build();
+	}
 }
