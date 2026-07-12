@@ -3,13 +3,15 @@ package com.codeit.deokhugam.domain.booksearch;
 import java.time.Instant;
 import java.util.UUID;
 
-import lombok.RequiredArgsConstructor;
-
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
 @RequiredArgsConstructor
+@Profile({"dev", "dev-batch", "prod", "test-es"})
 @Transactional(readOnly = true)
 public class SearchKeywordService {
 
