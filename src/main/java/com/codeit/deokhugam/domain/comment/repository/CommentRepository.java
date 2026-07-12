@@ -11,4 +11,5 @@ public interface CommentRepository extends JpaRepository<Comment, UUID> {
 
     List<Comment> findByReviewIdAndDeletedAtIsNull(UUID reviewId);
 
+    List<Comment> findByUserIdAndDeletedAtIsNull(UUID userId);
 }

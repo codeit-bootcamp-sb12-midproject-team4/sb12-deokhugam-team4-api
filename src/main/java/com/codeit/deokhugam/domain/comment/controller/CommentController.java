@@ -35,6 +35,13 @@ public class CommentController {
         return ResponseEntity.ok(commentService.getComments(reviewId));
     }
 
+    // 내가 쓴 댓글 목록 조회
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<CommentResponse>> getMyComments(
+            @PathVariable UUID userId) {
+        return ResponseEntity.ok(commentService.findMyComments(userId));
+    }
+
     // 댓글 단건 조회
     @GetMapping("/{commentId}")
     public ResponseEntity<CommentResponse> getComment(
