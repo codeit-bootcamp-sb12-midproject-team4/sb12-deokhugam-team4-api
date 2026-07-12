@@ -8,6 +8,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.codeit.deokhugam.domain.common.CursorPageResponse;
 import com.codeit.deokhugam.domain.notification.dto.NotificationResponse;
 import com.codeit.deokhugam.domain.notification.dto.NotificationUpdateRequest;
+import com.codeit.deokhugam.domain.notification.dto.PopularReviewNotificationRequest;
 import com.codeit.deokhugam.domain.notification.service.NotificationService;
 
 import jakarta.validation.Valid;
@@ -59,5 +61,12 @@ public class NotificationController {
 		@RequestParam(defaultValue = "20") @Min(1) int limit
 	) {
 		return notificationService.findByUserId(userId, direction, cursor, after, limit);
+	}
+
+	@PostMapping("/internal/popular-reviews")
+	public void postPopularReviewRankingNotifications(
+		@RequestBody @Valid PopularReviewNotificationRequest request
+	) {
+		notificationService.savePopularReviewSelectedNotifications(request.reviewIds(), request.period());
 	}
 }

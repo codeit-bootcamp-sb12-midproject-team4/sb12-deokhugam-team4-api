@@ -1,6 +1,7 @@
 package com.codeit.deokhugam.domain.notification.service;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.data.domain.Sort.Direction;
@@ -18,6 +19,8 @@ public interface NotificationService {
 	void saveReviewLikedNotification(ReviewLikedEvent event);
 
 	void savePopularReviewSelectedNotification(PopularReviewSelectedEvent event);
+
+	void savePopularReviewSelectedNotifications(List<UUID> reviewIds, String period);
 
 	NotificationResponse markNotificationAsRead(
 		UUID notificationId,

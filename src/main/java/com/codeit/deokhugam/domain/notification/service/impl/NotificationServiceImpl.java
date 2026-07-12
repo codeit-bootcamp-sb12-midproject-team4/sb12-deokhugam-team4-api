@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.codeit.deokhugam.domain.common.CursorPageResponse;
+import com.codeit.deokhugam.domain.dashboard.entity.PeriodType;
 import com.codeit.deokhugam.domain.notification.dto.NotificationResponse;
 import com.codeit.deokhugam.domain.notification.entity.Notification;
 import com.codeit.deokhugam.domain.notification.event.CommentCreatedEvent;
@@ -86,15 +87,39 @@ public class NotificationServiceImpl implements NotificationService {
 	@Override
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void savePopularReviewSelectedNotification(PopularReviewSelectedEvent event) {
-		Review review = reviewRepository.findById(event.reviewId())
-			.orElseThrow(() -> ReviewNotFoundException.withReviewId(event.reviewId()));
+		savePopularReviewSelectedNotification(event.reviewId(), event.period());
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public void savePopularReviewSelectedNotifications(List<UUID> reviewIds, String period) {
+		PeriodType periodType = parsePeriod(period);
+
+		for (UUID reviewId : reviewIds) {
+			savePopularReviewSelectedNotification(reviewId, periodType);
+		}
+	}
+
+	// Dto에서 바로 period로 받기?
+	// 아니면 지금처럼 파싱한 후 가공?
+	private PeriodType parsePeriod(String period) {
+		try {
+			return PeriodType.valueOf(period.trim().toUpperCase());
+		} catch (IllegalArgumentException e) {
+			throw new IllegalArgumentException("Invalid period: " + period);
+		}
+	}
+
+	private void savePopularReviewSelectedNotification(UUID reviewId, PeriodType period) {
+		Review review = reviewRepository.findById(reviewId)
+			.orElseThrow(() -> ReviewNotFoundException.withReviewId(reviewId));
 
 		User receiver = review.getUser();
 
 		String message = String.format(
 			"[%s]님의 리뷰가 [%s] 인기 리뷰에 선정되었습니다.",
 			receiver.getNickname(),
-			event.period().getDescription()
+			period.getDescription()
 		);
 
 		saveNotification(receiver, review, message);
