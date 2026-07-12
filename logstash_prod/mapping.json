@@ -1,0 +1,54 @@
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "korean_analyzer": {
+          "type": "custom",
+          "tokenizer": "seunjeon_tokenizer"
+        }
+      }
+    }
+  },
+  "mappings": {
+    "properties": {
+      "_class": { "type": "keyword" },
+      "id": {
+        "type": "keyword",
+        "fields": {
+          "keyword": { "type": "keyword" }
+        }
+      },
+      "title": {
+        "type": "text",
+        "analyzer": "korean_analyzer",
+        "fields": {
+          "keyword": { "type": "keyword" }
+        }
+      },
+      "author": { "type": "text", "analyzer": "korean_analyzer" },
+      "description": { "type": "text", "analyzer": "korean_analyzer" },
+      "titleSuggest": { "type": "completion", "analyzer": "korean_analyzer" },
+      "publisher": {
+        "type": "text",
+        "analyzer": "korean_analyzer",
+        "fields": {
+          "keyword": { "type": "keyword" }
+        }
+      },
+      "categoryPath": {
+        "type": "text",
+        "analyzer": "korean_analyzer",
+        "fields": {
+          "keyword": { "type": "keyword" }
+        }
+      },
+      "reviewCount": { "type": "long" },
+      "rating": { "type": "double" },
+      "publishedDate": { "type": "date", "format": "yyyy-MM-dd" },
+      "isbn": { "type": "keyword" },
+      "thumbnailKey": { "type": "keyword", "index": false },
+      "createdAt": { "type": "date", "format": "strict_date_optional_time||epoch_millis" },
+      "updatedAt": { "type": "date", "format": "strict_date_optional_time||epoch_millis" }
+    }
+  }
+}

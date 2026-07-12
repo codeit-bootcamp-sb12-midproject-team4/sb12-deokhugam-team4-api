@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
 
 import com.codeit.deokhugam.domain.book.Book;
 import com.codeit.deokhugam.domain.common.CursorPageResponse;
@@ -22,10 +23,8 @@ import com.codeit.deokhugam.domain.reviewlike.entity.ReviewLike;
 import com.codeit.deokhugam.domain.user.User;
 import com.codeit.deokhugam.global.config.QueryDslConfig;
 
-@DataJpaTest(properties = {
-	"spring.sql.init.mode=never",
-	"spring.jpa.hibernate.ddl-auto=create-drop"
-})
+@DataJpaTest
+@ActiveProfiles("test")
 @Import(QueryDslConfig.class)
 class ReviewRepositoryTest {
 
@@ -68,10 +67,10 @@ class ReviewRepositoryTest {
 			.publisher("아니지롱")
 			.publishedDate(LocalDate.of(2026, 1, 1))
 			.isbn("12345")
-				.thumbnailKey("thumbnail-key")
-				.reviewCount(0L)
-				.rating(0.0)
-				.build()
+			.thumbnailKey("thumbnail-key")
+			.reviewCount(0L)
+			.rating(0.0)
+			.build()
 		);
 		book2 = entityManager.persist(Book.builder()
 			.title("개구리 왕자")
@@ -80,10 +79,10 @@ class ReviewRepositoryTest {
 			.publisher("아니지롱")
 			.publishedDate(LocalDate.of(2026, 1, 2))
 			.isbn("23456")
-				.thumbnailKey("thumbnail-key")
-				.reviewCount(0L)
-				.rating(0.0)
-				.build());
+			.thumbnailKey("thumbnail-key")
+			.reviewCount(0L)
+			.rating(0.0)
+			.build());
 		book3 = entityManager.persist(Book.builder()
 			.title("백설공주")
 			.author("사과")
@@ -125,23 +124,6 @@ class ReviewRepositoryTest {
 
 		assertThat(review.isOwnedBy(user1.getId())).isTrue();
 		assertThat(review.isOwnedBy(user2.getId())).isFalse();
-	}
-
-	@Test
-	@DisplayName("Review 엔티티 - increaseLikeCount/decreaseLikeCount")
-	void review_likeCount() {
-		Review review = Review.builder()
-			.content("테스트 리뷰")
-			.rating(5)
-			.book(book1)
-			.user(user1)
-			.build();
-
-		review.increaseLikeCount();
-		assertThat(review.getLikeCount()).isEqualTo(1L);
-
-		review.decreaseLikeCount();
-		assertThat(review.getLikeCount()).isEqualTo(0L);
 	}
 
 	@Test

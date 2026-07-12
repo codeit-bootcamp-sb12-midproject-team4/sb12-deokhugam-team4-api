@@ -1,20 +1,19 @@
 spring:
   application:
     name: deokhugam
-    version: 0.0.1
+    version: 1.0.0
   servlet:
     multipart:
       max-file-size: 100MB
       max-request-size: 300MB
   profiles:
-    active: dev   # dev, dev-batch, prod 선택 가능
+    active: dev-batch   # dev, dev-batch, prod 선택 가능
   jackson:
     parser:
       allow-unquoted-control-chars: true  # 탭(code 9), 줄바꿈 등을 허용
 
   jpa:
     open-in-view: false
-    show-sql: false
     properties:
       hibernate:
         format_sql: true
@@ -35,9 +34,9 @@ spring:
     circuitbreaker:
       instances:
         aladinApi:
-          slidingWindowSize: 10     # 최근 10번 호출을 기준으로 판단
-          failureRateThreshold: 50  # 실패율이 50%를 넘으면 차단(Open)
-          waitDurationInOpenState: 10s # 10초 동안 차단 유지 후 Half-Open으로 전환
+          slidingWindowSize: 10
+          failureRateThreshold: 50
+          waitDurationInOpenState: 10s
 
 # log
 logging:

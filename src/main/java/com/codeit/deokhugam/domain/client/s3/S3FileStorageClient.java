@@ -23,7 +23,6 @@ import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignReques
 @Component
 @RequiredArgsConstructor
 public class S3FileStorageClient implements FileStorageClient {
-	private static final String PREFIX = "thumbnail";
 
 	private final S3Client s3Client;
 	private final S3Presigner s3Presigner;
@@ -33,14 +32,14 @@ public class S3FileStorageClient implements FileStorageClient {
 	private long presignedUrlExpiration; // Presigned URL 만료 시간 (초, 기본 10분)
 
 	@Override
-	public String uploadImage(MultipartFile image) {
+	public String uploadImage(MultipartFile image, ImgType type) {
 		String originalName = image.getOriginalFilename();
 		String ext = (originalName != null && originalName.contains("."))
 			? originalName.substring(originalName.lastIndexOf('.'))
 			: "";
 
 		String renamed = Generators.timeBasedEpochGenerator().generate() + ext;
-		String key = PREFIX + "/" + renamed;
+		String key = type.getField() + "/" + renamed;
 
 		uploadToS3(key, image);
 		log.info("첨부파일 S3 업로드 완료: {}", key);

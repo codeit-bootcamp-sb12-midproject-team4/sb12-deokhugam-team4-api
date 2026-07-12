@@ -152,7 +152,7 @@ CREATE TABLE batch_metadata
         'POWER_USER',
         'TRENDING_KEYWORD'
     ) NOT NULL,
-    period ENUM(
+    period        ENUM(
         'REALTIME',
         'DAILY',
         'WEEKLY',
@@ -166,10 +166,7 @@ CREATE TABLE batch_metadata
         DEFAULT CURRENT_TIMESTAMP(6)
         ON UPDATE CURRENT_TIMESTAMP(6),
 
-    CONSTRAINT pk_batch_metadata
-        PRIMARY KEY (metadata_type, period),
-    CONSTRAINT uq_batch_metadata_dataset_id
-        UNIQUE (dataset_id)
+    PRIMARY KEY (metadata_type, period)
 );
 
 CREATE TABLE popular_book
@@ -177,7 +174,7 @@ CREATE TABLE popular_book
     id             BINARY(16)      NOT NULL,
     dataset_id     BIGINT          NOT NULL,
     book_id        BINARY(16)      NOT NULL,
-    period ENUM('DAILY','WEEKLY','MONTHLY','ALL_TIME') NOT NULL,
+    period         ENUM('DAILY','WEEKLY','MONTHLY','ALL_TIME') NOT NULL,
     batch_date     DATE            NOT NULL,
     ranking        INT UNSIGNED    NOT NULL,
     book_title     VARCHAR(255)    NOT NULL,
@@ -203,7 +200,7 @@ CREATE TABLE popular_review
     id             BINARY(16)      NOT NULL,
     dataset_id     BIGINT          NOT NULL,
     review_id      BINARY(16)      NOT NULL,
-    period ENUM('DAILY','WEEKLY','MONTHLY','ALL_TIME') NOT NULL,
+    period         ENUM('DAILY','WEEKLY','MONTHLY','ALL_TIME') NOT NULL,
     batch_date     DATE            NOT NULL,
     ranking        INT UNSIGNED    NOT NULL,
     book_title     VARCHAR(255)    NOT NULL,
@@ -230,7 +227,7 @@ CREATE TABLE power_user
     id            BINARY(16)      NOT NULL,
     dataset_id    BIGINT          NOT NULL,
     user_id       BINARY(16)      NOT NULL,
-    period ENUM('DAILY','WEEKLY','MONTHLY','ALL_TIME') NOT NULL,
+    period        ENUM('DAILY','WEEKLY','MONTHLY','ALL_TIME') NOT NULL,
     batch_date    DATE            NOT NULL,
     ranking       INT UNSIGNED    NOT NULL,
     nickname      VARCHAR(20)     NOT NULL,

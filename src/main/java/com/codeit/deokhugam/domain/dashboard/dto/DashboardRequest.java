@@ -1,14 +1,12 @@
-package com.codeit.deokhugam.domain.book.dto;
-
-import java.util.UUID;
+package com.codeit.deokhugam.domain.dashboard.dto;
 
 import org.springframework.format.annotation.DateTimeFormat;
+
+import com.codeit.deokhugam.domain.dashboard.entity.PeriodType;
 
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -20,19 +18,12 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class BookSearchRequest {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class DashboardRequest { // for PowerUser, PopularBook, PopularReview request
 
-	@Nullable
-	private UUID userId;
-
-	@Nullable
-	private String keyword;
-
-	@NotBlank(message = "정렬 기준은 필수입니다.")
-	@Pattern(regexp = "title|publishedDate|rating|reviewCount|score", message = "정렬 기준은 title, publishedDate, rating, reviewCount, score 중 하나여야 합니다.")
-	private String orderBy;
+	@Builder.Default
+	private PeriodType period = PeriodType.DAILY;
 
 	@Builder.Default
 	@Pattern(regexp = "ASC|DESC", message = "정렬 방향은 ASC 또는 DESC여야 합니다.")

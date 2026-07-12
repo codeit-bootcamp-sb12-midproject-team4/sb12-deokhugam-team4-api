@@ -77,27 +77,6 @@ public class Review extends SoftDeletableEntity {
 		this.attachmentUrl = attachmentUrl;
 	}
 
-	/// TODO: 동시성 이슈 발생지점! -> Repository Layer에서 @OptimisticLock으로 처리
-	public void increaseLikeCount() {
-		this.likeCount++;
-	}
-
-	public void decreaseLikeCount() {
-		if (likeCount > 0) {
-			this.likeCount--;
-		}
-	}
-
-	public void increaseCommentCount() {
-		this.commentCount++;
-	}
-
-	public void decreaseCommentCount() {
-		if (commentCount > 0) {
-			this.commentCount--;
-		}
-	}
-
 	public boolean isOwnedBy(UUID userId) {
 		return this.user.getId().equals(userId);
 	}
